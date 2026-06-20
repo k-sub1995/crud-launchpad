@@ -4,7 +4,7 @@
 
 ## URL
 
-- GitHub Pages: 未設定
+- [GitHub Pages](https://k-sub1995.github.io/crud-launchpad/)
 
 GitHub PagesのGUI公開手順は [docs/github-pages-gui.md](docs/github-pages-gui.md) を参照してください。
 
