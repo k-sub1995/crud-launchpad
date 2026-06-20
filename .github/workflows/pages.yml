@@ -9,6 +9,12 @@ on:
     branches:
       - main
 
+# deploy-pages がGitHub Pagesへ公開するため権限付与
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   deploy:
     name: Deploy static files
@@ -26,16 +32,16 @@ jobs:
 
       # GitHub Pages向けのメタデータや設定を準備
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       # Pages用artifactとしてアップロード
       # リポジトリ直下のindex.htmlを公開入口にするためpath: .
       - name: Upload static files
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: .
 
       # artifactをGitHub Pagesへ反映
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
