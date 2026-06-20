@@ -8,8 +8,10 @@
 
 GitHub Pagesの公開手順は次を参照してください。
 
-- [GUI公開手順](docs/github-pages-gui.md)
-- [Actions公開手順](docs/github-pages-actions.md)
+- [GUI公開手順](docs/github-pages/gui.md)
+- [Actions公開手順](docs/github-pages/actions.md)
+
+AWS公開手順を含むドキュメント全体は [docs/README.md](docs/README.md) を参照してください。
 
 ## 機能
 
@@ -45,9 +47,10 @@ python3 -m http.server 8000
 - `styles.css`: 画面スタイル
 - `script.js`: localStorage を使ったCRUD処理
 - `assets/icon.svg`: ヘッダー用アイコン
+- `docs/README.md`: ドキュメント目次
 - `docs/spec.md`: 仕様メモ
-- `docs/github-pages-gui.md`: GitHub PagesのGUI公開手順
-- `docs/github-pages-actions.md`: GitHub PagesのActions公開手順
+- `docs/github-pages/`: GitHub Pages公開手順
+- `docs/aws/`: AWS公開手順
 - `.github/workflows/pages.yml`: GitHub Pages Actions公開workflow
 
 ## 保存データ
