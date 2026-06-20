@@ -2,17 +2,27 @@
 
 確認日: 2026-06-20
 
-AWS関連の手順は、できるだけ日本語の公式ドキュメントを優先します。
-AWSの画面や推奨構成は変わるため、作業前にリンク先の最新内容も確認します。
+AWS関連の手順で使う参考資料です。
+アカウント登録や初期設定は、まず読みやすい日本語記事で流れをつかみ、サービス仕様や画面差分は公式情報で確認します。
 
 ## AWSアカウント登録と初期設定
 
+AWSを初めて使う場合は、アカウント作成後に最低限のセキュリティ設定と料金確認の準備をしてから作業します。
+
+まず読む資料:
+
+- [新規 AWS アカウント作成手順](https://qiita.com/su_j0shuA/items/b1522a770fcb6495a42b)
+  - AWSアカウント作成の流れを、初心者向けに画面操作ベースで確認できます。
+- [AWS無料プランで個人開発環境を作る 第1回：アカウント初期設定と課金対策](https://qiita.com/rabbit2145/items/6accf375db722a7daa1f)
+  - アカウント作成後に必要な初期設定、root MFA、課金対策をまとめて確認できます。
+- [[AWS] アカウント作成時の初期セキュリティ設定 後編](https://qiita.com/wakinoza/items/f0bfc182db96082524e6)
+  - Budgets、Cost Explorerなど、料金監視まわりの初期設定を補足できます。
+
+困ったときに確認する公式情報:
+
 - [AWS アカウントを作成する](https://docs.aws.amazon.com/ja_jp/accounts/latest/reference/manage-acct-creating.html)
-  - AWSアカウント作成、メール検証、支払い方法、電話確認、サポートプラン選択までの公式手順。
 - [AWS アカウントのルートユーザーのベストプラクティス](https://docs.aws.amazon.com/ja_jp/IAM/latest/UserGuide/root-user-best-practices.html)
-  - ルートユーザーを日常利用しない、MFAを有効化する、アクセスキーを作らないなどの初期セキュリティ確認。
 - [AWS アカウントのルートユーザーの多要素認証](https://docs.aws.amazon.com/ja_jp/IAM/latest/UserGuide/enable-mfa-for-root.html)
-  - ルートユーザーMFAの公式手順。
 
 ## S3単体の静的ウェブサイトホスティング
 
