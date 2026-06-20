@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CRUD Sample</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="page-header">
+        <div class="header-copy">
+          <h1>CRUD Launchpad</h1>
+          <div class="tips-card" aria-label="固定メッセージ">
+            <div class="tips-list">
+              <p class="fixed-message">
+                長崎ペンギン水族館にはペンギン以外も飼育されている
+              </p>
+              <p class="fixed-message">
+                その中には「オヨギピンノ」という絶滅危惧種のカニちゃんがいる
+              </p>
+              <p class="fixed-message">
+                カニちゃんとペンちゃんは仲良いのだろうか
+              </p>
+              <p class="fixed-message">カニペンギンは語呂も良くて可愛い</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="workspace" aria-label="文章管理">
+        <form class="editor" id="entry-form">
+          <div class="section-heading">
+            <h2 id="form-title">文章登録</h2>
+            <p id="form-mode">新しい文章をローカルストレージへ保存します。</p>
+          </div>
+
+          <input type="hidden" id="entry-id" />
+
+          <label for="entry-text">文章</label>
+          <textarea
+            id="entry-text"
+            name="entryText"
+            rows="8"
+            maxlength="1200"
+            placeholder="ここに登録する文章を入力してください。"
+            required
+          ></textarea>
+          <div class="form-footer">
+            <span id="char-count">0 / 1200</span>
+            <div class="actions">
+              <button
+                type="button"
+                class="button secondary"
+                id="cancel-edit"
+                hidden
+              >
+                キャンセル
+              </button>
+              <button type="submit" class="button primary" id="save-button">
+                登録
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <section class="list-panel" aria-labelledby="list-title">
+          <div class="section-heading">
+            <h2 id="list-title">登録文章</h2>
+            <p><span id="result-count">0</span>件の文章があります。</p>
+          </div>
+
+          <label for="search-input">文章検索</label>
+          <div class="search-row">
+            <input
+              type="search"
+              id="search-input"
+              placeholder="キーワードで検索"
+              autocomplete="off"
+            />
+            <button type="button" class="button secondary" id="clear-search">
+              クリア
+            </button>
+          </div>
+
+          <div class="entries" id="entries" aria-live="polite"></div>
+          <p class="empty-state" id="empty-state">
+            まだ文章が登録されていません。
+          </p>
+        </section>
+      </section>
+    </main>
+
+    <template id="entry-template">
+      <article class="entry">
+        <p class="entry-text"></p>
+        <div class="entry-meta">
+          <span class="updated-at"></span>
+          <div class="entry-actions">
+            <button type="button" class="text-button edit-button">更新</button>
+            <button type="button" class="text-button danger delete-button">
+              削除
+            </button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>
