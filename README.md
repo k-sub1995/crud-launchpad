@@ -6,6 +6,8 @@
 
 - GitHub Pages: 未設定
 
+GitHub PagesのGUI公開手順は [docs/github-pages-gui.md](docs/github-pages-gui.md) を参照してください。
+
 ## 機能
 
 - 文章登録
@@ -41,6 +43,7 @@ python3 -m http.server 8000
 - `script.js`: localStorage を使ったCRUD処理
 - `assets/icon.svg`: ヘッダー用アイコン
 - `docs/spec.md`: 仕様メモ
+- `docs/github-pages-gui.md`: GitHub PagesのGUI公開手順
 
 ## 保存データ
 
