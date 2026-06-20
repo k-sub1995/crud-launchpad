@@ -6,7 +6,10 @@
 
 - [GitHub Pages](https://k-sub1995.github.io/crud-launchpad/)
 
-GitHub PagesのGUI公開手順は [docs/github-pages-gui.md](docs/github-pages-gui.md) を参照してください。
+GitHub Pagesの公開手順は次を参照してください。
+
+- [GUI公開手順](docs/github-pages-gui.md)
+- [Actions公開手順](docs/github-pages-actions.md)
 
 ## 機能
 
@@ -44,6 +47,8 @@ python3 -m http.server 8000
 - `assets/icon.svg`: ヘッダー用アイコン
 - `docs/spec.md`: 仕様メモ
 - `docs/github-pages-gui.md`: GitHub PagesのGUI公開手順
+- `docs/github-pages-actions.md`: GitHub PagesのActions公開手順
+- `.github/workflows/pages.yml`: GitHub Pages Actions公開workflow
 
 ## 保存データ
 

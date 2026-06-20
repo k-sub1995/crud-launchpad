@@ -1,0 +1,41 @@
+# GitHub Pagesへ静的サイトを公開するためのworkflow
+# リポジトリ内の静的ファイルをPages用のartifactとしてGitHub Pagesへデプロイ
+
+name: Deploy GitHub Pages
+
+on:
+  # mainブランチへpushされたときに自動で公開
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy static files
+    runs-on: ubuntu-latest
+
+    # deploy-pages actionの出力URLをenvironmentに紐づけて公開URLへ移動しやすくする
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      # リポジトリのファイルをActionsの実行環境で取得
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # GitHub Pages向けのメタデータや設定を準備
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      # Pages用artifactとしてアップロード
+      # リポジトリ直下のindex.htmlを公開入口にするためpath: .
+      - name: Upload static files
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .
+
+      # artifactをGitHub Pagesへ反映
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
