@@ -8,8 +8,8 @@
 
 GitHub Pagesの公開手順は次を参照してください。
 
-- [GUI公開手順](docs/github-pages/gui.md)
-- [Actions公開手順](docs/github-pages/actions.md)
+- [GUI公開手順](docs/github-pages/01-gui.md)
+- [Actions公開手順](docs/github-pages/02-actions.md)
 
 AWS公開手順を含むドキュメント全体は [docs/README.md](docs/README.md) を参照してください。
 
