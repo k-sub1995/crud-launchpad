@@ -6,6 +6,17 @@
 
 - [GitHub Pages](https://k-sub1995.github.io/crud-launchpad/)
 
+## 事前準備
+
+GitHubアカウントとVSCode（任意）を準備します。
+
+- [GitHubアカウント作成手順](https://docs.github.com/ja/get-started/start-your-journey/creating-an-account-on-github)
+- [Visual Studio Codeインストール手順](https://qiita.com/ryosuke_tsuda/items/11fd5965e4c965f67e0c)
+
+## GitHub Pages公開
+
+GitHub Pagesで公開すると、作成した静的サイトをURLで共有してブラウザから利用できます。
+
 GitHub Pagesの公開手順は次を参照してください。
 
 - [GUI公開手順](docs/github-pages/01-gui.md)

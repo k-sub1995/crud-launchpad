@@ -18,12 +18,19 @@
 
 ## AWS
 
-1. [aws/01-sources.md](aws/01-sources.md): AWSアカウント登録、S3、CloudFrontの参考ソース
-2. [aws/02-services.md](aws/02-services.md): 必要サービスと構成の整理
-3. [aws/03-s3-static-hosting.md](aws/03-s3-static-hosting.md): S3単体の静的ウェブサイトホスティング手順
-4. [aws/04-s3-cloudfront-hosting.md](aws/04-s3-cloudfront-hosting.md): S3 + CloudFrontの静的サイト公開手順
+- [aws/README.md](aws/README.md): AWS公開手順の入口
 
-読む順番は、まずAWSの参考ソースと必要サービスを確認し、次にS3単体、最後にS3 + CloudFrontへ進む流れです。
+1. [aws/00-account-signup.md](aws/00-account-signup.md): AWSアカウント作成手順
+2. [aws/01-account-initial-setup.md](aws/01-account-initial-setup.md): AWSアカウント初期設定手順
+3. [aws/02-services.md](aws/02-services.md): 必要サービスと構成の整理
+4. [aws/03-s3-static-hosting.md](aws/03-s3-static-hosting.md): S3単体の静的ウェブサイトホスティング手順
+5. [aws/04-s3-cloudfront-hosting.md](aws/04-s3-cloudfront-hosting.md): S3 + CloudFrontの静的サイト公開手順
+
+読む順番は、AWS公開手順の入口を確認し、AWSアカウント作成、初期設定、必要サービス、S3単体、最後にS3 + CloudFrontへ進む流れです。
+
+補足:
+
+- [images/aws/](images/aws/): AWS手順用スクリーンショット
 
 ## スライド
 
