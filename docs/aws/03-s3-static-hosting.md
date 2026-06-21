@@ -3,6 +3,8 @@
 この手順では、Amazon S3単体で静的ウェブサイトとして公開します。  
 S3単体公開は構成が簡単ですが、S3ウェブサイトエンドポイントはHTTPSに対応しません。
 
+目安: 90分
+
 ## 参考サイト
 
 - [【小ネタ】Amazon S3 で静的ウェブサイトホスティングを試してみた](https://dev.classmethod.jp/articles/aws-s3-web-iwazaki/)

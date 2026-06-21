@@ -3,6 +3,8 @@
 この手順は、CRUD LaunchpadをS3に置き、CloudFront経由で公開するためのものです。
 S3バケットは公開せず、CloudFront Origin Access Control (OAC) を使ってCloudFrontからだけアクセスできる構成にします。
 
+目安: 90分
+
 ## 構成
 
 ```text

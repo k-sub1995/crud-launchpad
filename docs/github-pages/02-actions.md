@@ -3,6 +3,8 @@
 この手順は、GitHub Actionsを使って CRUD Launchpad を GitHub Pages に公開するためのものです。
 GUI公開ではGitHub Pagesがブランチのファイルを直接公開しますが、Actions公開ではworkflowが公開用artifactを作り、そのartifactをGitHub Pagesへデプロイします。
 
+目安: 60分
+
 ## 前提
 
 - GitHubリポジトリにこのプロジェクトがpushされている
