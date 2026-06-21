@@ -1,0 +1,46 @@
+<mxfile host="app.diagrams.net" modified="2026-06-21T00:00:00.000Z" agent="Codex" version="24.7.17" type="device">
+  <diagram id="s3-static-hosting-architecture" name="S3 static hosting">
+    <mxGraphModel adaptiveColors="auto" dx="1092" dy="654" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="430" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="title" value="S3単体 静的ウェブサイトホスティング構成" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="195" y="30" width="510" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="users" value="ユーザー&lt;br&gt;Browser" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.users;" vertex="1" parent="1">
+          <mxGeometry x="80" y="125" width="78" height="78" as="geometry"/>
+        </mxCell>
+        <mxCell id="internet" value="Internet" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.internet;" vertex="1" parent="1">
+          <mxGeometry x="290" y="140" width="78" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="s3" value="Amazon S3&lt;br&gt;Public bucket" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#5A6C86;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="1">
+          <mxGeometry x="545" y="125" width="78" height="78" as="geometry"/>
+        </mxCell>
+        <mxCell id="website-endpoint" value="S3 website endpoint&lt;br&gt;http://&amp;lt;bucket&amp;gt;.s3-website-..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F3F3;strokeColor=#879196;strokeWidth=1;fontColor=#232F3E;fontSize=12;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="470" y="265" width="230" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="http-note" value="HTTPS非対応&lt;br&gt;HTTPで公開" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3F3;strokeColor=#D13212;strokeWidth=1;fontColor=#D13212;fontSize=13;fontStyle=1;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="215" y="265" width="150" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="public-policy" value="&lt;b&gt;Public read&lt;/b&gt;&lt;br&gt;Block Public Accessを外す&lt;br&gt;bucket policyで s3:GetObject を許可" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7ED;strokeColor=#FF9900;strokeWidth=2;fontColor=#232F3E;fontSize=14;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="430" y="350" width="320" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-users-internet" value="HTTP request" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;html=1;strokeWidth=2;strokeColor=#232F3E;fontColor=#232F3E;fontSize=12;" edge="1" parent="1" source="users" target="internet">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-internet-s3" value="website endpoint" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;html=1;strokeWidth=2;strokeColor=#232F3E;fontColor=#232F3E;fontSize=12;" edge="1" parent="1" source="internet" target="s3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-http-note" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=none;html=1;strokeWidth=1.5;strokeColor=#D13212;fontColor=#D13212;fontSize=12;dashed=1;" edge="1" parent="1" source="http-note" target="edge-users-internet">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-endpoint-s3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=none;html=1;strokeWidth=1.5;strokeColor=#879196;fontColor=#545B64;fontSize=12;dashed=1;" edge="1" parent="1" source="website-endpoint" target="s3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-policy-s3" value="公開読み取り" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=none;html=1;strokeWidth=1.5;strokeColor=#FF9900;fontColor=#B45309;fontSize=12;dashed=1;" edge="1" parent="1" source="public-policy" target="s3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
