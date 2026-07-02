@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@keyframes dcflash { 0% { background-color: #ffe9a8; } 100% { background-color: #ffffff; } }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: #f7fafc; }
+</style>
+</helmet>
+
+<div style="font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#0f172a;padding:48px 24px 80px 24px;line-height:1.7">
+<div style="max-width:1080px;margin:0 auto">
+
+  <!-- ============ HERO ============ -->
+  <header data-screen-label="00 導入" style="margin-bottom:56px">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:#ff6b6b;color:#ffffff;padding:6px 16px;border-radius:999px;font-weight:700;font-size:13px;letter-spacing:0.04em">献立アプリで学ぶ React 入門</div>
+    <h1 style="font-size:34px;margin:18px 0 10px 0;line-height:1.3">JavaScript → React 置き換えマップ</h1>
+    <p style="color:#6b7280;font-size:16px;margin:0;max-width:720px">あなたが作った献立検索アプリ（recipe-app）のコードを題材に、Reactの主要概念を「今のコード」と比べながら学びます。左が今のJavaScript、右がReact。デモはどちらも実際に触れます。</p>
+
+    <!-- 全体像 -->
+    <div style="margin-top:32px;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:24px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:16px">画面が変わるまでの流れ — いちばん大事な違い</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px">
+        <span style="background:#fdf1e0;border:1px solid #f3ddb8;color:#92580a;padding:5px 12px;border-radius:999px;font-weight:700;font-size:12px">JavaScript</span>
+        <span style="background:#fdf1e0;border:1px solid #f3ddb8;color:#92580a;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">イベント発生</span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#fdf1e0;border:1px solid #f3ddb8;color:#92580a;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">自分でDOMを探す <span style="font-family:ui-monospace,Menlo,monospace;font-weight:400">getElementById</span></span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#fdf1e0;border:1px solid #f3ddb8;color:#92580a;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">自分で書き換える <span style="font-family:ui-monospace,Menlo,monospace;font-weight:400">innerHTML</span></span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">画面が変わる</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:5px 12px;border-radius:999px;font-weight:700;font-size:12px">React</span>
+        <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">イベント発生</span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">stateを更新 <span style="font-family:ui-monospace,Menlo,monospace;font-weight:400">setLikes(1)</span></span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">Reactが差分を計算</span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">必要な所だけDOM更新</span>
+      </div>
+      <p style="margin:18px 0 0 0;font-size:15px;background:#fdf4f4;border-radius:10px;padding:12px 16px"><strong style="color:#ff6b6b">Reactでは「画面 = stateから計算した結果」。</strong> あなたが触るのはstateだけで、DOMの書き換えはReactの仕事になります。</p>
+    </div>
+
+    <!-- TOC -->
+    <nav style="margin-top:24px;display:flex;flex-wrap:wrap;gap:8px">
+      <a href="#ch1" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">01 JSX</a>
+      <a href="#ch2" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">02 stateとDOM操作</a>
+      <a href="#ch3" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">03 リストとkey</a>
+      <a href="#ch4" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">04 条件付きレンダリング</a>
+      <a href="#ch5" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">05 フォーム</a>
+      <a href="#ch6" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">06 useEffectと保存</a>
+      <a href="#ch7" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">07 コンポーネントとprops</a>
+      <a href="#ch8" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">08 総合: 検索機能</a>
+      <a href="#ch9" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">09 置き換え対応表</a>
+    </nav>
+  </header>
+
+  <!-- ============ CH1 JSX ============ -->
+  <section id="ch1" data-screen-label="01 JSX" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#ff6b6b">01</span>
+      <h2 style="font-size:26px;margin:0">JSX — HTML文字列の組み立てをやめる</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">今の <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">src/ui/ui.js</span> では、テンプレート文字列でHTMLを組み立てて <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">innerHTML</span> に流し込んでいます。Reactでは同じ見た目を <strong>JSX</strong>（JavaScriptの中に書けるタグ構文）で書きます。文字列ではないので、タグの閉じ忘れはエラーで教えてくれます。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">JavaScript — 今のコード（ui.js）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">function renderRecipeListItem(recipe) {
+  <span style="color:#7c8aa5">// ただの「文字列」を組み立てている</span>
+  return `
+    &lt;article class="recipe-card"&gt;
+      &lt;a href="detail.html?id=${recipe.id}"&gt;
+        &lt;strong&gt;${recipe.name}&lt;/strong&gt;
+      &lt;/a&gt;
+    &lt;/article&gt;
+  `;
+}
+
+<span style="color:#7c8aa5">// 使うとき: 文字列をDOMに流し込む</span>
+recipeList.<span style="color:#fcd34d">innerHTML</span> =
+  recipes.map(renderRecipeListItem).join("\n");</pre>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">React — これから</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">function RecipeCard({ recipe }) {
+  <span style="color:#7c8aa5">// 文字列ではなく「JSX」を返す</span>
+  return (
+    &lt;article <span style="color:#fcd34d">className</span>="recipe-card"&gt;
+      &lt;a href={`/recipes/${recipe.id}`}&gt;
+        &lt;strong&gt;<span style="color:#fcd34d">{recipe.name}</span>&lt;/strong&gt;
+      &lt;/a&gt;
+    &lt;/article&gt;
+  );
+}
+
+<span style="color:#7c8aa5">// 使うとき: タグのように書くだけ</span>
+&lt;RecipeCard recipe={recipe} /&gt;</pre>
+      </div>
+    </div>
+    <div style="margin-top:16px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:14px 18px;font-size:14px;color:#4b5563">
+      <strong style="color:#0f172a">JSXの約束ごと（3つだけ）:</strong>&nbsp; ① <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">class</span> は <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">className</span> と書く&nbsp;&nbsp;② タグは必ず閉じる（<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">&lt;input /&gt;</span>）&nbsp;&nbsp;③ <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">{ }</span> の中にJavaScriptの式を書ける（<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">${ }</span> の代わり）
+    </div>
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#fdf4f4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#ff6b6b">Q. JSXはHTMLの新しい書き方？</strong><br>
+      <span style="color:#4b5563">A. いいえ、JavaScriptの構文拡張です。ビルド時にただの関数呼び出しに変換されます。だから <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">{ }</span> の中で変数・関数・三項演算子など、JSの式が全部使えます。</span>
+    </div>
+    </sc-if>
+  </section>
+
+  <!-- ============ CH2 STATE ============ -->
+  <section id="ch2" data-screen-label="02 stateとDOM操作" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#ff6b6b">02</span>
+      <h2 style="font-size:26px;margin:0">state — DOMを触るのをやめて、データを触る</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">レシピカードに「いいね」を付ける例です。JSでは <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">addEventListener</span> で登録し、データ（変数）とDOMの<strong>両方</strong>を自分で更新します。Reactでは <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">useState</span> のデータだけを更新すれば、画面はReactが合わせてくれます。イベントも <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">onClick</span> をタグに直接書きます。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">JavaScript — 今のコード</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// HTML側: あらかじめ id を振っておく</span>
+&lt;button id="likeButton"&gt;♥ いいね&lt;/button&gt;
+&lt;span id="likeCount"&gt;0&lt;/span&gt;
+
+<span style="color:#7c8aa5">// JS側: 探して、聞いて、自分で書き換える</span>
+let likes = 0;
+document.<span style="color:#fcd34d">getElementById</span>("likeButton")
+  .<span style="color:#fcd34d">addEventListener</span>("click", () =&gt; {
+    likes++; <span style="color:#7c8aa5">// ① データを変えて…</span>
+    document.getElementById("likeCount")
+      .<span style="color:#fcd34d">textContent</span> = likes; <span style="color:#7c8aa5">// ② DOMも自分で変える</span>
+  });</pre>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ 触ってみよう（JS版の動き）</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e5e7eb;border-radius:8px;padding:12px">
+            <strong>オムライス</strong>
+            <div style="display:flex;align-items:center;gap:10px">
+              <button onClick="{{ likeJs }}" style="min-height:38px;background:#ff6b6b;color:#ffffff;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px">♥ いいね</button>
+              <span style="font-weight:700;font-size:18px;min-width:24px;text-align:center">{{ likesJs }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">React — これから</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">function LikeButton() {
+  <span style="color:#7c8aa5">// 「状態」を宣言する。likesが今の値、</span>
+  <span style="color:#7c8aa5">// setLikesが値を変える唯一の方法</span>
+  const [likes, setLikes] = <span style="color:#fcd34d">useState</span>(0);
+
+  return (
+    &lt;button <span style="color:#fcd34d">onClick</span>={() =&gt; setLikes(likes + 1)}&gt;
+      ♥ いいね {likes}
+    &lt;/button&gt;
+  );
+  <span style="color:#7c8aa5">// DOM更新のコードはどこにもない。</span>
+  <span style="color:#7c8aa5">// stateが変わる→Reactがこの関数を再実行→画面更新</span>
+}</pre>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ 触ってみよう（React版の動き）</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e5e7eb;border-radius:8px;padding:12px">
+            <strong>オムライス</strong>
+            <div style="display:flex;align-items:center;gap:10px">
+              <button onClick="{{ likeReact }}" style="min-height:38px;background:#ff6b6b;color:#ffffff;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px">♥ いいね {{ likesReact }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#fdf4f4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#ff6b6b">Q. なぜ直接DOMを触ってはいけないの？</strong><br>
+      <span style="color:#4b5563">A. 触ってもいいのですが、アプリが育つと「データとDOMのズレ」がバグの温床になります。detail.js では保存のあとに <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">renderRecipeDetail() → bindDetailControls() → toggleEditMode(false)</span> と、DOMの整合性を保つ処理を自分で全部呼び直していますよね。Reactは「画面は常にstateから計算」なので、このズレが構造的に起きません。</span>
+    </div>
+    </sc-if>
+  </section>
+
+  <!-- ============ CH3 LIST/KEY ============ -->
+  <section id="ch3" data-screen-label="03 リストとkey" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#ff6b6b">03</span>
+      <h2 style="font-size:26px;margin:0">リスト表示とkey — 「全部作り直す」から「差分だけ」へ</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">材料を1つ追加してみてください。<strong style="background:#ffe9a8;padding:1px 6px;border-radius:4px">黄色く光る行</strong>が「実際にDOMが作り直された部分」のイメージです。JS版は <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">innerHTML</span> でリスト全体を作り直しますが、React版は <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">key</span> を手がかりに追加された1行だけをDOMに挿入します。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">JavaScript — 今のコード（ui.js）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">result.<span style="color:#fcd34d">innerHTML</span> = recipes.length
+  ? `&lt;ul&gt;${recipes
+      .map(renderRecipeSearchItem)
+      .<span style="color:#fcd34d">join</span>("\n")}&lt;/ul&gt;`
+  : "&lt;p&gt;該当するレシピがありません。&lt;/p&gt;";
+
+<span style="color:#7c8aa5">// ⚠ 1件増えただけでも、リスト全体のHTMLを</span>
+<span style="color:#7c8aa5">//    文字列から作り直して差し替える</span></pre>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ 材料を追加してみよう（JS版の動き）</div>
+          <ul style="list-style:none;margin:0 0 10px 0;padding:0">
+            <sc-for list="{{ ingJsItems }}" as="it" hint-placeholder-count="2">
+              <li style="padding:8px 12px;border:1px solid #eef0f4;border-radius:8px;margin-bottom:6px;background:#ffffff;font-size:14px;animation:{{ it.anim }}">{{ it.name }}</li>
+            </sc-for>
+          </ul>
+          <div style="display:flex;gap:8px">
+            <input value="{{ ingJsInput }}" onChange="{{ onIngJsInput }}" placeholder="例: ケチャップ 大さじ2" style="flex:1;padding:10px;border:1px solid #e6e9ef;border-radius:6px;font-family:inherit;font-size:14px;min-width:0">
+            <button onClick="{{ addIngJs }}" style="min-height:38px;background:#ff6b6b;color:#ffffff;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px">追加</button>
+          </div>
+          <p style="margin:10px 0 0 0;font-size:12.5px;color:#6b7280">DOM更新: <strong style="color:#92580a">全 {{ ingJsCount }} 行を作り直し</strong>（innerHTML差し替え）</p>
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">React — これから</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">&lt;ul&gt;
+  {ingredients.<span style="color:#fcd34d">map</span>(item =&gt; (
+    &lt;li <span style="color:#fcd34d">key</span>={item.id}&gt;{item.name}&lt;/li&gt;
+  ))}
+&lt;/ul&gt;
+
+<span style="color:#7c8aa5">// key で「どの行がどの行か」をReactが識別できる。</span>
+<span style="color:#7c8aa5">// だから増えた1行だけをDOMに追加できる</span></pre>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ 材料を追加してみよう（React版の動き）</div>
+          <ul style="list-style:none;margin:0 0 10px 0;padding:0">
+            <sc-for list="{{ ingReactItems }}" as="it" hint-placeholder-count="2">
+              <li style="padding:8px 12px;border:1px solid #eef0f4;border-radius:8px;margin-bottom:6px;background:#ffffff;font-size:14px;animation:{{ it.anim }}">{{ it.name }}</li>
+            </sc-for>
+          </ul>
+          <div style="display:flex;gap:8px">
+            <input value="{{ ingReactInput }}" onChange="{{ onIngReactInput }}" placeholder="例: ケチャップ 大さじ2" style="flex:1;padding:10px;border:1px solid #e6e9ef;border-radius:6px;font-family:inherit;font-size:14px;min-width:0">
+            <button onClick="{{ addIngReact }}" style="min-height:38px;background:#ff6b6b;color:#ffffff;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px">追加</button>
+          </div>
+          <p style="margin:10px 0 0 0;font-size:12.5px;color:#6b7280">DOM更新: <strong style="color:#1d55b4">追加した1行だけ挿入</strong>（既存行はそのまま）</p>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:12px;text-align:right">
+      <button onClick="{{ resetIng }}" style="min-height:32px;background:#eee;color:#0f172a;border:none;padding:6px 12px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:12.5px">デモをリセット</button>
+    </div>
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:8px;background:#fdf4f4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#ff6b6b">Q. key って何のためにあるの？ index じゃだめ？</strong><br>
+      <span style="color:#4b5563">A. keyはReactが「前回とどの項目が同じか」を見分ける名札です。レシピアプリには <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">recipe.id</span> がすでにあるので、それをそのまま使えばOK。並び替えや削除があるリストでindexをkeyにすると、名札がズレて誤った再利用が起きます。</span>
+    </div>
+    </sc-if>
+  </section>
+
+  <!-- ============ CH4 CONDITIONAL ============ -->
+  <section id="ch4" data-screen-label="04 条件付きレンダリング" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#ff6b6b">04</span>
+      <h2 style="font-size:26px;margin:0">条件付きレンダリング — 「隠す」から「無くす」へ</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">詳細画面の編集モード切替です。今の <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">detail.js</span> は編集フォームを最初からHTMLに入れておき、<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">display:none</span> で隠しています。Reactは条件式で「描くか、描かないか」を決めます。切り替えながら、下の「DOMの状態」表示を見比べてください。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">JavaScript — 今のコード（detail.js）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">function toggleEditMode(show) {
+  const <span>editMode</span> =
+    document.getElementById("editMode");
+  <span>editMode</span>.<span style="color:#fcd34d">style.display</span> =
+    show ? "block" : "none";
+}
+<span style="color:#7c8aa5">// フォームは常にDOMの中にある。</span>
+<span style="color:#7c8aa5">// 「見えなくしている」だけ</span></pre>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ 編集モードを切り替えよう（JS版の動き）</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <strong style="font-size:16px">{{ nameJs }}</strong>
+            <button onClick="{{ startEditJs }}" style="min-height:34px;background:#eee;color:#0f172a;border:none;padding:6px 12px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">編集する</button>
+          </div>
+          <div style="display:{{ jsEditDisplay }};margin-top:12px;border-top:1px dashed #eef2f7;padding-top:12px">
+            <label style="font-size:13px;color:#6b7280">料理名</label>
+            <input value="{{ draftJs }}" onChange="{{ onDraftJs }}" style="width:100%;padding:10px;border:1px solid #e6e9ef;border-radius:6px;font-family:inherit;font-size:14px;box-sizing:border-box;margin-top:4px">
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button onClick="{{ saveJs }}" style="min-height:34px;background:#ff6b6b;color:#ffffff;border:none;padding:6px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">保存</button>
+              <button onClick="{{ cancelJs }}" style="min-height:34px;background:#eee;color:#0f172a;border:none;padding:6px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">キャンセル</button>
+            </div>
+          </div>
+          <div style="margin-top:12px;background:#f1f5f9;border-radius:8px;padding:10px 12px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#334155">DOMの状態: {{ jsDomNote }}</div>
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">React — これから</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">const [editing, setEditing] = useState(false);
+
+{editing <span style="color:#fcd34d">?</span> (
+  &lt;EditForm recipe={recipe} /&gt;
+) <span style="color:#fcd34d">:</span> (
+  &lt;RecipeDetail recipe={recipe} /&gt;
+)}
+<span style="color:#7c8aa5">// editing が false のとき、</span>
+<span style="color:#7c8aa5">// EditForm はDOMに存在すらしない</span></pre>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ 編集モードを切り替えよう（React版の動き）</div>
+          <sc-if value="{{ notEditReact }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <strong style="font-size:16px">{{ nameReact }}</strong>
+              <button onClick="{{ startEditReact }}" style="min-height:34px;background:#eee;color:#0f172a;border:none;padding:6px 12px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">編集する</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ editReact }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <label style="font-size:13px;color:#6b7280">料理名</label>
+              <input value="{{ draftReact }}" onChange="{{ onDraftReact }}" style="width:100%;padding:10px;border:1px solid #e6e9ef;border-radius:6px;font-family:inherit;font-size:14px;box-sizing:border-box;margin-top:4px">
+              <div style="display:flex;gap:8px;margin-top:10px">
+                <button onClick="{{ saveReact }}" style="min-height:34px;background:#ff6b6b;color:#ffffff;border:none;padding:6px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">保存</button>
+                <button onClick="{{ cancelReact }}" style="min-height:34px;background:#eee;color:#0f172a;border:none;padding:6px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">キャンセル</button>
+              </div>
+            </div>
+          </sc-if>
+          <div style="margin-top:12px;background:#f1f5f9;border-radius:8px;padding:10px 12px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#334155">DOMの状態: {{ reactDomNote }}</div>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#fdf4f4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#ff6b6b">Q. display:none と何が違うの？</strong><br>
+      <span style="color:#4b5563">A. JS版はフォームのHTML・入力値・イベントリスナーが常にメモリに居座ります。React版は不要なときDOMごと無い。表示条件が増えても「HTMLに全部入れて出し分ける」のではなく、条件式を書き足すだけで済みます。</span>
+    </div>
+    </sc-if>
+  </section>
+
+  <!-- ============ CH5 FORM ============ -->
+  <section id="ch5" data-screen-label="05 フォーム" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#ff6b6b">05</span>
+      <h2 style="font-size:26px;margin:0">フォーム — 値を「取りに行く」から「常に持っている」へ</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">レシピ登録フォームの例です。今の <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">form-utils.js</span> は、ボタンが押された瞬間に <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">.value</span> をDOMへ取りに行きます。Reactの<strong>制御コンポーネント</strong>では入力値が常にstateにあるので、入力しながらのバリデーションや連動表示がタダで手に入ります。両方に文字を入れてみてください。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">JavaScript — 今のコード（form-utils.js）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// 値はDOMの中。必要な瞬間に取りに行く</span>
+const text = document
+  .getElementById("recipeText")
+  .<span style="color:#fcd34d">value</span>.trim();
+
+<span style="color:#7c8aa5">// リセットも自分でDOMを触る</span>
+recipeText.value = "";
+recipeUrl.value = "";</pre>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ 入力してからボタンを押そう（JS版の動き）</div>
+          <div style="display:flex;gap:8px">
+            <input ref="{{ jsFormRef }}" placeholder="料理名を入力…" style="flex:1;padding:10px;border:1px solid #e6e9ef;border-radius:6px;font-family:inherit;font-size:14px;min-width:0">
+            <button onClick="{{ readJsForm }}" style="min-height:38px;background:#ff6b6b;color:#ffffff;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px">値を取得</button>
+          </div>
+          <div style="margin-top:12px;background:#f1f5f9;border-radius:8px;padding:10px 12px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#334155">JSが知っている値: {{ jsFormNote }}</div>
+          <p style="margin:10px 0 0 0;font-size:12.5px;color:#6b7280">入力中、JSは値を知りません。ボタンを押した瞬間にDOMへ聞きに行きます。</p>
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">React — これから（制御コンポーネント）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">const [name, setName] = useState("");
+
+&lt;input
+  <span style="color:#fcd34d">value</span>={name}
+  <span style="color:#fcd34d">onChange</span>={e =&gt; setName(e.target.value)}
+/&gt;
+
+<span style="color:#7c8aa5">// 値は常にstateの中 → 連動表示も検証も簡単</span>
+&lt;button disabled={name.trim() === ""}&gt;追加&lt;/button&gt;
+<span style="color:#7c8aa5">// リセットは setName("") を呼ぶだけ</span></pre>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ 入力してみよう（React版の動き）</div>
+          <div style="display:flex;gap:8px">
+            <input value="{{ formReact }}" onChange="{{ onFormReact }}" placeholder="料理名を入力…" style="flex:1;padding:10px;border:1px solid #e6e9ef;border-radius:6px;font-family:inherit;font-size:14px;min-width:0">
+            <button disabled="{{ formReactEmpty }}" onClick="{{ clearFormReact }}" style="min-height:38px;background:#ff6b6b;color:#ffffff;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px;opacity:{{ formReactBtnOpacity }}">リセット</button>
+          </div>
+          <div style="margin-top:12px;background:#f1f5f9;border-radius:8px;padding:10px 12px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#334155">state: "{{ formReact }}"（{{ formReactLen }}文字）</div>
+          <p style="margin:10px 0 0 0;font-size:12.5px;color:#6b7280">1文字打つたびにstateが更新され、文字数もボタンの活性状態も連動します。</p>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#fdf4f4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#ff6b6b">Q. 毎回stateを更新するなんて重くない？</strong><br>
+      <span style="color:#4b5563">A. 実用上は問題ありません。Reactは差分だけ更新するので、1文字の入力で変わるDOMはごくわずかです。それより「値がどこにあるか分からない」バグを減らせる利点の方がずっと大きいです。</span>
+    </div>
+    </sc-if>
+  </section>
+
+  <!-- ============ CH6 USEEFFECT ============ -->
+  <section id="ch6" data-screen-label="06 useEffectと保存" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#ff6b6b">06</span>
+      <h2 style="font-size:26px;margin:0">useEffect — localStorage保存を「呼び忘れない」仕組みに</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">今の <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">recipes.js</span> は追加・更新・削除の<strong>それぞれの関数の中で</strong> <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">saveRecipes()</span> を手動で呼んでいます。Reactの <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">useEffect</span> は「stateが変わったら自動で実行される処理」を1箇所に書けます。下のデモは本物のlocalStorageに保存しています — <strong>ページをリロードしても残る</strong>ので試してみてください。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">JavaScript — 今のコード（recipes.js）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">export function addRecipe(recipe) {
+  recipes.push(normalizeRecipe(recipe));
+  <span style="color:#fcd34d">saveRecipes(recipes)</span>; <span style="color:#7c8aa5">// ← 手動で保存</span>
+}
+export function updateRecipe(id, recipe) {
+  <span style="color:#7c8aa5">// …</span>
+  <span style="color:#fcd34d">saveRecipes(recipes)</span>; <span style="color:#7c8aa5">// ← ここでも手動</span>
+}
+export function deleteRecipe(id) {
+  <span style="color:#7c8aa5">// …</span>
+  <span style="color:#fcd34d">saveRecipes(recipes)</span>; <span style="color:#7c8aa5">// ← 呼び忘れたらバグ</span>
+}</pre>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ レシピ名を保存してみよう（JS版）</div>
+          <div style="display:flex;gap:8px">
+            <input value="{{ lsJsInput }}" onChange="{{ onLsJsInput }}" placeholder="例: カレーライス" style="flex:1;padding:10px;border:1px solid #e6e9ef;border-radius:6px;font-family:inherit;font-size:14px;min-width:0">
+            <button onClick="{{ addLsJs }}" style="min-height:38px;background:#ff6b6b;color:#ffffff;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px">追加</button>
+          </div>
+          <div style="margin-top:12px;background:#f1f5f9;border-radius:8px;padding:10px 12px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#334155;word-break:break-all">localStorageの中身: {{ lsJsRaw }}</div>
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">React — これから</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">const [recipes, setRecipes] = useState(loadRecipes);
+
+<span style="color:#fcd34d">useEffect</span>(() =&gt; {
+  localStorage.setItem(
+    "recipes", JSON.stringify(recipes));
+}, <span style="color:#fcd34d">[recipes]</span>); <span style="color:#7c8aa5">// ← recipesが変わったら自動実行</span>
+
+<span style="color:#7c8aa5">// 追加でも更新でも削除でも、</span>
+<span style="color:#7c8aa5">// 保存のコードはこの1箇所だけ</span></pre>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ レシピ名を保存してみよう（React版）</div>
+          <div style="display:flex;gap:8px">
+            <input value="{{ lsReactInput }}" onChange="{{ onLsReactInput }}" placeholder="例: カレーライス" style="flex:1;padding:10px;border:1px solid #e6e9ef;border-radius:6px;font-family:inherit;font-size:14px;min-width:0">
+            <button onClick="{{ addLsReact }}" style="min-height:38px;background:#ff6b6b;color:#ffffff;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px">追加</button>
+          </div>
+          <div style="margin-top:12px;background:#f1f5f9;border-radius:8px;padding:10px 12px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#334155;word-break:break-all">localStorageの中身: {{ lsReactRaw }}</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:12px;text-align:right">
+      <button onClick="{{ resetLs }}" style="min-height:32px;background:#eee;color:#0f172a;border:none;padding:6px 12px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:12.5px">保存データをリセット</button>
+    </div>
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:8px;background:#fdf4f4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#ff6b6b">Q. useEffect はいつ動くの？</strong><br>
+      <span style="color:#4b5563">A. 画面の描画が終わった後です。第2引数の配列（依存配列）に入れた値が変わったときだけ再実行されます。<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">[]</span> なら初回だけ — 今の <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">initializeRecipes()</span>（起動時の読み込み）に相当します。</span>
+    </div>
+    </sc-if>
+  </section>
+
+  <!-- ============ CH7 COMPONENTS ============ -->
+  <section id="ch7" data-screen-label="07 コンポーネントとprops" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#ff6b6b">07</span>
+      <h2 style="font-size:26px;margin:0">コンポーネントとprops — 画面を「部品」で組み立てる</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">index.html のトップ画面をReactで作るなら、こんな部品に分かれます。同じ <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">RecipeCard</span> 部品を、<strong>props</strong>（部品への引数）を変えて何度も使い回します。今のコードの <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">renderRecipeListItem(recipe)</span> の引数が、そのままpropsになるイメージです。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px;align-items:start">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:14px">トップ画面の分解図</div>
+        <div style="position:relative;border:1.5px dashed #7ea6e0;border-radius:12px;padding:22px 14px 14px 14px">
+          <span style="position:absolute;top:-10px;left:12px;background:#ffffff;padding:0 8px;font-family:ui-monospace,Menlo,monospace;font-size:11px;font-weight:700;color:#1d55b4">&lt;App /&gt;</span>
+          <div style="position:relative;border:1.5px dashed #b9cdec;border-radius:10px;padding:18px 12px 10px 12px;margin-bottom:12px">
+            <span style="position:absolute;top:-9px;left:10px;background:#ffffff;padding:0 6px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#1d55b4">&lt;Header /&gt;</span>
+            <strong style="font-size:15px">献立検索アプリ</strong>
+          </div>
+          <div style="position:relative;border:1.5px dashed #b9cdec;border-radius:10px;padding:18px 12px 12px 12px;margin-bottom:12px">
+            <span style="position:absolute;top:-9px;left:10px;background:#ffffff;padding:0 6px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#1d55b4">&lt;SearchBox /&gt;</span>
+            <div style="display:flex;gap:6px">
+              <div style="flex:1;border:1px solid #e6e9ef;border-radius:6px;padding:7px 10px;font-size:12px;color:#9ca3af">材料または料理名…</div>
+              <div style="background:#ff6b6b;color:#ffffff;border-radius:6px;padding:7px 12px;font-size:12px;font-weight:600">検索</div>
+            </div>
+          </div>
+          <div style="position:relative;border:1.5px dashed #b9cdec;border-radius:10px;padding:18px 12px 12px 12px">
+            <span style="position:absolute;top:-9px;left:10px;background:#ffffff;padding:0 6px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#1d55b4">&lt;RecipeList /&gt;</span>
+            <div style="display:grid;gap:8px">
+              <div style="position:relative;border:1.5px dashed #e3b8b8;border-radius:8px;padding:14px 10px 8px 10px">
+                <span style="position:absolute;top:-9px;left:10px;background:#ffffff;padding:0 6px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#b45050">&lt;RecipeCard recipe={オムライス} /&gt;</span>
+                <span style="font-size:13px">オムライス</span>
+              </div>
+              <div style="position:relative;border:1.5px dashed #e3b8b8;border-radius:8px;padding:14px 10px 8px 10px">
+                <span style="position:absolute;top:-9px;left:10px;background:#ffffff;padding:0 6px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#b45050">&lt;RecipeCard recipe={親子丼} /&gt;</span>
+                <span style="font-size:13px">親子丼</span>
+              </div>
+              <div style="position:relative;border:1.5px dashed #e3b8b8;border-radius:8px;padding:14px 10px 8px 10px">
+                <span style="position:absolute;top:-9px;left:10px;background:#ffffff;padding:0 6px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#b45050">&lt;RecipeCard recipe={カレーライス} /&gt;</span>
+                <span style="font-size:13px">カレーライス</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">React — 部品の定義と利用</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// 部品の定義: propsは「部品への引数」</span>
+function RecipeCard(<span style="color:#fcd34d">{ recipe }</span>) {
+  return (
+    &lt;article <span>className</span>="recipe-card"&gt;
+      &lt;strong&gt;{recipe.name}&lt;/strong&gt;
+      &lt;small&gt;{recipe.ingredients.length} 材料&lt;/small&gt;
+    &lt;/article&gt;
+  );
+}
+
+<span style="color:#7c8aa5">// 組み立て: 親が子にpropsでデータを渡す</span>
+function App() {
+  return (
+    &lt;&gt;
+      &lt;Header /&gt;
+      &lt;SearchBox /&gt;
+      &lt;RecipeList&gt;
+        {recipes.map(r =&gt;
+          &lt;RecipeCard key={r.id} <span style="color:#fcd34d">recipe={r}</span> /&gt;
+        )}
+      &lt;/RecipeList&gt;
+    &lt;/&gt;
+  );
+}</pre>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:14px 18px;font-size:14px;color:#4b5563">
+          <strong style="color:#0f172a">データの流れは一方通行:</strong> 親 → 子 へpropsで渡すだけ。子は受け取ったpropsを変更できません。「誰がデータを持っているか」が常に明確になります。
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#fdf4f4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#ff6b6b">Q. どこまで細かく部品に分ければいいの？</strong><br>
+      <span style="color:#4b5563">A. 最初は分けなくてOK。App.jsxに全部書く → 画面の大きな塊（Header / SearchBox / RecipeList）で分ける → 繰り返し出てくるもの（RecipeCard）を切り出す、の順で十分です。</span>
+    </div>
+    </sc-if>
+  </section>
+
+  <!-- ============ CH8 SEARCH ============ -->
+  <section id="ch8" data-screen-label="08 総合検索" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#ff6b6b">08</span>
+      <h2 style="font-size:26px;margin:0">総合演習 — 材料検索をReactで書き直すと</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">アプリの中心機能、材料検索です。ここまでの概念が全部登場します。注目ポイント: React版は<strong>検索結果をstateに入れません</strong>。結果は「入力stateから毎回計算するだけ」なので、検索ボタンすら不要になります（JS版は「卵」で検索ボタン、React版はただ入力してみてください）。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">JavaScript — 今のコード（app.js 要約）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">function searchRecipe() {
+  <span style="color:#7c8aa5">// ① DOMから入力値を取りに行く</span>
+  const input = document
+    .getElementById("ingredientInput").<span style="color:#fcd34d">value</span>;
+  const terms = normalizeSearchInput(input);
+  <span style="color:#7c8aa5">// ② 検索して…</span>
+  const results =
+    findRecipesByIngredientsOrName(
+      getRecipes(), terms);
+  <span style="color:#7c8aa5">// ③ 結果をHTML文字列にして流し込む</span>
+  <span style="color:#fcd34d">displaySearchResults</span>(results, terms);
+}
+<span style="color:#7c8aa5">// ④ ボタンとEnterキーに自分で紐づける</span>
+searchButton.<span style="color:#fcd34d">addEventListener</span>("click", searchRecipe);</pre>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ 「卵」や「オムライス」で検索（JS版の動き）</div>
+          <div style="display:flex;gap:8px">
+            <input value="{{ searchJsInput }}" onChange="{{ onSearchJsInput }}" onKeyDown="{{ onSearchJsKey }}" placeholder="材料または料理名を入力" style="flex:1;padding:10px;border:1px solid #e6e9ef;border-radius:6px;font-family:inherit;font-size:14px;min-width:0">
+            <button onClick="{{ runSearchJs }}" style="min-height:38px;background:#ff6b6b;color:#ffffff;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px">検索</button>
+          </div>
+          <sc-if value="{{ searchJsIdle }}" hint-placeholder-val="{{ true }}">
+            <p style="margin:12px 0 0 0;font-size:13px;color:#6b7280">検索ボタン（またはEnter）を押すと結果が表示されます。</p>
+          </sc-if>
+          <sc-if value="{{ searchJsHasResults }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:12px;display:grid;gap:8px">
+              <sc-for list="{{ searchJsResults }}" as="r" hint-placeholder-count="1">
+                <div style="border:1px solid #f0f0f2;border-radius:8px;padding:10px 12px;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(250,250,250,0.6))">
+                  <strong style="font-size:14px">{{ r.name }}</strong>
+                  <div style="font-size:12.5px;color:#6b7280;margin-top:2px">{{ r.ing }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ searchJsNoHit }}" hint-placeholder-val="{{ false }}">
+            <p style="margin:12px 0 0 0;font-size:13px;color:#6b7280">該当するレシピがありません。</p>
+          </sc-if>
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">React — これから</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">function SearchPage() {
+  const [query, setQuery] = <span style="color:#fcd34d">useState</span>("");
+
+  <span style="color:#7c8aa5">// 結果はstateに入れない。毎回計算するだけ</span>
+  const results = findRecipes(
+    recipes, normalize(query));
+
+  return (
+    &lt;&gt;
+      &lt;input value={query}
+        <span>onChange</span>={e =&gt; setQuery(e.target.value)} /&gt;
+      &lt;ul&gt;
+        {results.<span style="color:#fcd34d">map</span>(r =&gt;
+          &lt;li <span style="color:#fcd34d">key</span>={r.id}&gt;{r.name}&lt;/li&gt;)}
+      &lt;/ul&gt;
+    &lt;/&gt;
+  );
+}</pre>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ 入力するだけで絞り込み（React版の動き）</div>
+          <input value="{{ searchReactInput }}" onChange="{{ onSearchReactInput }}" placeholder="入力すると即絞り込まれます" style="width:100%;padding:10px;border:1px solid #e6e9ef;border-radius:6px;font-family:inherit;font-size:14px;box-sizing:border-box">
+          <sc-if value="{{ searchReactHasResults }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:12px;display:grid;gap:8px">
+              <sc-for list="{{ searchReactResults }}" as="r" hint-placeholder-count="1">
+                <div style="border:1px solid #f0f0f2;border-radius:8px;padding:10px 12px;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(250,250,250,0.6))">
+                  <strong style="font-size:14px">{{ r.name }}</strong>
+                  <div style="font-size:12.5px;color:#6b7280;margin-top:2px">{{ r.ing }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ searchReactNoHit }}" hint-placeholder-val="{{ false }}">
+            <p style="margin:12px 0 0 0;font-size:13px;color:#6b7280">該当するレシピがありません。</p>
+          </sc-if>
+          <div style="margin-top:12px;background:#f1f5f9;border-radius:8px;padding:10px 12px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#334155">query: "{{ searchReactInput }}" → results.length = {{ searchReactCount }}</div>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#fdf4f4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#ff6b6b">Q. 検索結果もuseStateに入れるべき？</strong><br>
+      <span style="color:#4b5563">A. 入れません。入力（query）から計算できる値は「派生値」としてレンダリングのたびに計算します。stateを最小限にするのがReactの定石で、今のコードのグローバル変数 <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">currentSearchIngredients</span> のような「同期し忘れ」を防げます。</span>
+    </div>
+    </sc-if>
+  </section>
+
+  <!-- ============ CH9 SUMMARY ============ -->
+  <section id="ch9" data-screen-label="09 対応表" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#ff6b6b">09</span>
+      <h2 style="font-size:26px;margin:0">置き換え対応表 — 今のコードはこうなる</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">リプレース作業のチートシートです。左のパターンをコードで見つけたら、右の考え方に置き換えます。</p>
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);overflow:hidden">
+      <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;padding:12px 20px;background:#f8fafc;font-size:12px;font-weight:700;letter-spacing:0.06em;color:#6b7280">
+        <span>JavaScript（今のコード）</span><span></span><span>React（これから）</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;padding:14px 20px;border-top:1px solid #f1f5f9;font-size:13.5px">
+        <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#92580a">document.getElementById(...)</span><span style="color:#9ca3af;font-weight:700;text-align:center">→</span><span>不要。JSXに直接書く（どうしても必要なら <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#1d55b4">useRef</span>）</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;padding:14px 20px;border-top:1px solid #f1f5f9;font-size:13.5px">
+        <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#92580a">el.innerHTML = `...` / textContent</span><span style="color:#9ca3af;font-weight:700;text-align:center">→</span><span>JSXを返す。stateが変わればReactが更新</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;padding:14px 20px;border-top:1px solid #f1f5f9;font-size:13.5px">
+        <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#92580a">addEventListener("click", fn)</span><span style="color:#9ca3af;font-weight:700;text-align:center">→</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#1d55b4">onClick={fn}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;padding:14px 20px;border-top:1px solid #f1f5f9;font-size:13.5px">
+        <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#92580a">let recipes = [] などの可変変数</span><span style="color:#9ca3af;font-weight:700;text-align:center">→</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#1d55b4">const [recipes, setRecipes] = useState([])</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;padding:14px 20px;border-top:1px solid #f1f5f9;font-size:13.5px">
+        <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#92580a">input.value を読む / 書く</span><span style="color:#9ca3af;font-weight:700;text-align:center">→</span><span>制御コンポーネント（<span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#1d55b4">value + onChange</span>）</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;padding:14px 20px;border-top:1px solid #f1f5f9;font-size:13.5px">
+        <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#92580a">style.display = "none" で出し分け</span><span style="color:#9ca3af;font-weight:700;text-align:center">→</span><span>条件付きレンダリング（<span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#1d55b4">editing ? A : B</span>）</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;padding:14px 20px;border-top:1px solid #f1f5f9;font-size:13.5px">
+        <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#92580a">map(...).join("\n") でHTML文字列化</span><span style="color:#9ca3af;font-weight:700;text-align:center">→</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#1d55b4">map(r =&gt; &lt;li key={r.id}&gt;...&lt;/li&gt;)</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;padding:14px 20px;border-top:1px solid #f1f5f9;font-size:13.5px">
+        <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#92580a">saveRecipes() を各所で手動呼び出し</span><span style="color:#9ca3af;font-weight:700;text-align:center">→</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#1d55b4">useEffect(save, [recipes])</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;padding:14px 20px;border-top:1px solid #f1f5f9;font-size:13.5px">
+        <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#92580a">detail.html?id=1 へページ遷移</span><span style="color:#9ca3af;font-weight:700;text-align:center">→</span><span>ルーティング（React Router / Next.jsで学ぶ）</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;padding:14px 20px;border-top:1px solid #f1f5f9;font-size:13.5px">
+        <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#92580a">renderRecipeListItem(recipe) 関数</span><span style="color:#9ca3af;font-weight:700;text-align:center">→</span><span>コンポーネント <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#1d55b4">&lt;RecipeCard recipe={r} /&gt;</span></span>
+      </div>
+    </div>
+
+    <div style="margin-top:32px;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:24px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:14px">次のステップ — リプレースの進め方</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">① react-learning/ の環境で App.jsx に検索画面を全部書く</span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">② Header / SearchBox / RecipeList に分割</span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">③ useEffect で localStorage 連携</span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">④ 詳細・編集・削除 → ルーティングへ</span>
+      </div>
+      <p style="margin:16px 0 0 0;font-size:14px;color:#6b7280">公式チュートリアルはこちら: <a href="https://ja.react.dev/learn" target="_blank" rel="noopener noreferrer" style="color:#ff6b6b;font-weight:600">ja.react.dev/learn</a> — この教材の各章は公式の「Reactの流儀」「state:コンポーネントのメモリ」「エフェクト」に対応しています。</p>
+    </div>
+  </section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showQa&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;表示&quot;,&quot;description&quot;:&quot;各章のQ&amp;Aコラムを表示&quot;},&quot;flashEnabled&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;表示&quot;,&quot;description&quot;:&quot;リストデモのDOM更新フラッシュ（黄色）を表示&quot;}}">
+class Component extends DCLogic {
+  state = {
+    likesJs: 0,
+    likesReact: 0,
+    ingJs: [{ id: 1, name: "卵 2個" }, { id: 2, name: "ご飯 1杯" }],
+    ingReact: [{ id: 1, name: "卵 2個" }, { id: 2, name: "ご飯 1杯" }],
+    ingJsInput: "",
+    ingReactInput: "",
+    ingJsFlash: [],
+    ingReactFlash: [],
+    nameJs: "オムライス",
+    editJs: false,
+    draftJs: "オムライス",
+    nameReact: "オムライス",
+    editReact: false,
+    draftReact: "オムライス",
+    jsFormResult: null,
+    formReact: "",
+    lsJs: [],
+    lsReact: [],
+    lsJsInput: "",
+    lsReactInput: "",
+    searchJsInput: "",
+    searchJsResults: null,
+    searchReactInput: ""
+  };
+
+  jsFormRef = React.createRef();
+  nextId = 3;
+  flashTimer = null;
+
+  RECIPES = [
+    { id: 1, name: "オムライス", ing: ["卵", "ご飯", "ケチャップ"] },
+    { id: 2, name: "親子丼", ing: ["鶏肉", "卵", "玉ねぎ"] },
+    { id: 3, name: "カレーライス", ing: ["じゃがいも", "にんじん", "玉ねぎ"] }
+  ];
+
+  componentDidMount() {
+    try {
+      const js = JSON.parse(localStorage.getItem("rl-demo-js") || "[]");
+      const re = JSON.parse(localStorage.getItem("rl-demo-react") || "[]");
+      this.setState({ lsJs: Array.isArray(js) ? js : [], lsReact: Array.isArray(re) ? re : [] });
+    } catch (e) { /* 破損データは無視 */ }
+  }
+
+  // React流: stateの変化を検知して自動保存（useEffectと同じ役割）
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevState || prevState.lsReact !== this.state.lsReact) {
+      localStorage.setItem("rl-demo-react", JSON.stringify(this.state.lsReact));
+    }
+  }
+
+  scheduleFlashClear = () => {
+    clearTimeout(this.flashTimer);
+    this.flashTimer = setTimeout(() => this.setState({ ingJsFlash: [], ingReactFlash: [] }), 950);
+  };
+
+  // ---- ch2 いいね ----
+  likeJs = () => this.setState(s => ({ likesJs: s.likesJs + 1 }));
+  likeReact = () => this.setState(s => ({ likesReact: s.likesReact + 1 }));
+
+  // ---- ch3 リスト ----
+  onIngJsInput = (e) => this.setState({ ingJsInput: e.target.value });
+  onIngReactInput = (e) => this.setState({ ingReactInput: e.target.value });
+  addIngJs = () => {
+    const name = this.state.ingJsInput.trim();
+    if (!name) return;
+    const id = this.nextId++;
+    const list = [...this.state.ingJs, { id, name }];
+    this.setState({ ingJs: list, ingJsInput: "", ingJsFlash: list.map(i => i.id) });
+    this.scheduleFlashClear();
+  };
+  addIngReact = () => {
+    const name = this.state.ingReactInput.trim();
+    if (!name) return;
+    const id = this.nextId++;
+    this.setState(s => ({ ingReact: [...s.ingReact, { id, name }], ingReactInput: "", ingReactFlash: [id] }));
+    this.scheduleFlashClear();
+  };
+  resetIng = () => this.setState({
+    ingJs: [{ id: 1, name: "卵 2個" }, { id: 2, name: "ご飯 1杯" }],
+    ingReact: [{ id: 1, name: "卵 2個" }, { id: 2, name: "ご飯 1杯" }],
+    ingJsFlash: [], ingReactFlash: [], ingJsInput: "", ingReactInput: ""
+  });
+
+  // ---- ch4 編集モード ----
+  startEditJs = () => this.setState(s => ({ editJs: true, draftJs: s.nameJs }));
+  cancelJs = () => this.setState({ editJs: false });
+  saveJs = () => this.setState(s => ({ nameJs: s.draftJs.trim() || s.nameJs, editJs: false }));
+  onDraftJs = (e) => this.setState({ draftJs: e.target.value });
+  startEditReact = () => this.setState(s => ({ editReact: true, draftReact: s.nameReact }));
+  cancelReact = () => this.setState({ editReact: false });
+  saveReact = () => this.setState(s => ({ nameReact: s.draftReact.trim() || s.nameReact, editReact: false }));
+  onDraftReact = (e) => this.setState({ draftReact: e.target.value });
+
+  // ---- ch5 フォーム ----
+  readJsForm = () => {
+    const el = this.jsFormRef.current;
+    this.setState({ jsFormResult: el ? el.value : "" });
+  };
+  onFormReact = (e) => this.setState({ formReact: e.target.value });
+  clearFormReact = () => this.setState({ formReact: "" });
+
+  // ---- ch6 localStorage ----
+  onLsJsInput = (e) => this.setState({ lsJsInput: e.target.value });
+  onLsReactInput = (e) => this.setState({ lsReactInput: e.target.value });
+  addLsJs = () => {
+    const v = this.state.lsJsInput.trim();
+    if (!v) return;
+    const list = [...this.state.lsJs, v];
+    // JS流: 変更のたびに手動で保存を呼ぶ
+    localStorage.setItem("rl-demo-js", JSON.stringify(list));
+    this.setState({ lsJs: list, lsJsInput: "" });
+  };
+  addLsReact = () => {
+    const v = this.state.lsReactInput.trim();
+    if (!v) return;
+    // React流: stateを変えるだけ。保存は componentDidUpdate（useEffect相当）が担当
+    this.setState(s => ({ lsReact: [...s.lsReact, v], lsReactInput: "" }));
+  };
+  resetLs = () => {
+    localStorage.setItem("rl-demo-js", "[]");
+    localStorage.setItem("rl-demo-react", "[]");
+    this.setState({ lsJs: [], lsReact: [], lsJsInput: "", lsReactInput: "" });
+  };
+
+  // ---- ch8 検索 ----
+  search(q) {
+    const terms = String(q).trim().toLowerCase().split(/\s+/).filter(Boolean);
+    if (!terms.length) return [];
+    return this.RECIPES
+      .filter(r => terms.some(t =>
+        r.name.toLowerCase().includes(t) || r.ing.some(i => i.toLowerCase().includes(t))
+      ))
+      .map(r => ({ id: r.id, name: r.name, ing: r.ing.join("、") }));
+  }
+  onSearchJsInput = (e) => this.setState({ searchJsInput: e.target.value });
+  runSearchJs = () => this.setState(s => ({ searchJsResults: this.search(s.searchJsInput) }));
+  onSearchJsKey = (e) => {
+    if (e.key === "Enter") { e.preventDefault(); this.runSearchJs(); }
+  };
+  onSearchReactInput = (e) => this.setState({ searchReactInput: e.target.value });
+
+  renderVals() {
+    const s = this.state;
+    const flashOn = this.props.flashEnabled ?? true;
+    const FLASH = "dcflash 0.9s ease-out";
+    const anim = (flags, id) => (flashOn && flags.includes(id)) ? FLASH : "none";
+
+    const searchJsHasRun = s.searchJsResults !== null;
+    const searchReactOn = s.searchReactInput.trim() !== "";
+    const searchReactResults = searchReactOn ? this.search(s.searchReactInput) : [];
+
+    return {
+      qaOn: this.props.showQa ?? true,
+
+      // ch2
+      likesJs: s.likesJs, likesReact: s.likesReact,
+      likeJs: this.likeJs, likeReact: this.likeReact,
+
+      // ch3
+      ingJsItems: s.ingJs.map(it => ({ name: it.name, anim: anim(s.ingJsFlash, it.id) })),
+      ingReactItems: s.ingReact.map(it => ({ name: it.name, anim: anim(s.ingReactFlash, it.id) })),
+      ingJsCount: s.ingJs.length,
+      ingJsInput: s.ingJsInput, ingReactInput: s.ingReactInput,
+      onIngJsInput: this.onIngJsInput, onIngReactInput: this.onIngReactInput,
+      addIngJs: this.addIngJs, addIngReact: this.addIngReact, resetIng: this.resetIng,
+
+      // ch4
+      nameJs: s.nameJs, nameReact: s.nameReact,
+      editJs: s.editJs, editReact: s.editReact, notEditReact: !s.editReact,
+      draftJs: s.draftJs, draftReact: s.draftReact,
+      onDraftJs: this.onDraftJs, onDraftReact: this.onDraftReact,
+      startEditJs: this.startEditJs, cancelJs: this.cancelJs, saveJs: this.saveJs,
+      startEditReact: this.startEditReact, cancelReact: this.cancelReact, saveReact: this.saveReact,
+      jsEditDisplay: s.editJs ? "block" : "none",
+      jsDomNote: s.editJs
+        ? '<div id="editMode" style="display:block"> — 常にDOMに存在（いま表示中）'
+        : '<div id="editMode" style="display:none"> — 常にDOMに存在（隠れているだけ）',
+      reactDomNote: s.editReact
+        ? "<EditForm> がDOMにマウントされている"
+        : "編集フォームはDOMに存在しない（隠すのではなく、無い）",
+
+      // ch5
+      jsFormRef: this.jsFormRef,
+      readJsForm: this.readJsForm,
+      jsFormNote: s.jsFormResult === null
+        ? "（まだ何も知らない）"
+        : (s.jsFormResult === "" ? '""（空文字）' : '"' + s.jsFormResult + '"'),
+      formReact: s.formReact,
+      formReactLen: s.formReact.length,
+      formReactEmpty: s.formReact.trim() === "",
+      formReactBtnOpacity: s.formReact.trim() === "" ? 0.45 : 1,
+      onFormReact: this.onFormReact, clearFormReact: this.clearFormReact,
+
+      // ch6
+      lsJsInput: s.lsJsInput, lsReactInput: s.lsReactInput,
+      onLsJsInput: this.onLsJsInput, onLsReactInput: this.onLsReactInput,
+      addLsJs: this.addLsJs, addLsReact: this.addLsReact, resetLs: this.resetLs,
+      lsJsRaw: s.lsJs.length ? JSON.stringify(s.lsJs) : "（まだ空です）",
+      lsReactRaw: s.lsReact.length ? JSON.stringify(s.lsReact) : "（まだ空です）",
+
+      // ch8
+      searchJsInput: s.searchJsInput,
+      onSearchJsInput: this.onSearchJsInput,
+      onSearchJsKey: this.onSearchJsKey,
+      runSearchJs: this.runSearchJs,
+      searchJsIdle: !searchJsHasRun,
+      searchJsHasResults: searchJsHasRun && s.searchJsResults.length > 0,
+      searchJsNoHit: searchJsHasRun && s.searchJsResults.length === 0,
+      searchJsResults: s.searchJsResults || [],
+      searchReactInput: s.searchReactInput,
+      onSearchReactInput: this.onSearchReactInput,
+      searchReactHasResults: searchReactOn && searchReactResults.length > 0,
+      searchReactNoHit: searchReactOn && searchReactResults.length === 0,
+      searchReactResults: searchReactResults,
+      searchReactCount: searchReactResults.length
+    };
+  }
+}
+</script>
+</body>
+</html>
