@@ -1,19 +1,19 @@
-const STORAGE_KEY = "static-launchpad.entries.v1";
+const STORAGE_KEY = 'static-launchpad.entries.v1';
 
-const form = document.querySelector("#entry-form");
-const entryIdInput = document.querySelector("#entry-id");
-const entryTextInput = document.querySelector("#entry-text");
-const saveButton = document.querySelector("#save-button");
-const cancelEditButton = document.querySelector("#cancel-edit");
-const formTitle = document.querySelector("#form-title");
-const formMode = document.querySelector("#form-mode");
-const charCount = document.querySelector("#char-count");
-const searchInput = document.querySelector("#search-input");
-const clearSearchButton = document.querySelector("#clear-search");
-const entriesContainer = document.querySelector("#entries");
-const emptyState = document.querySelector("#empty-state");
-const resultCount = document.querySelector("#result-count");
-const entryTemplate = document.querySelector("#entry-template");
+const form = document.querySelector('#entry-form');
+const entryIdInput = document.querySelector('#entry-id');
+const entryTextInput = document.querySelector('#entry-text');
+const saveButton = document.querySelector('#save-button');
+const cancelEditButton = document.querySelector('#cancel-edit');
+const formTitle = document.querySelector('#form-title');
+const formMode = document.querySelector('#form-mode');
+const charCount = document.querySelector('#char-count');
+const searchInput = document.querySelector('#search-input');
+const clearSearchButton = document.querySelector('#clear-search');
+const entriesContainer = document.querySelector('#entries');
+const emptyState = document.querySelector('#empty-state');
+const resultCount = document.querySelector('#result-count');
+const entryTemplate = document.querySelector('#entry-template');
 
 let entries = loadEntries();
 
@@ -37,9 +37,9 @@ function saveEntries() {
 }
 
 function formatDate(value) {
-  return new Intl.DateTimeFormat("ja-JP", {
-    dateStyle: "medium",
-    timeStyle: "short",
+  return new Intl.DateTimeFormat('ja-JP', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
   }).format(new Date(value));
 }
 
@@ -60,9 +60,9 @@ function renderEntries() {
 
   filteredEntries.forEach((entry) => {
     const fragment = entryTemplate.content.cloneNode(true);
-    const article = fragment.querySelector(".entry");
-    const entryText = fragment.querySelector(".entry-text");
-    const updatedAt = fragment.querySelector(".updated-at");
+    const article = fragment.querySelector('.entry');
+    const entryText = fragment.querySelector('.entry-text');
+    const updatedAt = fragment.querySelector('.updated-at');
 
     article.dataset.id = entry.id;
     entryText.textContent = entry.text;
@@ -71,8 +71,8 @@ function renderEntries() {
   });
 
   emptyState.textContent = searchInput.value.trim()
-    ? "検索条件に一致する文章はありません。"
-    : "まだ文章が登録されていません。";
+    ? '検索条件に一致する文章はありません。'
+    : 'まだ文章が登録されていません。';
   emptyState.hidden = filteredEntries.length > 0;
 }
 
@@ -82,16 +82,16 @@ function updateCharacterCount() {
 
 function resetForm() {
   form.reset();
-  entryIdInput.value = "";
-  formTitle.textContent = "文章登録";
-  formMode.textContent = "新しい文章をローカルストレージへ保存します。";
-  saveButton.textContent = "登録";
+  entryIdInput.value = '';
+  formTitle.textContent = '文章登録';
+  formMode.textContent = '新しい文章をローカルストレージへ保存します。';
+  saveButton.textContent = '登録';
   cancelEditButton.hidden = true;
   updateCharacterCount();
 }
 
 function createEntryId() {
-  if (window.crypto && typeof window.crypto.randomUUID === "function") {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
     return window.crypto.randomUUID();
   }
 
@@ -123,15 +123,15 @@ function upsertEntry(text) {
 function startEdit(entry) {
   entryIdInput.value = entry.id;
   entryTextInput.value = entry.text;
-  formTitle.textContent = "文章更新";
-  formMode.textContent = "選択した文章を更新します。";
-  saveButton.textContent = "更新";
+  formTitle.textContent = '文章更新';
+  formMode.textContent = '選択した文章を更新します。';
+  saveButton.textContent = '更新';
   cancelEditButton.hidden = false;
   updateCharacterCount();
   entryTextInput.focus();
 }
 
-form.addEventListener("submit", (event) => {
+form.addEventListener('submit', (event) => {
   event.preventDefault();
 
   const text = entryTextInput.value.trim();
@@ -146,35 +146,37 @@ form.addEventListener("submit", (event) => {
   renderEntries();
 });
 
-entryTextInput.addEventListener("input", updateCharacterCount);
+entryTextInput.addEventListener('input', updateCharacterCount);
 
-cancelEditButton.addEventListener("click", resetForm);
+cancelEditButton.addEventListener('click', resetForm);
 
-searchInput.addEventListener("input", renderEntries);
+searchInput.addEventListener('input', renderEntries);
 
-clearSearchButton.addEventListener("click", () => {
-  searchInput.value = "";
+clearSearchButton.addEventListener('click', () => {
+  searchInput.value = '';
   renderEntries();
   searchInput.focus();
 });
 
-entriesContainer.addEventListener("click", (event) => {
-  const entryElement = event.target.closest(".entry");
+entriesContainer.addEventListener('click', (event) => {
+  const entryElement = event.target.closest('.entry');
   if (!entryElement) {
     return;
   }
 
-  const entry = entries.find((candidate) => candidate.id === entryElement.dataset.id);
+  const entry = entries.find(
+    (candidate) => candidate.id === entryElement.dataset.id,
+  );
   if (!entry) {
     return;
   }
 
-  if (event.target.matches(".edit-button")) {
+  if (event.target.matches('.edit-button')) {
     startEdit(entry);
     return;
   }
 
-  if (event.target.matches(".delete-button")) {
+  if (event.target.matches('.delete-button')) {
     entries = entries.filter((candidate) => candidate.id !== entry.id);
     saveEntries();
 
@@ -188,3 +190,7 @@ entriesContainer.addEventListener("click", (event) => {
 
 updateCharacterCount();
 renderEntries();
+
+document.getElementById('go-react-study').addEventListener('click', () => {
+  location.href = './docs/study/React学習/React学習ページ.dc.html';
+});
