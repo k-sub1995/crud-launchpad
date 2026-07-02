@@ -360,3 +360,10 @@ button:focus-visible {
     width: 100%;
   }
 }
+
+.study-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+}
