@@ -1,5 +1,22 @@
 const STORAGE_KEY = 'static-launchpad.entries.v1';
 
+// 固定メッセージのセット。ACTIVE_FIXED_MESSAGE_SET を切り替えると表示内容を戻せる
+const FIXED_MESSAGE_SETS = {
+  oyogipinno: [
+    '長崎ペンギン水族館にはペンギン以外も飼育されている',
+    'その中には「オヨギピンノ」という絶滅危惧種のカニちゃんがいる',
+    'カニちゃんとペンちゃんは仲良いのだろうか',
+    'カニペンギンは語呂も良くて可愛い',
+  ],
+  kaniPenguin: [
+    'ペンギンは鳥なのに空を飛ばず海の中を飛ぶように泳ぐ',
+    'カニは横歩きが得意だけど真っ直ぐも歩けるらしい',
+    'カニペンギンコンビ、水族館の人気者になれる予感がする',
+  ],
+};
+
+const ACTIVE_FIXED_MESSAGE_SET = 'kaniPenguin';
+
 const form = document.querySelector('#entry-form');
 const entryIdInput = document.querySelector('#entry-id');
 const entryTextInput = document.querySelector('#entry-text');
@@ -14,6 +31,7 @@ const entriesContainer = document.querySelector('#entries');
 const emptyState = document.querySelector('#empty-state');
 const resultCount = document.querySelector('#result-count');
 const entryTemplate = document.querySelector('#entry-template');
+const tipsList = document.querySelector('#tips-list');
 
 let entries = loadEntries();
 
@@ -34,6 +52,18 @@ function loadEntries() {
 
 function saveEntries() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+}
+
+function renderFixedMessages() {
+  const messages = FIXED_MESSAGE_SETS[ACTIVE_FIXED_MESSAGE_SET] ?? [];
+
+  tipsList.innerHTML = '';
+  for (const message of messages) {
+    const paragraph = document.createElement('p');
+    paragraph.className = 'fixed-message';
+    paragraph.textContent = message;
+    tipsList.appendChild(paragraph);
+  }
 }
 
 function formatDate(value) {
@@ -190,6 +220,7 @@ entriesContainer.addEventListener('click', (event) => {
 
 updateCharacterCount();
 renderEntries();
+renderFixedMessages();
 
 document.getElementById('go-react-study').addEventListener('click', () => {
   location.href = './docs/study/React学習/React学習ページ.dc.html';
