@@ -233,3 +233,7 @@ document.getElementById('go-react-distibute').addEventListener('click', () => {
 document.getElementById('go-next-study').addEventListener('click', () => {
   location.href = './docs/study/Next.js学習/Next.js学習ページ.dc.html';
 });
+
+document.getElementById('go-lang-study').addEventListener('click', () => {
+  location.href = './docs/study/言語学習/言語学習ページ.html';
+});

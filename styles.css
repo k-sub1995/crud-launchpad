@@ -233,6 +233,27 @@ button:focus-visible {
   background: color-mix(in srgb, var(--surface-strong) 82%, var(--primary));
 }
 
+.muted {
+  border-style: dashed;
+  border-color: var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.muted:hover {
+  background: color-mix(in srgb, var(--surface-strong) 60%, transparent);
+}
+
+.study-actions-extra {
+  margin-top: 8px;
+}
+
+.study-actions-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
 .search-row {
   margin: 8px 0 18px;
 }
