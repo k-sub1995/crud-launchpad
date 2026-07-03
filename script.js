@@ -198,3 +198,7 @@ document.getElementById('go-react-study').addEventListener('click', () => {
 document.getElementById('go-react-distibute').addEventListener('click', () => {
   location.href = './docs/study/React学習/ver2/React学習ページ v2.dc.html';
 });
+
+document.getElementById('go-next-study').addEventListener('click', () => {
+  location.href = './docs/study/Next.js学習/Next.js学習ページ.dc.html';
+});

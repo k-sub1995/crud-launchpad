@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@keyframes dcflash { 0% { background-color: #ffe9a8; } 100% { background-color: #ffffff; } }
+html { color-scheme: light; }
+body { margin: 0; background: #f7fafc; }
+</style>
+</helmet>
+
+<div style="font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#0f172a;line-height:1.7">
+<div style="max-width:1280px;margin:0 auto;padding:32px 24px 80px 24px;display:flex;gap:36px;align-items:flex-start;flex-wrap:wrap">
+
+  <!-- ============ SIDEBAR TOC ============ -->
+  <aside data-screen-label="目次サイドバー" style="width:224px;flex-shrink:0;position:sticky;top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:16px 12px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;padding:0 8px 10px 8px">目次</div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ navItems }}" as="nv" hint-placeholder-count="24">
+        <sc-if value="{{ nv.isHeader }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:0.06em;color:#9ca3af;padding:10px 8px 4px 8px;border-top:1px solid #f1f5f9;margin-top:4px">{{ nv.label }}</div>
+        </sc-if>
+        <sc-if value="{{ nv.isItem }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ nv.go }}" style="text-align:left;border:none;cursor:pointer;font-family:inherit;font-size:13px;padding:8px 10px;border-radius:8px;background:{{ nv.bg }};color:{{ nv.color }};font-weight:{{ nv.weight }};display:flex;gap:8px;align-items:baseline;min-height:34px">
+            <span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;opacity:0.75;width:24px;flex-shrink:0">{{ nv.num }}</span>
+            <span>{{ nv.label }}</span>
+          </button>
+        </sc-if>
+      </sc-for>
+    </div>
+    <div style="margin-top:12px;padding:10px 8px 2px 8px;border-top:1px solid #f1f5f9;font-size:11.5px;color:#9ca3af">{{ pageIndicator }}</div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main style="flex:1;min-width:0;max-width:960px">
+
+  <!-- ======== PAGE 0: TOC / INTRO ======== -->
+  <div data-screen-label="00 導入" style="display:{{ pg0 }}">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:#0f172a;color:#ffffff;padding:6px 16px;border-radius:999px;font-weight:700;font-size:13px;letter-spacing:0.04em">献立アプリで学ぶ Next.js 入門</div>
+    <h1 style="font-size:32px;margin:18px 0 10px 0;line-height:1.3">React → Next.js 置き換えマップ</h1>
+    <p style="color:#6b7280;font-size:15.5px;margin:0;max-width:720px">React版レシピアプリを題材に、Next.jsの主要概念を比較して学びます。<br></p>
+
+    <!-- 全体像 -->
+    <div style="margin-top:28px;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:24px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:16px">ページが表示されるまでの流れ — いちばん大事な違い</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px">
+        <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:5px 12px;border-radius:999px;font-weight:700;font-size:12px">React（今: CSR）</span>
+        <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">ほぼ空のHTMLが届く</span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">JSをダウンロード</span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">ブラウザでReactが実行</span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">やっと画面が出る</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <span style="background:#e6f4ec;border:1px solid #bfe3cd;color:#1a7f4b;padding:5px 12px;border-radius:999px;font-weight:700;font-size:12px">Next.js（SSR）</span>
+        <span style="background:#e6f4ec;border:1px solid #bfe3cd;color:#1a7f4b;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">サーバーでReactを実行</span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e6f4ec;border:1px solid #bfe3cd;color:#1a7f4b;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">完成済みHTMLが届く（即表示）</span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e6f4ec;border:1px solid #bfe3cd;color:#1a7f4b;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">後からJSが動き出す（ハイドレーション）</span>
+      </div>
+      <p style="margin:18px 0 0 0;font-size:15px;background:#f0faf4;border-radius:10px;padding:12px 16px"><strong style="color:#1a7f4b">Next.js = 「Reactをどこで・いつ実行するか」を選べるようにしたフレームワーク。</strong><br><br>コンポーネント・state・propsなどReactの知識はすべてそのまま使います。<br><br>新しく増えるのは「サーバーで動く部分」と「その境界線の引き方」です。</p>
+    </div>
+
+    <!-- Glossary teaser -->
+    <div style="margin-top:24px;background:#0f172a;border-radius:14px;padding:22px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.12)">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#94a3b8;margin-bottom:6px">用語ディープダイブ（01–12）</div>
+      <p style="margin:0 0 16px 0;font-size:13.5px;color:#cbd5e1">この先の章で何度も出てくる7つの言葉を、具体的な処理の流れつきで先に1つずつ掘り下げます。<br><br>一気に読んでも、気になる言葉だけつまみ食いしてもOKです。</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px">
+        <sc-for list="{{ glossaryToc }}" as="gt" hint-placeholder-count="11">
+          <button onClick="{{ gt.go }}" style="text-align:left;border:1px solid #334155;cursor:pointer;font-family:inherit;background:#1e293b;border-radius:10px;padding:12px 14px;min-height:40px" style-hover="border-color:#4ade80">
+            <div style="display:flex;gap:8px;align-items:baseline">
+              <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;font-weight:700;color:#4ade80">{{ gt.num }}</span>
+              <strong style="font-size:14px;color:#f1f5f9">{{ gt.label }}</strong>
+            </div>
+            <p style="margin:4px 0 0 0;font-size:12px;color:#94a3b8;line-height:1.5">{{ gt.desc }}</p>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- TOC cards -->
+    <div style="margin-top:28px;font-size:13px;font-weight:700;letter-spacing:0.08em;color:#6b7280">本編（01–08）</div>
+    <div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px">
+      <sc-for list="{{ tocItems }}" as="tc" hint-placeholder-count="8">
+        <button onClick="{{ tc.go }}" style="text-align:left;border:1px solid #e5e7eb;cursor:pointer;font-family:inherit;background:#ffffff;border-radius:12px;padding:16px 18px;box-shadow:0 4px 12px rgba(15,23,42,0.04);min-height:44px" style-hover="border-color:#1a7f4b">
+          <div style="display:flex;gap:10px;align-items:baseline">
+            <span style="font-family:ui-monospace,Menlo,monospace;font-size:13px;font-weight:700;color:#1a7f4b">{{ tc.num }}</span>
+            <strong style="font-size:15px;color:#0f172a">{{ tc.label }}</strong>
+          </div>
+          <p style="margin:6px 0 0 0;font-size:13px;color:#6b7280;line-height:1.6">{{ tc.desc }}</p>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ======== PAGE G0-intro: WHAT IS REACT / WHAT IS NEXT ======== -->
+  <div data-screen-label="01 ReactとNextとは" style="display:{{ pg1 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#4ade80;background:#0f172a;padding:2px 10px;border-radius:6px">01</span>
+      <h2 style="font-size:25px;margin:0">そもそもReactとは？ Next.jsとは？</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">この先ずっと「CSR」「SSR」のような<strong>レンダリング方式</strong>の話が続きますが、その前に一番土台になる認識をそろえます。<br><br>ReactとNext.jsは対立する2つの技術ではなく、<strong>Next.jsはReactを内包する上位互換のフレームワーク</strong>です。</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+        <div style="display:inline-block;background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:4px 12px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:10px">React</div>
+        <div style="font-size:20px;font-weight:700;margin-bottom:8px">UIを組み立てるための<br>「部品ライブラリ」</div>
+        <p style="margin:0;font-size:13.5px;color:#4b5563">画面を「コンポーネント」という部品に分けて、propsとstateから<strong>HTML（見た目）を作る</strong>ことだけに専念するライブラリです。<br><br>ルーティング、サーバーとの通信方法、ビルドの仕方などは決めていません。それらは自分で選んで用意する必要があります。</p>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+        <div style="display:inline-block;background:#e6f4ec;border:1px solid #bfe3cd;color:#1a7f4b;padding:4px 12px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:10px">Next.js</div>
+        <div style="font-size:20px;font-weight:700;margin-bottom:8px">Reactを内包した<br>「全部のせフレームワーク」</div>
+        <p style="margin:0;font-size:13.5px;color:#4b5563">中身は<strong>そのままReact</strong>です。コンポーネント・props・stateの書き方は変わりません。<br><br>そのうえで、React単体には無かった<strong>ルーティング・サーバー機能・画像最適化・ビルド設定</strong>などを標準搭載し、「Reactで画面を作る以外に必要なもの」を一式そろえています。</p>
+      </div>
+    </div>
+
+    <div style="background:#0f172a;border-radius:14px;padding:20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.12)">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#94a3b8;margin-bottom:10px">つまり</div>
+      <p style="margin:0;font-size:14px;color:#cbd5e1">Next.js = React（部品を作る力）<span style="color:#4ade80;font-weight:700">＋</span>ルーティング・サーバー機能・最適化など（部品を届ける仕組み）</p>
+      <p style="margin:14px 0 0 0;font-size:13.5px;color:#94a3b8">この2つ目の「届け方」の中でも、いちばん影響が大きいのが<strong style="color:#e2e8f0">「HTMLをどこで・いつ組み立てるか（レンダリング方式）」</strong>の違いです。次のページからは、そこに絞って掘り下げます。</p>
+    </div>
+
+    <p style="margin:20px 0 0 0;font-size:13px;color:#9ca3af">次のページでは、ReactとNext.jsの「結論」を先に一言でまとめます。</p>
+  </div>
+
+  <!-- ======== PAGE G0a: REACT VS NEXT ======== -->
+  <div data-screen-label="02 ReactとNextの違い" style="display:{{ pg2 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#4ade80;background:#0f172a;padding:2px 10px;border-radius:6px">02</span>
+      <h2 style="font-size:25px;margin:0">ReactとNext.jsの違い（レンダリング）</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">まず一番大事な結論だけ、先に押さえます。<br><br>この先の説明は、すべてこの1点の掘り下げです。</p>
+
+    <div style="background:#ffffff;border:2px solid #1a7f4b;border-radius:14px;padding:22px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#1a7f4b;margin-bottom:14px">結論: 素のReactとNext.jsで「できること」が違う</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:14px">
+        <div style="background:#e4eefc;border:1px solid #c9dcf6;border-radius:10px;padding:14px 16px">
+          <div style="font-size:13px;font-weight:700;color:#1d55b4;margin-bottom:6px">素のReact（react-learning/）</div>
+          <div style="font-size:22px;font-weight:700;color:#1d55b4;margin-bottom:4px">CSRしかできない</div>
+          <span style="font-size:12.5px;color:#334155">HTMLを組み立てる場所は<strong>ブラウザだけ</strong>。選択肢がない。</span>
+        </div>
+        <div style="background:#e6f4ec;border:1px solid #bfe3cd;border-radius:10px;padding:14px 16px">
+          <div style="font-size:13px;font-weight:700;color:#1a7f4b;margin-bottom:6px">Next.js</div>
+          <div style="font-size:22px;font-weight:700;color:#1a7f4b;margin-bottom:4px">CSRに加えて選べる</div>
+          <span style="font-size:12.5px;color:#334155">同じコンポーネントの書き方のまま、<strong>SSR・SSG・ISR</strong>もページごとに選べるようになる。</span>
+        </div>
+      </div>
+      <p style="margin:0;font-size:13.5px;color:#4b5563">つまりNext.jsが足しているのは「新しい書き方」ではなく、<strong>「HTMLをいつ・どこで作るか」の選択肢</strong>です。</p>
+    </div>
+
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:10px">なぜReactは「ブラウザだけ」しか使えなかったの？</div><p style="margin:0;font-size:13.5px;color:#4b5563">Reactは<strong>ライブラリ</strong>として読み込まれているだけで、サーバー側のプログラムを書く仕組みがそもそもありません。<br><br>Next.jsは<strong>フレームワーク</strong>として「サーバー側で実行する場所（app/のフォルダ構成）」を用意しているため、同じReactのコンポーネントの書き方のまま、サーバー実行という選択肢が使えるようになります（01章で詳しく）。</p>
+      
+    </div>
+
+    <p style="margin:20px 0 0 0;font-size:13px;color:#9ca3af">次のページでは、そもそも「レンダリング」という作業自体を定義します。</p>
+  </div>
+
+  <!-- ======== PAGE G0b: WHAT IS RENDERING ======== -->
+  <div data-screen-label="03 レンダリングとは" style="display:{{ pg3 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#4ade80;background:#0f172a;padding:2px 10px;border-radius:6px">03</span>
+      <h2 style="font-size:25px;margin:0">レンダリングとは？</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">前ページで「CSR/SSRの違い」と言いましたが、そもそも<strong>レンダリング</strong>という言葉自体を定義します。</p>
+
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <p style="margin:0;font-size:14px;color:#4b5563">レンダリングとは、<strong>コンポーネントの中身（JSXやstate）を、実際にブラウザが表示できるHTML/DOMに変換する作業</strong>です。</p>
+      <div style="margin-top:16px;display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center">
+        <div style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#334155">&lt;RecipeCard recipe={r} /&gt;<br><span style="color:#9ca3af">// ただのJSオブジェクト</span></div>
+        <div style="color:#9ca3af;font-weight:700;text-align:center">レンダリング<br>→</div>
+        <div style="background:#e6f4ec;border:1px solid #bfe3cd;border-radius:8px;padding:12px 14px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#1a7f4b">&lt;article&gt;<br>&nbsp;&lt;strong&gt;オムライス&lt;/strong&gt;<br>&lt;/article&gt;</div>
+      </div>
+      <p style="margin:16px 0 0 0;font-size:13.5px;color:#4b5563">「どこでこの変換計算をするか」がCSR/SSR/SSG/ISRの違いになります。この計算は<strong>2つの全く違うコンピューター</strong>のどちらでも行えます。</p>
+    </div>
+
+    <p style="margin:20px 0 0 0;font-size:13px;color:#9ca3af">次のページでは、この「ブラウザ」と「サーバー」それぞれの特性を比べます。</p>
+  </div>
+
+  <!-- ======== PAGE G0c: WHERE/WHEN ======== -->
+  <div data-screen-label="04 レンダリングの違い" style="display:{{ pg4 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#4ade80;background:#0f172a;padding:2px 10px;border-radius:6px">04</span>
+      <h2 style="font-size:25px;margin:0">ReactとNextのレンダリングの違いは？</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">レンダリング（＝HTMLへの変換）は<strong>ブラウザ</strong>と<strong>サーバー</strong>のどちらでも行えます。この「どこで」が両者の違いの正体です。</p>
+
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);margin-bottom:20px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px">
+        <div style="background:#e4eefc;border:1px solid #c9dcf6;border-radius:10px;padding:14px 16px;font-size:13px;color:#1d55b4">
+          <strong>ブラウザ（クライアント）</strong><br><br>
+          <span style="color:#334155">ユーザー1人ぶんのマシンパワーを使う。<br>ネットワークが遅くても、一度JSが届けばその後は速く動ける。<br>ユーザーの手元にしかない情報（localStorageなど）に直接アクセスできる。</span>
+        </div>
+        <div style="background:#e6f4ec;border:1px solid #bfe3cd;border-radius:10px;padding:14px 16px;font-size:13px;color:#1a7f4b">
+          <strong>サーバー</strong><br><br>
+          <span style="color:#334155">開発者が管理する強いマシンで計算できる。<br>DBやAPIキーなど「秘密の情報」に安全にアクセスできる。<br>結果を使い回せる（同じHTMLを大勢に配れる＝SSG/ISR）。</span>
+        </div>
+      </div>
+      <p style="margin:14px 0 0 0;font-size:13.5px;color:#4b5563">「どちらで計算するか」によって、<strong>初回表示の速さ・サーバーの負荷・データの新しさ・秘密情報の扱い</strong>が変わります。</p>
+    </div>
+
+    <div style="background:#0f172a;border-radius:12px;padding:20px 22px">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#94a3b8;margin-bottom:14px">Next.jsで「サーバー行」が使えるようになる</div>
+      <div style="display:grid;grid-template-columns:100px repeat(3,1fr);gap:8px;font-size:12.5px">
+        <div></div>
+        <div style="color:#94a3b8;text-align:center;padding:6px">アクセスのたび</div>
+        <div style="color:#94a3b8;text-align:center;padding:6px">ビルド時1回</div>
+        <div style="color:#94a3b8;text-align:center;padding:6px">ビルド時＋一定間隔</div>
+
+        <div style="color:#94a3b8;display:flex;align-items:center">ブラウザで</div>
+        <div style="background:#1e3a5f;border:1px solid #2d5a8f;border-radius:8px;padding:12px;text-align:center;color:#93c5fd;font-weight:700">CSR<br><span style="font-weight:400;font-size:11px;color:#94a3b8">G1</span></div>
+        <div style="color:#475569;text-align:center;padding:12px;font-size:12px">該当なし</div>
+        <div style="color:#475569;text-align:center;padding:12px;font-size:12px">該当なし</div>
+
+        <div style="color:#94a3b8;display:flex;align-items:center">サーバーで</div>
+        <div style="background:#14532d;border:1px solid #1a7f4b;border-radius:8px;padding:12px;text-align:center;color:#86efac;font-weight:700">SSR<br><span style="font-weight:400;font-size:11px;color:#94a3b8">(G2)</span></div>
+        <div style="background:#14532d;border:1px solid #1a7f4b;border-radius:8px;padding:12px;text-align:center;color:#86efac;font-weight:700">SSG<br><span style="font-weight:400;font-size:11px;color:#94a3b8">(G3)</span></div>
+        <div style="background:#14532d;border:1px solid #1a7f4b;border-radius:8px;padding:12px;text-align:center;color:#86efac;font-weight:700">ISR<br><span style="font-weight:400;font-size:11px;color:#94a3b8">(G4)</span></div>
+      </div>
+      <p style="margin:16px 0 0 0;font-size:12.5px;color:#94a3b8">Reactで使えるのは青の「CSR」のみ。Next.jsは「CSR」に加えて緑の「SSR」「SSG」「ISR」（サーバー行）も使えるようになります。<br><br>G1〜G4で、この4マスを1つずつ具体的に見ていきます。</p>
+    </div>
+  </div>
+
+  <!-- ======== PAGE G1: CSR ======== -->
+  <div data-screen-label="05 CSR" style="display:{{ pg5 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#4ade80;background:#0f172a;padding:2px 10px;border-radius:6px">05</span>
+      <h2 style="font-size:25px;margin:0">CSR — Client Side Rendering</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0"><strong>ひとことで言うと:</strong> HTMLを組み立てる作業を<strong>ブラウザの中</strong>でやる方式。<br><br>ReactはCSRしかできません。</p>
+
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:12px">▶ 具体的な処理の流れ — ユーザーがURLを開いてから</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">01</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">ブラウザが <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">index.html</span> をリクエストする</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">02</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">サーバーは<strong>ほぼ空のHTML</strong>（<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">&lt;div id="root"&gt;&lt;/div&gt;</span>）とJSファイルのURLだけを返す — 画面はまだ真っ白</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">03</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">ブラウザがJSバンドル（Reactごと全部）をダウンロードし、パース・実行する</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">04</span><div style="flex:1;background:#e6f4ec;border:1px solid #bfe3cd;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155"><strong>Reactが実行され、DOMを組み立てて<span style="text-decoration:underline">ここでやっと</span>画面が表示される</strong></div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">05</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">以降のクリックや検索は、全部ブラウザ内のReactが処理する（サーバーへの依存なし）</div></div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">具体例: 今のApp.jsx</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// index.htmlの中身はこれだけ</span>
+&lt;div id="root"&gt;&lt;/div&gt;
+&lt;script src="/src/main.jsx"&gt;&lt;/script&gt;
+
+<span style="color:#7c8aa5">// main.jsx がブラウザで実行されて</span>
+<span style="color:#7c8aa5">// 初めてid="root"の中身が生まれる</span>
+ReactDOM.createRoot(
+  document.getElementById("root")
+).render(&lt;App /&gt;);</pre>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
+        <strong style="color:#0f172a">向いている場面</strong><br><br>
+        ログイン後の管理画面・ダッシュボードなど「検索エンジンに拾われる必要がなく、開く人がログイン済みで限られる」画面。<br><br>
+        <strong style="color:#0f172a">向いていない場面</strong><br><br>
+        誰かに公開・共有するページ。初回表示の遅さとSEOの弱さが弱点になります（01章のQ&amp;A参照）。
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== PAGE G2: SSR ======== -->
+  <div data-screen-label="06 SSR" style="display:{{ pg6 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#4ade80;background:#0f172a;padding:2px 10px;border-radius:6px">06</span>
+      <h2 style="font-size:25px;margin:0">SSR — Server Side Rendering</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0"><strong>ひとことで言うと:</strong> HTMLを組み立てる作業を、<strong>リクエストが来るたびにサーバー側</strong>でやる方式。<br><br>常に最新のデータでHTMLが作られます。</p>
+
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:12px">▶ 具体的な処理の流れ — ユーザーがURLを開いてから</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">01</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">ブラウザがURLをリクエスト</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">02</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">サーバーがその場でReactコンポーネントを実行し、DBやAPIからデータも取得してHTMLを組み立てる</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">03</span><div style="flex:1;background:#e6f4ec;border:1px solid #bfe3cd;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155"><strong>完成済みHTMLが届き、この時点で内容が見える</strong>（JSはまだ届いていなくても文字や画像は表示済み）</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">04</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">裏でJSバンドルが届く</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">05</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">ハイドレーション（G5）が終わり、クリックや入力が効くようになる</div></div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">具体例: Next.jsでの書き方</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">export default async function Page() {
+  <span style="color:#7c8aa5">// cache:"no-store" = 毎回サーバーで</span>
+  <span style="color:#7c8aa5">// 新しく取得し直す → SSRになる</span>
+  const res = await fetch(
+    "https://api/recipes/mine",
+    { cache: "no-store" }
+  );
+  const myRecipes = await res.json();
+  return &lt;RecipeList recipes={myRecipes} /&gt;;
+}</pre>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
+        <strong style="color:#0f172a">向いている場面</strong><br><br>
+        「ログインユーザーのマイレシピ」「在庫の残り数」など、<strong>アクセスするたびに中身が変わる</strong>ページ。<br><br>
+        <strong style="color:#0f172a">コスト面の注意</strong><br><br>
+        アクセスのたびにサーバーが計算し直すため、SSG/ISRより<strong>サーバー負荷が高く、表示もやや遅い</strong>のが弱点です。
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== PAGE G3: SSG ======== -->
+  <div data-screen-label="07 SSG" style="display:{{ pg7 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#4ade80;background:#0f172a;padding:2px 10px;border-radius:6px">07</span>
+      <h2 style="font-size:25px;margin:0">SSG — Static Site Generation</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0"><strong>ひとことで言うと:</strong> HTMLを<strong>デプロイする前に1回だけ</strong>作り置きしておく方式。<br><br>リクエスト時の計算がゼロなので、3方式の中で最速です。</p>
+
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:12px">▶ 具体的な処理の流れ</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">01</span><div style="flex:1;background:#fdf1e0;border:1px solid #f3ddb8;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155"><strong>（デプロイ前）</strong> <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">next build</span> の実行時に、全レシピ分のHTMLを1つずつ生成しておく</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">02</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">作ったHTMLをCDNなどに配置してデプロイ完了</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">03</span><div style="flex:1;background:#e6f4ec;border:1px solid #bfe3cd;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155"><strong>ユーザーがアクセス → 作り置きHTMLを即返すだけ</strong>（サーバーは何も計算しない、最速）</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">04</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">裏でJSが届き、ハイドレーションで操作可能に</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">05</span><div style="flex:1;background:#fdf4f4;border:1px solid #ffd2d2;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">レシピの中身を変えても、<strong>再ビルド・再デプロイするまで画面には反映されない</strong></div></div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">具体例: Next.jsでの書き方</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">export default async function Page({ params }) {
+  <span style="color:#7c8aa5">// force-cache = ビルド時に1回だけ取得</span>
+  <span style="color:#7c8aa5">// してキャッシュを使い回す → SSG</span>
+  const res = await fetch(
+    `https://api/recipes/${params.id}`,
+    { cache: "force-cache" }
+  );
+  const recipe = await res.json();
+  return &lt;RecipeDetail recipe={recipe} /&gt;;
+}</pre>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
+        <strong style="color:#0f172a">向いている場面</strong><br><br>
+        公開レシピの詳細ページのように、<strong>誰が見ても同じで、更新頻度が低い</strong>ページ。<br><br>
+        <strong style="color:#0f172a">弱点</strong><br><br>
+        中身を更新するたびに再ビルドが必要。「新着レシピが増える一覧」のように<strong>更新はあるが都度SSRするほどではない</strong>場合は、次のISR（G4）が向いています。
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== PAGE G4: ISR ======== -->
+  <div data-screen-label="08 ISR" style="display:{{ pg8 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#4ade80;background:#0f172a;padding:2px 10px;border-radius:6px">08</span>
+      <h2 style="font-size:25px;margin:0">ISR — Incremental Static Regeneration</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0"><strong>ひとことで言うと:</strong> SSGの<strong>作り置きHTMLを、決めた時間ごとに裏側で作り直す</strong>方式。<br><br>SSGの速さと、SSRのような自動更新を両取りできます。</p>
+
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:12px">▶ 具体的な処理の流れ（例: 60秒ごとに再検証）</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">01</span><div style="flex:1;background:#e6f4ec;border:1px solid #bfe3cd;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">SSGと同じく、ビルド時（または初回アクセス時）に作り置きHTMLを用意</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">02</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">60秒以内のアクセスには、その作り置きHTMLを<strong>即返す</strong>（SSGと全く同じ速さ）</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">03</span><div style="flex:1;background:#fdf1e0;border:1px solid #f3ddb8;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">60秒を過ぎて誰かがアクセスすると、<strong>そのアクセスには古いHTMLを返しつつ</strong>、裏側で再生成を開始する</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">04</span><div style="flex:1;background:#e6f4ec;border:1px solid #bfe3cd;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">再生成が終わると、<strong>それ以降のアクセスから新しいHTMLに自動で切り替わる</strong>（再ビルド不要）</div></div>
+      </div>
+      <p style="margin:12px 0 0 0;font-size:12.5px;color:#6b7280">この「古いものを一旦返しつつ裏で更新する」考え方は stale-while-revalidate と呼ばれます。</p>
+    </div>
+
+    <div style="margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">具体例: Next.jsでの書き方</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">export default async function Page() {
+  const res = await fetch(
+    "https://api/recipes",
+    <span style="color:#7c8aa5">// 60秒ごとに裏で再生成</span>
+    { next: { <span style="color:#fcd34d">revalidate: 60</span> } }
+  );
+  const recipes = await res.json();
+  return &lt;RecipeList recipes={recipes} /&gt;;
+}</pre>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
+        <strong style="color:#0f172a">向いている場面</strong><br><br>
+        「みんなのレシピ一覧」のように<strong>誰が見ても同じだが、新着が増える</strong>ページ。<br><br>
+        <strong style="color:#0f172a">SSR・SSGとの使い分け</strong><br><br>
+        「今すぐ確実に最新」が必須ならSSR、「多少の遅れは許容できる」ならISR、「ほぼ更新されない」ならSSG、が判断の目安です。
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== PAGE G0d: SUMMARY ======== -->
+  <div data-screen-label="09 全体まとめ" style="display:{{ pg9 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#4ade80;background:#0f172a;padding:2px 10px;border-radius:6px">09</span>
+      <h2 style="font-size:25px;margin:0">全体まとめ — ReactとNext.jsで選べる選択肢</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">05〜08でCSR・SSR・SSG・ISRを見てきました。ここで一度、全体を1枚にまとめます。</p>
+
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);overflow:hidden">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0;font-size:12px;font-weight:700;letter-spacing:0.05em;color:#6b7280;background:#f8fafc;padding:12px 16px">
+        <span></span><span>CSR</span><span>SSR</span><span>SSG / ISR</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13px;color:#334155">
+        <span style="font-weight:700;color:#0f172a">使える場所</span><span>React / Next.js</span><span>Next.jsのみ</span><span>Next.jsのみ</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13px;color:#334155">
+        <span style="font-weight:700;color:#0f172a">計算する場所</span><span>ブラウザ</span><span>サーバー</span><span>サーバー</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13px;color:#334155">
+        <span style="font-weight:700;color:#0f172a">計算するタイミング</span><span>アクセス毎（ブラウザ内）</span><span>アクセス毎</span><span>ビルド時（＋ISRは一定間隔）</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13px;color:#334155">
+        <span style="font-weight:700;color:#0f172a">初回表示の速さ</span><span>遅い</span><span>速い</span><span>最速</span>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;background:#0f172a;border-radius:12px;padding:20px 22px">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#94a3b8;margin-bottom:10px">この先の読み進め方</div>
+      <p style="margin:0;font-size:13.5px;color:#cbd5e1">レンダリングの選択肢はここまでで一通り揃いました。<br><br>この後の10〜12は、SSR/SSG/ISRを使うと必ず関わってくる<strong style="color:#e2e8f0">「ハイドレーション」「ストリーミング」「RSCペイロード」</strong>という周辺の仕組みです。<br><br>読み終えたら本編01章から、実際にNext.jsのコードでこれらを使っていきます。</p>
+    </div>
+  </div>
+
+  <!-- ======== PAGE G5: HYDRATION ======== -->
+  <div data-screen-label="10 ハイドレーション" style="display:{{ pg10 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#4ade80;background:#0f172a;padding:2px 10px;border-radius:6px">10</span>
+      <h2 style="font-size:25px;margin:0">ハイドレーション（Hydration）</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0"><strong>ひとことで言うと:</strong> サーバーが作った「見た目だけのHTML」に、ブラウザ側のReactが後から<strong>クリックやuseStateなどの「命」を吹き込む</strong>処理。<br><br>SSR・SSG・ISR、どの方式でも必ず1回発生します。</p>
+
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:12px">▶ 具体的な処理の流れ</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">01</span><div style="flex:1;background:#e6f4ec;border:1px solid #bfe3cd;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">サーバー製HTMLが届き、<strong>見た目だけ</strong>は即座に表示される（この時点でボタンを押しても何も起きない）</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">02</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">裏でReact本体と各コンポーネントのJSがダウンロードされる</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">03</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">ReactがそのJSを実行し、「本来ならこういうDOMになるはず」という予想を組み立てる</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">04</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">予想と、実際に届いているサーバー製DOMを<strong>照合</strong>する</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">05</span><div style="flex:1;background:#e6f4ec;border:1px solid #bfe3cd;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">一致していれば、そのDOMに<strong>イベントリスナーとstateを紐付ける</strong> — ここでようやくクリックやuseStateが動き出す</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">⚠</span><div style="flex:1;background:#fdf4f4;border:1px solid #ffd2d2;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">一致<strong>していなければ</strong> → <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">Hydration failed</span> エラー</div></div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">起きやすいミスの具体例</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// サーバーでは実行時刻のA、ブラウザでは</span>
+<span style="color:#7c8aa5">// 数ミリ秒後の時刻Bになり、文字列が一致しない</span>
+&lt;p&gt;最終更新: {new Date().toLocaleTimeString()}&lt;/p&gt;
+
+<span style="color:#7c8aa5">// サーバーにはlocalStorageが存在しないので</span>
+<span style="color:#7c8aa5">// 常に「なし」判定 → ブラウザとズレる</span>
+&lt;p&gt;{localStorage.getItem("theme") ?? "デフォルト"}&lt;/p&gt;</pre>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
+        <strong style="color:#0f172a">対処法</strong><br><br>
+        レンダリング中に「サーバーとブラウザで結果が変わりうる値」（現在時刻・乱数・localStorage・window幅など）を使わない。<br><br>
+        どうしても必要なら、<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">useEffect</span> の中（＝ハイドレーション後、ブラウザ側だけ）で読み込みます。
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== PAGE G6: STREAMING ======== -->
+  <div data-screen-label="11 ストリーミング" style="display:{{ pg11 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#4ade80;background:#0f172a;padding:2px 10px;border-radius:6px">11</span>
+      <h2 style="font-size:25px;margin:0">ストリーミング / Suspense</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0"><strong>ひとことで言うと:</strong> ページの中で<strong>遅いデータ取得がある部分だけ</strong>を後回しにし、準備できた部分から先にHTMLを届ける仕組み。<br><br>「全部揃うまで真っ白」を防ぎます。</p>
+
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:12px">▶ 具体的な処理の流れ</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">01</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">レシピ詳細のうち「みんなの評価」だけ集計に時間がかかるとする。その部分を <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">&lt;Suspense&gt;</span> で囲む</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">02</span><div style="flex:1;background:#e6f4ec;border:1px solid #bfe3cd;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">サーバーは<strong>準備できたレシピ本体を先に送信開始</strong>（評価部分はまだ待たせない）</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">03</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">評価部分には一旦 <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">fallback</span>（スケルトンや「読み込み中」）が表示される</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">04</span><div style="flex:1;background:#e6f4ec;border:1px solid #bfe3cd;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">評価の集計が終わり次第、サーバーが追加でHTMLを送り、<strong>その部分だけ差し替わる</strong>（ページ全体の再読み込みなし）</div></div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">具体例: Next.jsでの書き方</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">export default function RecipeDetailPage() {
+  return (
+    &lt;article&gt;
+      &lt;RecipeHeader /&gt;   <span style="color:#7c8aa5">← 先に届く</span>
+      &lt;<span style="color:#fcd34d">Suspense</span> fallback={&lt;RatingSkeleton /&gt;}&gt;
+        &lt;RatingSummary /&gt;  <span style="color:#7c8aa5">← 遅れて届く</span>
+      &lt;/Suspense&gt;
+    &lt;/article&gt;
+  );
+}</pre>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
+        <strong style="color:#0f172a">02章・05章との関係</strong><br><br>
+        フォルダに置く <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">loading.tsx</span>（05章）は、実は<strong>ページ全体を自動でSuspenseで包む</strong>簡易版です。<br><br>ページの一部分だけを段階的に出したいときは、自分で <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">&lt;Suspense&gt;</span> を明示的に使います。
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== PAGE G7: RSC PAYLOAD ======== -->
+  <div data-screen-label="12 RSCペイロード" style="display:{{ pg12 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#4ade80;background:#0f172a;padding:2px 10px;border-radius:6px">12</span>
+      <h2 style="font-size:25px;margin:0">RSCペイロード — 遷移が速い裏側</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0"><strong>ひとことで言うと:</strong> サーバーコンポーネントは、初回はHTMLとして届きますが、<strong>ページ内遷移のときは特殊な軽量データ形式（RSCペイロード）</strong>としてやり取りされます。<br><br>06章の <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">&lt;Link&gt;</span> がなぜ速いのか、の裏側です。</p>
+
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:12px">▶ 具体的な処理の流れ — 一覧ページから詳細ページへLinkで移動</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">01</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">&lt;Link&gt;が画面に見えた時点で、遷移先のRSCペイロードを<strong>先読み（prefetch）</strong>しておく</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">02</span><div style="flex:1;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">クリックすると、共通の<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">layout.tsx</span>部分は<strong>再取得しない</strong>（すでに画面にあるものは使い回す）</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">03</span><div style="flex:1;background:#e6f4ec;border:1px solid #bfe3cd;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">先読み済みのRSCペイロード（差分だけの軽量データ）をReactが受け取り、<strong>ページ全体のHTMLではなく必要な部分だけ</strong>を組み立て直す</div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:20px;flex-shrink:0">04</span><div style="flex:1;background:#e6f4ec;border:1px solid #bfe3cd;border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">画面が差し替わる — 通常のMPA遷移（JS版のdetail.html移動）のようなページ全体の再読み込みは起きない</div></div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
+      <strong style="color:#0f172a">なぜHTMLではなく専用データ形式を使うのか</strong><br><br>
+      HTML全体を毎回送ると、共通のヘッダーやレイアウトまで再送する無駄が出ます。<br><br>RSCペイロードは<strong>「サーバーコンポーネントの計算結果」を軽量なツリー構造で表現したもの</strong>で、Reactはこれを受け取ってDOMのうち変わった部分だけを更新します。<br><br>普段のコーディングでこの形式を直接書くことはありませんが、「Linkが速いのはこの仕組みのおかげ」と知っておくと06章のprefetchが腹落ちします。
+    </div>
+  </div>
+
+  <!-- ======== PAGE 1: WHY NEXT ======== -->
+  <div data-screen-label="01 Next.jsとは" style="display:{{ pg13 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">01</span>
+      <h2 style="font-size:25px;margin:0">Next.jsとは — Reactに何が足されるのか</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0"><strong>Vite + React</strong> の場合、<br><br>Viteは「開発サーバーとビルド」だけを担当し、ルーティングもデータ取得も自分で選んで足す必要があります。<br><br>Next.jsはそれらが最初から一体になった<strong>フルスタックフレームワーク</strong>です。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">React（Vite）— 今の構成</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">react-learning/
+├── index.html      <span style="color:#7c8aa5">← 唯一のHTML</span>
+├── vite.config.js
+└── src/
+    ├── main.jsx    <span style="color:#7c8aa5">← ReactをDOMに接続</span>
+    └── App.jsx     <span style="color:#7c8aa5"></span>
+
+<span style="color:#7c8aa5">← 足りないライブラリは自分で追加:</span>
+<span style="color:#7c8aa5">//  ルーティング → react-router-dom</span>
+<span style="color:#7c8aa5">//  データ取得   → fetch + useEffect</span>
+<span style="color:#7c8aa5">//  サーバー処理 → 別途APIサーバーを立てる</span></pre>
+        <div style="margin-top:10px;background:#f7faff;border:1px solid #c9dcf6;border-radius:10px;padding:12px 16px;font-size:13px;color:#4b5563">
+          <strong style="color:#1d55b4;font-size:12px;letter-spacing:0.04em">⚙ 実行の仕組み（今）</strong><br>
+          すべてのコードは<strong>ブラウザの中だけ</strong>で動きます。<br><br>サーバーは index.html とJSファイルを配るだけの「ただの倉庫」です。<br><br>これをCSR（クライアントサイドレンダリング）と呼びます。
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">Next.js — これから</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">recipe-next/
+├── next.config.js
+└── app/            <span style="color:#7c8aa5">← App Router</span>
+    ├── layout.tsx  <span style="color:#7c8aa5">← 全ページ共通の枠</span>
+    ├── page.tsx    <span style="color:#7c8aa5">← 「/」のページ</span>
+    └── recipes/
+        └── [id]/
+            └── page.tsx  <span style="color:#7c8aa5">← 「/recipes/1」</span>
+
+<span style="color:#7c8aa5">// ルーティング → フォルダ構成がそのままURL</span>
+<span style="color:#7c8aa5">// データ取得   → コンポーネント内でawait</span>
+<span style="color:#7c8aa5">// サーバー処理 → 同じプロジェクトに書ける</span></pre>
+        <div style="margin-top:10px;background:#f0faf4;border:1px solid #bfe3cd;border-radius:10px;padding:12px 16px;font-size:13px;color:#4b5563">
+          <strong style="color:#1a7f4b;font-size:12px;letter-spacing:0.04em">⚙ 実行の仕組み（Next.js）</strong><br>
+          コードが<strong>サーバーとブラウザの2箇所</strong>で動きます。<br><br>初回表示はサーバーがHTMLを作って返し（SSR）、その後の操作はブラウザ側のReactが引き継ぎます。<br><br>「どのコードがどちらで動くか」を意識するのが、Next.js学習の中心テーマです。
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:14px 18px;font-size:14px;color:#4b5563">
+      <strong style="color:#0f172a">Reactの知識はすべてそのまま:</strong>&nbsp; コンポーネント・props・useState・useEffect・JSX・key、前作で学んだ全部をNext.jsでも使います。<br><br>Next.jsが変えるのは「書き方」ではなく「動く場所と動くタイミング」です。
+    </div>
+
+    <!-- Glossary recap -->
+    <div style="margin-top:24px;background:#0f172a;border-radius:14px;padding:18px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.12)">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#94a3b8;margin-bottom:4px">用語のおさらい</div>
+      <p style="margin:0 0 12px 0;font-size:13px;color:#cbd5e1">CSR・SSR・SSG・ISR・ハイドレーション、ここから先の説明の前提になる言葉は目次冒頭のG1–G7で先に詳しく解説済みです。<br><br>ピンと来ない言葉があれば、サイドバーからいつでも戻れます。</p>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#f0faf4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#1a7f4b">Q. なぜCSRのままではだめなの？</strong><br>
+      <span style="color:#4b5563">A. だめではありません。<br><br>ただしCSRは「最初に空のHTMLが届く」ため、①初回表示が遅い（JSを全部落として実行するまで真っ白）、②検索エンジンやSNSカードが中身を読めないことがある、という弱点があります。<br><br>レシピを他人に公開・共有するアプリでは、この2つが効いてきます。</span>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- ======== PAGE 2: ROUTING ======== -->
+  <div data-screen-label="02 ルーティング" style="display:{{ pg14 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">02</span>
+      <h2 style="font-size:25px;margin:0">ファイルベースルーティング — フォルダ構成がURLになる</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">元のJS版は <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">detail.html?id=1</span> とHTMLファイルを行き来し、React版ではReact Routerで <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">&lt;Route&gt;</span> を自分で並べる予定でした。<br><br>Next.jsでは<strong>設定ファイルすら不要</strong>。フォルダを掘るとURLが生えます。<br><br>下のデモでフォルダをクリックして、対応するURLを確かめてください。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">React — Router設定を自分で書く</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// URLとコンポーネントの対応表を</span>
+<span style="color:#7c8aa5">// JSXとして自分で管理する</span>
+&lt;BrowserRouter&gt;
+  &lt;Routes&gt;
+    &lt;Route path="/"
+      element={&lt;SearchPage /&gt;} /&gt;
+    &lt;Route path="/recipes/:id"
+      element={&lt;DetailPage /&gt;} /&gt;
+    &lt;Route path="/register"
+      element={&lt;RegisterPage /&gt;} /&gt;
+  &lt;/Routes&gt;
+&lt;/BrowserRouter&gt;
+
+<span style="color:#7c8aa5">// idの取り出しはフックで</span>
+const { id } = <span style="color:#fcd34d">useParams</span>();</pre>
+        <div style="margin-top:10px;background:#f7faff;border:1px solid #c9dcf6;border-radius:10px;padding:12px 16px;font-size:13px;color:#4b5563">
+          <strong style="color:#1d55b4;font-size:12px;letter-spacing:0.04em">⚙ 仕組み（React Router）</strong><br>
+          対応表はあくまで<strong>JSの実行結果</strong>です。<br><br>ページが増えるたびにこのファイルを編集し、パス文字列の打ち間違いは実行するまで気づけません。
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">Next.js — フォルダがそのまま対応表</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">app/
+├── page.tsx              <span style="color:#7c8aa5">→ /</span>
+├── register/
+│   └── page.tsx          <span style="color:#7c8aa5">→ /register</span>
+└── recipes/
+    └── <span style="color:#fcd34d">[id]</span>/           <span style="color:#7c8aa5">← 動的セグメント</span>
+        └── page.tsx      <span style="color:#7c8aa5">→ /recipes/1, /recipes/2…</span>
+
+<span style="color:#7c8aa5">// idはpropsで受け取る（フック不要）</span>
+export default async function DetailPage(
+  { params }
+) {
+  const { id } = await params;
+}</pre>
+        <div style="margin-top:10px;background:#f0faf4;border:1px solid #bfe3cd;border-radius:10px;padding:12px 16px;font-size:13px;color:#4b5563">
+          <strong style="color:#1a7f4b;font-size:12px;letter-spacing:0.04em">⚙ 仕組み（Next.js）</strong><br>
+          <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.92em">page.tsx</span> という名前のファイルを置くと、その場所がURLとして公開されます。<br><br><span style="font-family:ui-monospace,Menlo,monospace;font-size:0.92em">[id]</span> のような角括弧フォルダが、元アプリの <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.92em">?id=1</span> に相当する可変部分です。<br><br>対応表という「管理物」自体が消えます。
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive demo -->
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ フォルダをクリックしてみよう — URLとの対応</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;align-items:start">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:13px;display:flex;flex-direction:column;gap:2px">
+          <div style="color:#6b7280;padding:4px 8px">app/</div>
+          <sc-for list="{{ routeItems }}" as="rt" hint-placeholder-count="4">
+            <button onClick="{{ rt.pick }}" style="text-align:left;border:none;cursor:pointer;font-family:inherit;font-size:13px;padding:6px 8px;border-radius:6px;background:{{ rt.bg }};color:{{ rt.color }};font-weight:{{ rt.weight }};min-height:32px">{{ rt.tree }}</button>
+          </sc-for>
+        </div>
+        <div>
+          <div style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:13px;color:#334155;display:flex;align-items:center;gap:8px">
+            <span style="width:10px;height:10px;border-radius:50%;background:#1a7f4b;flex-shrink:0"></span>
+            recipe-app.com<strong style="color:#1a7f4b">{{ routeUrl }}</strong>
+          </div>
+          <div style="margin-top:10px;background:#f0faf4;border:1px solid #bfe3cd;border-radius:8px;padding:10px 14px;font-size:13px;color:#4b5563">{{ routeNote }}</div>
+          <div style="margin-top:10px;font-size:12.5px;color:#6b7280">元のアプリでの対応: <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.95em;color:#92580a">{{ routeOld }}</span></div>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#f0faf4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#1a7f4b">Q. page.tsx 以外のファイルも置けるの？</strong><br>
+      <span style="color:#4b5563">A. 置けます。<br><br>URLになるのは <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">page.tsx</span>（と <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">route.ts</span>）だけなので、同じフォルダに部品（SearchBox.tsxなど)を置いてもURLは生えません。<br><br>他に予約された名前として <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">layout.tsx</span>（06章）、<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">loading.tsx</span>・<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">error.tsx</span>（読み込み中・エラー時の画面）があります。</span>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- ======== PAGE 3: SERVER/CLIENT ======== -->
+  <div data-screen-label="03 サーバー/クライアント" style="display:{{ pg15 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">03</span>
+      <h2 style="font-size:25px;margin:0">サーバー / クライアントコンポーネント — 一番の新概念</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">Next.jsのコンポーネントは、<strong>デフォルトで全部サーバーコンポーネント</strong>です。<br><br>サーバーで1回実行されてHTMLになり、ブラウザにはJSが送られません。<br><br>useStateやonClickを使いたい部品にだけ、先頭に <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">"use client"</span> と書いてクライアントコンポーネントにします。<br><br>「サーバー / クライアント」は<strong>どこで実行されるか</strong>の区別で、03章冒頭の用語辞典の「CSR/SSR」（<strong>いつ・どういう頻度で</strong>HTMLを作るか）とは別の軸です。<br><br>下のデモで、部品ごとにどちらにすべきか試してみてください。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">React — 全部クライアントで動く</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// 今のApp.jsx: 何も宣言しなくても</span>
+<span style="color:#7c8aa5">// 全コードがブラウザで動く</span>
+function App() {
+  const [query, setQuery] = useState("");
+  <span style="color:#7c8aa5">// stateもイベントも自由に使える。</span>
+  <span style="color:#7c8aa5">// そのかわり全コンポーネントのJSが</span>
+  <span style="color:#7c8aa5">// ブラウザに送られる</span>
+}</pre>
+        <div style="margin-top:10px;background:#f7faff;border:1px solid #c9dcf6;border-radius:10px;padding:12px 16px;font-size:13px;color:#4b5563">
+          <strong style="color:#1d55b4;font-size:12px;letter-spacing:0.04em">⚙ 今の動き</strong><br>
+          「サーバーかクライアントか」という区別自体が存在しません。<br><br>アプリが大きくなるほど、ブラウザに送るJSの量が増え続けます。
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">Next.js — 境界線を自分で引く</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// app/page.tsx — 宣言なし = サーバー</span>
+<span style="color:#7c8aa5">// HTMLだけ届く。JSは送られない</span>
+export default function Page() {
+  return &lt;RecipeList recipes={recipes} /&gt;;
+}
+
+<span style="color:#7c8aa5">// SearchBox.tsx — 対話が必要な部品だけ</span>
+<span style="color:#fcd34d">"use client"</span>;  <span style="color:#7c8aa5">// ← この1行が境界線</span>
+import { useState } from "react";
+
+export function SearchBox() {
+  const [query, setQuery] = useState("");
+  <span style="color:#7c8aa5">// useState/onClickはここでだけ使える</span>
+}</pre>
+        <div style="margin-top:10px;background:#f0faf4;border:1px solid #bfe3cd;border-radius:10px;padding:12px 16px;font-size:13px;color:#4b5563">
+          <strong style="color:#1a7f4b;font-size:12px;letter-spacing:0.04em">⚙ Next.jsの動き</strong><br>
+          サーバーコンポーネントはサーバーで実行後、<strong>結果のHTMLだけ</strong>が届きます。<br><br><span style="font-family:ui-monospace,Menlo,monospace;font-size:0.92em">"use client"</span> を書いた部品（とそのimport先）だけJSが送られ、ブラウザで動き続けます。<br><br>境界を最小にするほどページは軽くなります。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== PAGE 4: USE CLIENT BOUNDARY ======== -->
+  <div data-screen-label="04 \"use client\" の境界線" style="display:{{ pg16 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">04</span>
+      <h2 style="font-size:25px;margin:0">"use client" が届く範囲</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">前ページで「対話が必要な部品だけに "use client" をつける」と書きましたが、その指示がどこまで効くのか、よくある誤解を含めて掘り下げます。</p>
+
+    <!-- use client boundary explainer -->
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:10px">"use client" が届く範囲 — 誤解しやすいポイント</div>
+      <p style="margin:0 0 12px 0;font-size:13.5px;color:#4b5563">"use client" は<strong>そのファイル1つ</strong>だけの印ではありません。<br><br>そのファイルが<strong>importしている子コンポーネントすべて</strong>も、まとめてクライアントバンドルに引き込まれます（これを「クライアント境界」と呼びます）。</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px">
+        <div style="background:#fdf4f4;border-radius:8px;padding:12px 14px;font-size:13px;color:#4b5563">
+          <strong style="color:#ff6b6b">✗ ありがちな失敗</strong><br><br>
+          ページの一番外側（詳細ページ全体など）に "use client" を書いてしまう。<br><br>→ そのページ配下の<strong>全部品</strong>がクライアントに引き込まれ、SSRの利点（軽さ）が消える。
+        </div>
+        <div style="background:#f0faf4;border-radius:8px;padding:12px 14px;font-size:13px;color:#4b5563">
+          <strong style="color:#1a7f4b">✓ 良い書き方</strong><br><br>
+          「編集ボタン」「検索欄」など<strong>末端の小さな部品だけ</strong>に "use client" を付け、そこをページ側からimportして埋め込む。<br><br>→ 引き込まれる範囲を最小化できる。
+        </div>
+      </div>
+    </div>
+
+    <!-- use server explainer -->
+    <div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">"use server" — 逆方向のもう1つの宣言</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// app/actions.ts — Server Action</span>
+<span style="color:#fcd34d">"use server"</span>;  <span style="color:#7c8aa5">// ← この関数はサーバーでだけ実行</span>
+
+export async function addRecipe(formData) {
+  const name = formData.get("name");
+  await db.recipes.insert({ name }); <span style="color:#7c8aa5">// DB直操作OK</span>
+}
+
+<span style="color:#7c8aa5">// クライアントコンポーネントのフォームから</span>
+<span style="color:#7c8aa5">// 直接この関数を呼べる（API不要）</span>
+&lt;form action={addRecipe}&gt;
+  &lt;input name="name" /&gt;
+  &lt;button&gt;追加&lt;/button&gt;
+&lt;/form&gt;</pre>
+      </div>
+      <div>
+        <div style="margin-top:38px;background:#fffdf5;border:1px solid #f3ddb8;border-radius:10px;padding:14px 16px;font-size:13.5px;color:#4b5563">
+          <strong style="color:#92580a">"use client" とは向きが逆</strong>です。<br><br>"use client" は「ここから先はブラウザで動かして」という<strong>サーバー→クライアントの境界線</strong>。<br><br>"use server" は「この関数だけはブラウザから呼ばれてもサーバー側で実行して」という<strong>クライアント→サーバーの入口</strong>（＝Server Action）です。<br><br>07章の「Server Actions」はこの仕組みのことで、フォーム送信時にfetchやAPI Routeを自分で書く必要がなくなります。
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive demo -->
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ レシピアプリの部品を仕分けしてみよう — サーバー？クライアント？</div>
+      <p style="margin:0 0 12px 0;font-size:13px;color:#6b7280">部品を選んで「サーバー」「クライアント」どちらかを押すと、正解と理由が出ます。</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+        <sc-for list="{{ quizItems }}" as="qz" hint-placeholder-count="4">
+          <button onClick="{{ qz.pick }}" style="border:1px solid {{ qz.border }};cursor:pointer;font-family:inherit;font-size:13px;padding:8px 14px;border-radius:999px;background:{{ qz.bg }};color:{{ qz.color }};font-weight:600;min-height:36px">{{ qz.label }}</button>
+        </sc-for>
+      </div>
+      <sc-if value="{{ quizPicked }}" hint-placeholder-val="{{ false }}">
+        <div style="border-top:1px dashed #eef2f7;padding-top:14px">
+          <div style="font-size:14px;margin-bottom:10px">「<strong>{{ quizName }}</strong>」はどっち？</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <button onClick="{{ answerServer }}" style="min-height:38px;background:#e6f4ec;border:1px solid #bfe3cd;color:#1a7f4b;padding:8px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:14px">サーバー</button>
+            <button onClick="{{ answerClient }}" style="min-height:38px;background:#fdf1e0;border:1px solid #f3ddb8;color:#92580a;padding:8px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:14px">クライアント（"use client"）</button>
+          </div>
+          <sc-if value="{{ quizAnswered }}" hint-placeholder-val="{{ false }}">
+            <div style="background:{{ quizResultBg }};border-radius:8px;padding:12px 16px;font-size:14px">
+              <strong>{{ quizVerdict }}</strong><br>
+              <span style="color:#4b5563">{{ quizReason }}</span>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#fdf4f4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#ff6b6b">⚠ ハマりどころNo.1:</strong>
+      <span style="color:#4b5563">サーバーコンポーネントで <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">useState</span> を使うと <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">You're importing a component that needs useState...</span> というエラーになります。<br><br>対処は「その部品を小さく切り出して "use client" を付ける」。<br><br>ページ全体をクライアントにするのは最終手段です。</span>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- ======== PAGE 5: DATA FETCH ======== -->
+  <div data-screen-label="05 データ取得" style="display:{{ pg17 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">05</span>
+      <h2 style="font-size:25px;margin:0">データ取得 — useEffectの「後から取る」をやめる</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">レシピをDBやAPIから取ってくる場面です。<br><br>Reactでは「まず空で描画 → useEffectで取得 → stateに入れて再描画」という3拍子でした。<br><br>Next.jsのサーバーコンポーネントは<strong>コンポーネント自体をasyncにして、描画の前にawaitで取得</strong>します。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">React — useEffectで後から取得</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">function RecipeList() {
+  <span style="color:#7c8aa5">// ① まず「空」の状態で描画される</span>
+  const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  <span style="color:#7c8aa5">// ② 描画後にuseEffectで取得</span>
+  <span style="color:#fcd34d">useEffect</span>(() =&gt; {
+    fetch("/api/recipes")
+      .then(res =&gt; res.json())
+      .then(data =&gt; {
+        setRecipes(data); <span style="color:#7c8aa5">// ③ 再描画</span>
+        setLoading(false);
+      });
+  }, []);
+
+  <span style="color:#7c8aa5">// ローディング表示も自分で管理</span>
+  if (loading) return &lt;p&gt;読み込み中…&lt;/p&gt;;
+  return &lt;ul&gt;…&lt;/ul&gt;;
+}</pre>
+        <div style="margin-top:10px;background:#f7faff;border:1px solid #c9dcf6;border-radius:10px;padding:12px 16px;font-size:13px;color:#4b5563">
+          <strong style="color:#1d55b4;font-size:12px;letter-spacing:0.04em">⚙ 画面に起きること</strong><br>
+          ① 空のリストで1回描画される（チラつき） → ② 通信 → ③ データが入って再描画。<br><br>loading・エラーのstate管理、通信の重複実行対策など、<strong>定型コードが毎回必要</strong>です。
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">Next.js — サーバーで取得してから描画</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// app/page.tsx（サーバーコンポーネント）</span>
+export default <span style="color:#fcd34d">async</span> function Page() {
+  <span style="color:#7c8aa5">// 描画の前にサーバーで取得が終わる。</span>
+  <span style="color:#7c8aa5">// DBに直接アクセスしてもOK</span>
+  const recipes = <span style="color:#fcd34d">await</span> getRecipes();
+
+  <span style="color:#7c8aa5">// データが揃った状態のHTMLが届く</span>
+  return (
+    &lt;ul&gt;
+      {recipes.map(r =&gt;
+        &lt;li key={r.id}&gt;{r.name}&lt;/li&gt;)}
+    &lt;/ul&gt;
+  );
+}
+
+<span style="color:#7c8aa5">// 読み込み中表示は loading.tsx を</span>
+<span style="color:#7c8aa5">// 置くだけ（stateでの管理が不要）</span></pre>
+        <div style="margin-top:10px;background:#f0faf4;border:1px solid #bfe3cd;border-radius:10px;padding:12px 16px;font-size:13px;color:#4b5563">
+          <strong style="color:#1a7f4b;font-size:12px;letter-spacing:0.04em">⚙ 画面に起きること</strong><br>
+          ブラウザには<strong>データ入りの完成HTML</strong>が最初から届きます。<br><br>空表示のチラつきも、loading用stateも、useEffectの定型文も消えます。<br><br>02章の詳細ページなら「URLのidでawait取得 → そのまま描画」の2行です。
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#f0faf4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#1a7f4b">Q. じゃあuseEffectはもう使わない？</strong><br>
+      <span style="color:#4b5563">A. 出番は減りますが、なくなりません。<br><br>「初回のデータ取得」はサーバーコンポーネントに移りますが、<strong>ブラウザでしかできないこと</strong>（localStorage、タイマー、ブラウザAPIの購読など）はこれからも "use client" な部品の中でuseEffectを使います。<br><br>前作06章の知識はそのまま有効です。</span>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- ======== PAGE 6: RENDERING ======== -->
+  <div data-screen-label="06 レンダリング方式" style="display:{{ pg18 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">06</span>
+      <h2 style="font-size:25px;margin:0">レンダリング方式 — いつHTMLを作るかを選ぶ</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">Next.js最大の武器は「HTMLを<strong>いつ</strong>作るか」をページごとに選べることです。<br><br>下のデモで方式を切り替えて、タイムラインの違いを見比べてください。</p>
+
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:14px 18px;font-size:13.5px;color:#4b5563;margin-bottom:20px">
+      <strong style="color:#0f172a">ハイドレーションって結局なに？</strong><br><br>
+      サーバーが返すHTMLは<strong>見た目だけ</strong>で、まだクリックしても何も起きません。<br><br>その直後、ブラウザに届いたJSがそのHTMLに対して「ここがボタン、ここにこのイベントを付ける」と<strong>後付けで結びつける</strong>作業がハイドレーションです。<br><br>これが終わって初めて、useStateやonClickが実際に動き出します。SSR・SSGどちらの方式でも、この工程は必ず発生します。
+    </div>
+
+    <!-- Interactive timeline demo -->
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06);margin-bottom:20px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ 方式を切り替えてみよう — ユーザーがURLを開いてからの流れ</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+        <sc-for list="{{ renderModes }}" as="rm" hint-placeholder-count="3">
+          <button onClick="{{ rm.pick }}" style="border:1px solid {{ rm.border }};cursor:pointer;font-family:inherit;font-size:13px;padding:8px 16px;border-radius:999px;background:{{ rm.bg }};color:{{ rm.color }};font-weight:700;min-height:36px">{{ rm.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ timelineSteps }}" as="ts" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9ca3af;width:24px;flex-shrink:0">{{ ts.num }}</span>
+            <div style="flex:1;background:{{ ts.bg }};border:1px solid {{ ts.border }};border-radius:8px;padding:9px 14px;font-size:13.5px;color:#334155">{{ ts.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:14px;background:#f1f5f9;border-radius:8px;padding:12px 16px;font-size:13.5px;color:#334155">
+        <strong>レシピアプリでの使いどころ:</strong> {{ renderUseCase }}
+      </div>
+    </div>
+
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:14px 18px;font-size:14px;color:#4b5563">
+      <strong style="color:#0f172a">選び方の目安:</strong>&nbsp; データが誰でも同じ＆ほぼ更新されない → <strong>SSG</strong>。<br><br>リクエストごとに中身が変わる（ログインユーザー別など） → <strong>SSR</strong>。<br><br>誰でも同じだが時々更新される（一覧ページなど） → <strong>ISR</strong>。<br><br>Next.jsではfetchのキャッシュ設定などで方式が決まり、<strong>同じコードのまま切り替え</strong>られます。
+    </div>
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#fdf4f4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#ff6b6b">⚠ ハマりどころ: ハイドレーションエラー</strong><br>
+      <span style="color:#4b5563">「サーバーが作ったHTML」と「ブラウザでReactが計算した結果」が食い違うと <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">Hydration failed</span> エラーになります。<br><br>典型例は <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">new Date()</span> や乱数、そして<strong>localStorage読み込み</strong>をレンダリング中に使うこと（サーバーとブラウザで結果が違うため）。<br><br>localStorageに触るのは、必ずuseEffectの中（＝ブラウザ側の描画後）にします。</span>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- ======== PAGE 7: LINK & LAYOUT ======== -->
+  <div data-screen-label="07 Linkとレイアウト" style="display:{{ pg19 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">07</span>
+      <h2 style="font-size:25px;margin:0">Linkとレイアウト — ページ間で共有するもの</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">複数ページになると「共通のヘッダー」と「ページ移動」の扱いが必要になります。<br><br>元のJS版では全HTMLファイルに同じ<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">&lt;header&gt;</span>をコピペしていました。<br><br>Next.jsでは <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">layout.tsx</span> と <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">&lt;Link&gt;</span> が担当します。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">React（+Router）— 自分で組む</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// 共通レイアウトも1つのコンポーネント</span>
+<span style="color:#7c8aa5">// として自分で設計して全Routeを包む</span>
+&lt;BrowserRouter&gt;
+  &lt;Header /&gt;   <span style="color:#7c8aa5">← 自分で置く</span>
+  &lt;Routes&gt;…&lt;/Routes&gt;
+&lt;/BrowserRouter&gt;
+
+<span style="color:#7c8aa5">// 移動は react-router の Link</span>
+&lt;Link to={`/recipes/${r.id}`}&gt;
+  {r.name}
+&lt;/Link&gt;</pre>
+        <div style="margin-top:10px;background:#f7faff;border:1px solid #c9dcf6;border-radius:10px;padding:12px 16px;font-size:13px;color:#4b5563">
+          <strong style="color:#1d55b4;font-size:12px;letter-spacing:0.04em">⚙ 仕組み</strong><br>
+          クリックするとRouterがURLを書き換え、対応するコンポーネントに差し替えます（ページ再読み込みなし）。<br><br>ただし遷移先のコードやデータの先読みは自分で工夫する必要があります。
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">Next.js — layout.tsx と Link</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// app/layout.tsx — 全ページ共通の枠。</span>
+<span style="color:#7c8aa5">// childrenに各page.tsxがはまる</span>
+export default function RootLayout(
+  { <span style="color:#fcd34d">children</span> }  <span style="color:#7c8aa5">// ← 前作07章のpropsそのもの</span>
+) {
+  return (
+    &lt;html lang="ja"&gt;
+      &lt;body&gt;
+        &lt;Header /&gt;
+        {children}   <span style="color:#7c8aa5">← ここが差し替わる</span>
+      &lt;/body&gt;
+    &lt;/html&gt;
+  );
+}
+
+<span style="color:#7c8aa5">// 移動は next/link の Link</span>
+&lt;<span style="color:#fcd34d">Link</span> href={`/recipes/${r.id}`}&gt;
+  {r.name}
+&lt;/Link&gt;</pre>
+        <div style="margin-top:10px;background:#f0faf4;border:1px solid #bfe3cd;border-radius:10px;padding:12px 16px;font-size:13px;color:#4b5563">
+          <strong style="color:#1a7f4b;font-size:12px;letter-spacing:0.04em">⚙ 仕組み</strong><br>
+          layout.tsxは<strong>ページ遷移しても再レンダリングされず</strong>、中身（children）だけ差し替わります。<br><br>さらに <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.92em">&lt;Link&gt;</span> は画面内に見えた時点で遷移先を<strong>自動で先読み（prefetch）</strong>するため、クリック時にはほぼ待ちゼロで表示されます。
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#fdf4f4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#ff6b6b">⚠ ハマりどころ: 普通の &lt;a&gt; タグを使ってしまう</strong><br>
+      <span style="color:#4b5563">見た目は同じでも <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">&lt;a href="/recipes/1"&gt;</span> はページ全体を再読み込みし、stateも消えます（元のJS版と同じMPA遷移に戻ってしまう）。<br><br>アプリ内の移動は必ず <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">&lt;Link&gt;</span>、外部サイトへは <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">&lt;a&gt;</span>、と使い分けます。</span>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- ======== PAGE 8: FULL PICTURE ======== -->
+  <div data-screen-label="08 総合構成" style="display:{{ pg20 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">08</span>
+      <h2 style="font-size:25px;margin:0">総合 — レシピアプリのNext.js版 全体構成</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">ここまでの概念を組み合わせると、レシピアプリはこういう構成になります。<br><br>ポイントは<strong>「ほとんどサーバー、対話する部品だけクライアント」</strong>という境界の引き方です。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px;align-items:start">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:14px">ファイル構成と境界線</div>
+        <pre style="margin:0;background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;font-size:12px;line-height:1.8;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">app/
+├── layout.tsx        <span style="color:#4ade80">🖥 サーバー</span> <span style="color:#7c8aa5">共通ヘッダー</span>
+├── page.tsx          <span style="color:#4ade80">🖥 サーバー</span> <span style="color:#7c8aa5">レシピ一覧を取得</span>
+│   └── SearchBox     <span style="color:#fcd34d">🌐 クライアント</span> <span style="color:#7c8aa5">検索入力(useState)</span>
+├── recipes/[id]/
+│   ├── page.tsx      <span style="color:#4ade80">🖥 サーバー</span> <span style="color:#7c8aa5">idで1件取得</span>
+│   │   ├── EditForm  <span style="color:#fcd34d">🌐 クライアント</span> <span style="color:#7c8aa5">編集モード(useState)</span>
+│   │   └── DeleteBtn <span style="color:#fcd34d">🌐 クライアント</span> <span style="color:#7c8aa5">確認モーダル(useState)</span>
+│   └── loading.tsx   <span style="color:#4ade80">🖥 サーバー</span> <span style="color:#7c8aa5">読み込み中表示</span>
+└── register/
+    └── page.tsx      <span style="color:#4ade80">🖥 サーバー</span>
+        └── Form      <span style="color:#fcd34d">🌐 クライアント</span> <span style="color:#7c8aa5">登録フォーム</span></pre>
+      </div>
+      <div>
+        <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px;box-shadow:0 6px 18px rgba(15,23,42,0.06);font-size:13.5px;color:#4b5563">
+          <strong style="color:#0f172a;font-size:14px">データの持ち方も変わる</strong><br><br>
+          JS版・React版では<strong>localStorage</strong>がデータの保管庫でした。<br><br>Next.jsではサーバーがあるので、データは<strong>サーバー側（DBやファイル）</strong>に置くのが基本形になります。<br><br>登録・編集・削除は「Server Actions」というサーバー側の関数をフォームから直接呼ぶ形になり、「API作成 → fetch → state更新」の手間が大幅に減ります。
+        </div>
+        <div style="margin-top:14px;background:#f0faf4;border:1px solid #bfe3cd;border-radius:12px;padding:18px;font-size:13.5px;color:#4b5563">
+          <strong style="color:#1a7f4b;font-size:14px">前作との対応</strong><br><br>
+          ・検索の絞り込み（08章の派生値）→ SearchBoxの中でそのまま<br>
+          ・編集モード切替（04章）→ EditFormの中でそのまま<br>
+          ・useEffect保存（06章）→ Server Actionsに置き換え<br><br>
+          <strong>Reactで学んだ書き方は部品の中で全部生きています。</strong>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#f0faf4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#1a7f4b">Q. localStorageのままではだめ？</strong><br>
+      <span style="color:#4b5563">A. 動きますが、Next.jsの利点が半減します。<br><br>localStorageはブラウザごとの保存領域なので、サーバーはレシピの中身を知れず、SSRしても空のHTMLしか作れません（05章のハイドレーション問題も起きやすい）。<br><br>学習の順番としては「まずlocalStorageのまま移植 → 動いたらサーバー側に移す」の2段階がおすすめです。</span>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- ======== PAGE 9: SUMMARY ======== -->
+  <div data-screen-label="09 対応表" style="display:{{ pg21 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">09</span>
+      <h2 style="font-size:25px;margin:0">置き換え対応表 — Reactの知識はこうなる</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">React→Next.jsのチートシートです。<br><br>左の書き方・考え方が、Next.jsでは右になります。</p>
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);overflow:hidden">
+      <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;padding:12px 20px;background:#f8fafc;font-size:12px;font-weight:700;letter-spacing:0.06em;color:#6b7280">
+        <span>React（今）</span><span></span><span>Next.js（これから）</span>
+      </div>
+      <sc-for list="{{ mappingRows }}" as="mr" hint-placeholder-count="9">
+        <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;padding:14px 20px;border-top:1px solid #f1f5f9;font-size:13.5px">
+          <span style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#1d55b4">{{ mr.left }}</span>
+          <span style="color:#9ca3af;font-weight:700;text-align:center">→</span>
+          <span style="color:#334155">{{ mr.right }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top:24px;background:#fdf4f4;border-radius:14px;padding:20px 24px">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#ff6b6b;margin-bottom:12px">⚠ 注意すべき点 まとめ（ハマりどころ TOP4）</div>
+      <div style="display:grid;gap:10px;font-size:14px;color:#4b5563">
+        <div><strong style="color:#0f172a">1. "use client" の付け忘れ / 付けすぎ</strong><br>useState・onClickを使う部品には必須。<br>逆にページ丸ごとに付けるとSSRの利点が消えます。境界は小さく。</div>
+        <div><strong style="color:#0f172a">2. ハイドレーションエラー</strong><br>new Date()・乱数・localStorageをレンダリング中に使わない。<br>ブラウザ依存の処理はuseEffectの中へ。</div>
+        <div><strong style="color:#0f172a">3. &lt;a&gt; と &lt;Link&gt; の混同</strong><br>アプリ内の遷移に&lt;a&gt;を使うとページ全再読み込みでstateが消えます。</div>
+        <div><strong style="color:#0f172a">4. サーバーコンポーネントでブラウザAPIを触る</strong><br>window・document・localStorageはサーバーに存在しません。<br>「これはどこで実行されるコードか？」を常に自問する癖をつけましょう。</div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:24px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:14px">次のステップ — 移行の進め方</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <span style="background:#e6f4ec;border:1px solid #bfe3cd;color:#1a7f4b;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">① npx create-next-app で新規作成</span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e6f4ec;border:1px solid #bfe3cd;color:#1a7f4b;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">② App.jsxの検索画面を page.tsx + SearchBox に移植</span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e6f4ec;border:1px solid #bfe3cd;color:#1a7f4b;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">③ recipes/[id] で詳細ページ</span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e6f4ec;border:1px solid #bfe3cd;color:#1a7f4b;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">④ Server Actionsで登録・編集・削除</span>
+      </div>
+      <p style="margin:16px 0 0 0;font-size:14px;color:#6b7280">公式チュートリアル: <a href="https://nextjs.org/learn" target="_blank" rel="noopener noreferrer" style="color:#1a7f4b;font-weight:600">nextjs.org/learn</a> ／ 前作の資料: <a href="React学習ページ v2.dc.html" style="color:#ff6b6b;font-weight:600">JavaScript → React 置き換えマップ</a></p>
+    </div>
+  </div>
+
+  <!-- pager spacer so fixed footer doesn't cover content -->
+  <div style="display:{{ pagerDisplay }};height:88px"></div>
+
+  </main>
+
+  <!-- ======== PAGER FOOTER (fixed) ======== -->
+  <div style="display:{{ pagerDisplay }};position:fixed;left:0;right:0;bottom:0;background:#ffffff;border-top:1px solid #e5e7eb;box-shadow:0 -6px 18px rgba(15,23,42,0.06);z-index:50">
+    <div style="max-width:1280px;margin:0 auto;padding:14px 24px;display:flex;justify-content:space-between;gap:12px">
+      <button onClick="{{ goPrev }}" style="min-height:44px;text-align:left;border:1px solid #e5e7eb;background:#ffffff;cursor:pointer;font-family:inherit;border-radius:10px;padding:10px 16px;max-width:46%">
+        <span style="font-size:11px;color:#9ca3af;font-weight:700;letter-spacing:0.05em">‹ 前へ</span><br>
+        <span style="font-size:13.5px;font-weight:600;color:#0f172a">{{ prevLabel }}</span>
+      </button>
+      <sc-if value="{{ hasNext }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ goNext }}" style="min-height:44px;text-align:right;border:1px solid #bfe3cd;background:#f0faf4;cursor:pointer;font-family:inherit;border-radius:10px;padding:10px 16px;max-width:46%;margin-left:auto">
+          <span style="font-size:11px;color:#1a7f4b;font-weight:700;letter-spacing:0.05em">次へ ›</span><br>
+          <span style="font-size:13.5px;font-weight:600;color:#0f172a">{{ nextLabel }}</span>
+        </button>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showQa&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;表示&quot;,&quot;description&quot;:&quot;各章のQ&amp;A・注意コラムを表示&quot;}}">
+class Component extends DCLogic {
+  state = {
+    page: 0,
+    routeSel: 0,
+    quizSel: -1,
+    quizAnswer: null,
+    renderMode: "SSR"
+  };
+
+  GLOSSARY = [
+    { label: "CSR", desc: "ブラウザの中でHTMLを組み立てる（今のReact）" },
+    { label: "SSR", desc: "リクエストのたびサーバーでHTMLを組み立てる" },
+    { label: "SSG", desc: "ビルド時に1回だけHTMLを作り置きする" },
+    { label: "ISR", desc: "作り置きを一定時間ごとに裏で作り直す" },
+    { label: "ハイドレーション", desc: "サーバー製HTMLに後から命を吹き込む処理" },
+    { label: "ストリーミング/Suspense", desc: "遅い部分だけ後回しにして先に届ける" },
+    { label: "RSCペイロード", desc: "ページ遷移が速い理由。<Link>の裏側" }
+  ];
+
+  CHAPTERS = [
+    { label: "目次・全体像", desc: "" },
+    { label: "Next.jsとは", desc: "Vite+Reactに何が足されるか。CSRとSSRの違い" },
+    { label: "ルーティング", desc: "フォルダ構成がそのままURLになる。[id]で動的ページ" },
+    { label: "サーバー/クライアント", desc: "一番の新概念。\"use client\"で境界線を引く" },
+    { label: "\"use client\"の境界線", desc: "どこまで効くか。use serverとの違い" },
+    { label: "データ取得", desc: "useEffectの3拍子から、awaitして描画へ" },
+    { label: "レンダリング方式", desc: "SSR/SSG/ISR — いつHTMLを作るかを選ぶ" },
+    { label: "Linkとレイアウト", desc: "layout.tsxとprefetch。<a>タグとの違い" },
+    { label: "総合: 全体構成", desc: "レシピアプリのNext.js版設計図と境界の引き方" },
+    { label: "対応表と注意点", desc: "チートシート＋ハマりどころTOP4" }
+  ];
+
+  ROUTES = [
+    { tree: "├── page.tsx", url: "/", note: "検索つきのレシピ一覧。今のApp.jsxがここに相当します。", old: "index.html" },
+    { tree: "├── register/page.tsx", url: "/register", note: "レシピ登録ページ。registerフォルダを作ってpage.tsxを置くだけです。", old: "register.html" },
+    { tree: "├── recipes/page.tsx", url: "/recipes", note: "レシピ一覧ページ。ネストしたフォルダはそのままネストしたURLになります。", old: "recipes.html" },
+    { tree: "└── recipes/[id]/page.tsx", url: "/recipes/1", note: "[id]は可変部分。/recipes/1でも/recipes/99でも同じpage.tsxが呼ばれ、params.idで値を受け取ります。", old: "detail.html?id=1" }
+  ];
+
+  QUIZ = [
+    { label: "レシピ一覧の表示", server: true, reason: "表示するだけでstateもイベントもありません。サーバーでHTMLにして送れば、ブラウザにJSを送る必要がゼロです。" },
+    { label: "検索ボックス", server: false, reason: "入力のたびにuseStateで絞り込むので\"use client\"が必要です。ただしクライアントにするのはこの入力部品だけで、結果リストの描画は工夫次第でサーバーに残せます。" },
+    { label: "詳細ページの編集フォーム", server: false, reason: "編集モード切替（useState）と入力（onChange）がある、典型的なクライアントコンポーネントです。前作04章の知識がそのまま使えます。" },
+    { label: "共通ヘッダー（ロゴとナビ）", server: true, reason: "静的な表示だけならサーバーでOK。もし「現在ページのハイライト」などでusePathname()を使うなら、その部分だけクライアントに切り出します。" }
+  ];
+
+  TIMELINES = {
+    CSR: {
+      steps: [
+        "サーバーが「ほぼ空のHTML」を返す（画面は真っ白）",
+        "ブラウザがJSバンドルをダウンロード",
+        "ブラウザでReactが実行され、やっと画面が表示される",
+        "データ取得がさらに走れば、その後もう一度描画"
+      ],
+      useCase: "今のreact-learning/がこれ。管理画面など「開く人が限られ、SEO不要」な画面なら今後も十分アリです。"
+    },
+    SSR: {
+      steps: [
+        "リクエストが来るたびに、サーバーがReactを実行してHTMLを生成",
+        "完成済みHTMLが届く — この時点で内容が見える（速い）",
+        "裏でJSが届き、ハイドレーションで操作可能になる",
+        "以降の操作はブラウザ側のReactが担当"
+      ],
+      useCase: "「ログインユーザーのマイレシピ」などリクエストごとに中身が変わるページ。常に最新のデータでHTMLを作れます。"
+    },
+    SSG: {
+      steps: [
+        "ビルド時（デプロイ前）に全ページのHTMLを作り置きしておく",
+        "リクエストが来たら、作り置きHTMLを即返すだけ（最速）",
+        "裏でJSが届き、ハイドレーションで操作可能になる",
+        "内容を変えたいときは再ビルドが必要（自動更新はされない）"
+      ],
+      useCase: "公開レシピの詳細ページに最適。内容は誰が見ても同じで、更新頻度も低いため、作り置きが一番速くて安上がりです。"
+    },
+    ISR: {
+      steps: [
+        "SSGと同じく、まず作り置きHTMLを即返す（最速）",
+        "裏でJSが届き、ハイドレーションで操作可能になる",
+        "設定した時間（例: 60秒）が過ぎたら、次のアクセス時に裏側で再生成を開始",
+        "再生成が終わると、以降のアクセスは新しいHTMLに自動で切り替わる（再ビルド不要）"
+      ],
+      useCase: "「みんなのレシピ一覧」のように、誰が見ても同じだが新着レシピで内容が増える画面。SSGの速さと、SSRのような自動更新を両取りできます。"
+    }
+  };
+
+  MAPPING = [
+    { left: "vite（開発サーバー・ビルド）", right: "next dev / next build に置き換わる" },
+    { left: "react-router の <Route> 設定", right: "app/ のフォルダ構成そのもの（02章）" },
+    { left: "useParams() でid取得", right: "page.tsx が受け取る params props（02章）" },
+    { left: "全コンポーネントがブラウザで実行", right: "デフォルトはサーバー。対話部品だけ \"use client\"（03章）" },
+    { left: "useEffect + fetch + loading state", right: "async なサーバーコンポーネントで await（05章）" },
+    { left: "if (loading) return <p>読み込み中…</p>", right: "loading.tsx を置くだけ（05章）" },
+    { left: "react-router の <Link to=…>", right: "next/link の <Link href=…>。自動prefetch付き（07章）" },
+    { left: "共通ヘッダーを自分で各ページに配置", right: "layout.tsx の children に自動ではまる（07章）" },
+    { left: "localStorage にデータ保存", right: "サーバー側（DB）+ Server Actions（08章）" }
+  ];
+
+  componentDidMount() {
+    try {
+      const pg = parseInt(localStorage.getItem("nx-demo-page") || "0", 10);
+      this.setState({ page: (pg >= 0 && pg <= 21) ? pg : 0 });
+    } catch (e) { /* ignore */ }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevState || prevState.page !== this.state.page) {
+      localStorage.setItem("nx-demo-page", String(this.state.page));
+    }
+  }
+
+  goPage = (n) => {
+    this.setState({ page: n });
+    window.scrollTo({ top: 0, behavior: "auto" });
+  };
+
+  renderVals() {
+    const s = this.state;
+    const page = s.page;
+    const pg = {};
+    for (let i = 0; i <= 21; i++) pg["pg" + i] = (page === i) ? "block" : "none";
+
+    const labelOf = (n) => {
+      if (n === 0) return "目次・全体像";
+      if (n === 1) return "01 ReactとNextとは";
+      if (n === 2) return "02 ReactとNextの違い";
+      if (n === 3) return "03 レンダリングとは";
+      if (n === 4) return "04 レンダリングの違い";
+      if (n >= 5 && n <= 8) return "0" + n + " " + this.GLOSSARY[n - 5].label;
+      if (n === 9) return "09 全体まとめ";
+      if (n >= 10 && n <= 12) return "1" + (n - 10) + " " + this.GLOSSARY[n - 6].label;
+      const c = n - 12;
+      return String(c).padStart(2, "0") + " " + this.CHAPTERS[c].label;
+    };
+
+    const route = this.ROUTES[s.routeSel];
+    const quiz = s.quizSel >= 0 ? this.QUIZ[s.quizSel] : null;
+    const tl = this.TIMELINES[s.renderMode];
+
+    return {
+      qaOn: this.props.showQa ?? true,
+
+      ...pg,
+      navItems: [
+        { isItem: true, isHeader: false, num: "—", label: "目次・全体像", go: () => this.goPage(0), bg: page === 0 ? "#1a7f4b" : "transparent", color: page === 0 ? "#ffffff" : "#334155", weight: page === 0 ? 700 : 500 },
+        { isHeader: true, isItem: false, label: "用語ディープダイブ" },
+        { isItem: true, isHeader: false, num: "01", label: "ReactとNextとは", go: () => this.goPage(1), bg: page === 1 ? "#1a7f4b" : "transparent", color: page === 1 ? "#ffffff" : "#334155", weight: page === 1 ? 700 : 500 },
+        { isItem: true, isHeader: false, num: "02", label: "ReactとNextの違い", go: () => this.goPage(2), bg: page === 2 ? "#1a7f4b" : "transparent", color: page === 2 ? "#ffffff" : "#334155", weight: page === 2 ? 700 : 500 },
+        { isItem: true, isHeader: false, num: "03", label: "レンダリングとは", go: () => this.goPage(3), bg: page === 3 ? "#1a7f4b" : "transparent", color: page === 3 ? "#ffffff" : "#334155", weight: page === 3 ? 700 : 500 },
+        { isItem: true, isHeader: false, num: "04", label: "レンダリングの違い", go: () => this.goPage(4), bg: page === 4 ? "#1a7f4b" : "transparent", color: page === 4 ? "#ffffff" : "#334155", weight: page === 4 ? 700 : 500 },
+        ...this.GLOSSARY.slice(0, 4).map((g, i) => {
+          const p = i + 5;
+          return { isItem: true, isHeader: false, num: String(p).padStart(2, "0"), label: g.label, go: () => this.goPage(p), bg: page === p ? "#1a7f4b" : "transparent", color: page === p ? "#ffffff" : "#334155", weight: page === p ? 700 : 500 };
+        }),
+        { isItem: true, isHeader: false, num: "09", label: "全体まとめ", go: () => this.goPage(9), bg: page === 9 ? "#1a7f4b" : "transparent", color: page === 9 ? "#ffffff" : "#334155", weight: page === 9 ? 700 : 500 },
+        ...this.GLOSSARY.slice(4).map((g, i) => {
+          const p = i + 10;
+          return { isItem: true, isHeader: false, num: String(p).padStart(2, "0"), label: g.label, go: () => this.goPage(p), bg: page === p ? "#1a7f4b" : "transparent", color: page === p ? "#ffffff" : "#334155", weight: page === p ? 700 : 500 };
+        }),
+        { isHeader: true, isItem: false, label: "本編" },
+        ...this.CHAPTERS.slice(1).map((c, i) => {
+          const p = i + 13;
+          return { isItem: true, isHeader: false, num: String(i + 1).padStart(2, "0"), label: c.label, go: () => this.goPage(p), bg: page === p ? "#1a7f4b" : "transparent", color: page === p ? "#ffffff" : "#334155", weight: page === p ? 700 : 500 };
+        })
+      ],
+      glossaryToc: [
+        { num: "01", label: "ReactとNextとは", desc: "そもそもReactは何で、Next.jsは何なのか", go: () => this.goPage(1) },
+        { num: "02", label: "ReactとNextの違い", desc: "まず結論だけ先に押さえる", go: () => this.goPage(2) },
+        { num: "03", label: "レンダリングとは", desc: "JSXをHTMLに変換する作業そのものを定義", go: () => this.goPage(3) },
+        { num: "04", label: "レンダリングの違い", desc: "ブラウザとサーバーの特性比較とマトリクス", go: () => this.goPage(4) },
+        ...this.GLOSSARY.slice(0, 4).map((g, i) => ({ num: String(i + 5).padStart(2, "0"), label: g.label, desc: g.desc, go: () => this.goPage(i + 5) })),
+        { num: "09", label: "全体まとめ", desc: "CSR/SSR/SSG/ISRを1枚の表に整理", go: () => this.goPage(9) },
+        ...this.GLOSSARY.slice(4).map((g, i) => ({ num: String(i + 10).padStart(2, "0"), label: g.label, desc: g.desc, go: () => this.goPage(i + 10) }))
+      ],
+      tocItems: this.CHAPTERS.slice(1).map((c, i) => ({
+        num: String(i + 1).padStart(2, "0"),
+        label: c.label,
+        desc: c.desc,
+        go: () => this.goPage(i + 13)
+      })),
+      pageIndicator: page === 0 ? "全9章 + 用語01–12" : (page <= 12 ? "用語ディープダイブ / 01–12" : "第" + (page - 12) + "章 / 全9章"),
+      pagerDisplay: page === 0 ? "none" : "block",
+      goPrev: () => this.goPage(Math.max(0, page - 1)),
+      goNext: () => this.goPage(Math.min(21, page + 1)),
+      prevLabel: labelOf(Math.max(0, page - 1)),
+      hasNext: page < 21,
+      nextLabel: page < 21 ? labelOf(page + 1) : "",
+
+      // ch2 routing demo
+      routeItems: this.ROUTES.map((r, i) => ({
+        tree: r.tree,
+        pick: () => this.setState({ routeSel: i }),
+        bg: s.routeSel === i ? "#e6f4ec" : "transparent",
+        color: s.routeSel === i ? "#1a7f4b" : "#334155",
+        weight: s.routeSel === i ? 700 : 400
+      })),
+      routeUrl: route.url,
+      routeNote: route.note,
+      routeOld: route.old,
+
+      // ch3 quiz
+      quizItems: this.QUIZ.map((q, i) => ({
+        label: q.label,
+        pick: () => this.setState({ quizSel: i, quizAnswer: null }),
+        bg: s.quizSel === i ? "#0f172a" : "#ffffff",
+        color: s.quizSel === i ? "#ffffff" : "#334155",
+        border: s.quizSel === i ? "#0f172a" : "#e5e7eb"
+      })),
+      quizPicked: s.quizSel >= 0,
+      quizName: quiz ? quiz.label : "",
+      answerServer: () => this.setState({ quizAnswer: true }),
+      answerClient: () => this.setState({ quizAnswer: false }),
+      quizAnswered: s.quizAnswer !== null,
+      quizVerdict: quiz && s.quizAnswer !== null
+        ? (s.quizAnswer === quiz.server ? "⭕ 正解！ " : "❌ 惜しい。 ") + "正解は「" + (quiz.server ? "サーバー" : "クライアント") + "」"
+        : "",
+      quizResultBg: quiz && s.quizAnswer !== null ? (s.quizAnswer === quiz.server ? "#f0faf4" : "#fdf4f4") : "#f1f5f9",
+      quizReason: quiz ? quiz.reason : "",
+
+      // ch5 rendering timeline
+      renderModes: ["CSR", "SSR", "SSG", "ISR"].map(m => ({
+        label: m === "CSR" ? "CSR（今のReact）" : (m === "SSR" ? "SSR（毎回生成）" : (m === "SSG" ? "SSG（作り置き）" : "ISR（作り置き＋自動更新）")),
+        pick: () => this.setState({ renderMode: m }),
+        bg: s.renderMode === m ? (m === "CSR" ? "#e4eefc" : "#e6f4ec") : "#ffffff",
+        color: s.renderMode === m ? (m === "CSR" ? "#1d55b4" : "#1a7f4b") : "#334155",
+        border: s.renderMode === m ? (m === "CSR" ? "#c9dcf6" : "#bfe3cd") : "#e5e7eb"
+      })),
+      timelineSteps: tl.steps.map((t, i) => ({
+        num: "0" + (i + 1),
+        text: t,
+        bg: i === 0 && s.renderMode !== "CSR" ? "#f0faf4" : (i === 0 ? "#f7faff" : "#ffffff"),
+        border: i === 0 && s.renderMode !== "CSR" ? "#bfe3cd" : (i === 0 ? "#c9dcf6" : "#e5e7eb")
+      })),
+      renderUseCase: tl.useCase,
+
+      // ch8 mapping
+      mappingRows: this.MAPPING
+    };
+  }
+}
+</script>
+</body>
+</html>
