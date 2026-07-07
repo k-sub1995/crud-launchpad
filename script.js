@@ -237,3 +237,8 @@ document.getElementById('go-next-study').addEventListener('click', () => {
 document.getElementById('go-lang-study').addEventListener('click', () => {
   location.href = './docs/study/言語学習/言語学習ページ.html';
 });
+
+document.getElementById('go-fargate-study').addEventListener('click', () => {
+  location.href =
+    './docs/study/AWS-ecs-on-fargate学習/ECS Fargate ハンズオン.dc.html';
+});

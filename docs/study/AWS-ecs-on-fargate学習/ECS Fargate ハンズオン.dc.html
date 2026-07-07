@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans+JP:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: #0b1016; color: #e6edf3; font-family: 'IBM Plex Sans JP', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent, #ff9900); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ::selection { background: rgba(255,153,0,.28); }
+  pre::-webkit-scrollbar { height: 8px; }
+  pre::-webkit-scrollbar-thumb { background: #2a3746; border-radius: 8px; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+</style>
+</helmet>
+<div style="--accent:{{ accent }};--code-fs:{{ codeFs }};display:flex;min-height:100vh;background:#0b1016">
+
+  <aside style="position:fixed;top:0;left:0;width:300px;height:100vh;overflow-y:auto;background:#0d141c;border-right:1px solid #1c2836;padding:26px 20px 40px;z-index:20">
+    <div style="display:flex;align-items:center;gap:11px;margin-bottom:6px">
+      <div style="width:38px;height:38px;border-radius:9px;overflow:hidden;flex:0 0 auto"><img src="icons/fargate.svg" alt="Fargate" style="width:100%;height:100%" /></div>
+      <div style="line-height:1.2">
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;letter-spacing:.01em">ECS on Fargate ハンズオン</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5f6f7e;letter-spacing:.08em;margin-top:2px">2026.07 EDITION</div>
+      </div>
+    </div>
+
+    <div style="margin:22px 0 24px;padding:14px;background:#121b25;border:1px solid #1c2836;border-radius:11px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px">
+        <span style="font-size:11.5px;color:#8b98a5;letter-spacing:.05em">進捗</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent,#ff9900);font-weight:600">{{ progressLabel }}</span>
+      </div>
+      <div style="height:7px;background:#0b1016;border-radius:99px;overflow:hidden">
+        <div style="height:100%;border-radius:99px;background:linear-gradient(90deg,#ec7211,var(--accent,#ff9900));transition:width .35s ease;width:{{ progressWidth }}"></div>
+      </div>
+    </div>
+
+    <nav style="display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="12">
+        <a href="{{ item.href }}" data-id="{{ item.id }}" onClick="{{ navClick }}" style="{{ item.style }}">
+          <span style="{{ item.numStyle }}">{{ item.num }}</span>
+          <span style="flex:1;font-size:13px;line-height:1.35">{{ item.title }}</span>
+          <span style="{{ item.dotStyle }}"></span>
+        </a>
+      </sc-for>
+    </nav>
+
+    <div style="margin-top:26px;padding-top:18px;border-top:1px solid #1c2836;font-size:11px;color:#5f6f7e;line-height:1.6">
+      AWS初見の方向け。マネジメントコンソール中心で、完全にゼロからWebアプリを公開するまでを通しでやります。📷マークにはご自身のスクリーンショットをドラッグ&ドロップで入れられます。
+    </div>
+  </aside>
+
+  <main style="flex:1;margin-left:300px;padding:0 0 120px">
+    <div style="max-width:900px;margin:0 auto;padding:0 48px">
+
+      <header id="top" style="padding:80px 0 54px;border-bottom:1px solid #1c2836">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 13px;border:1px solid #2a3746;border-radius:99px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--accent,#ff9900);letter-spacing:.06em;margin-bottom:26px">
+          <span style="width:6px;height:6px;border-radius:99px;background:var(--accent,#ff9900);display:inline-block"></span>
+          HANDS-ON / NEXT.JS + FASTAPI + POSTGRESQL / ap-northeast-1
+        </div>
+        <h1 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:50px;line-height:1.1;font-weight:700;margin:0 0 20px;letter-spacing:-.01em">
+          動的サイトを<br><span style="color:var(--accent,#ff9900)">ECS on Fargate</span> で<br>ゼロから公開する
+        </h1>
+        <p style="font-size:16.5px;line-height:1.75;color:#aab6c2;max-width:660px;margin:0 0 32px">
+          AWSアカウントを作った直後の状態から、<strong style="color:#e6edf3">独自ドメインのHTTPSで動くWebアプリ</strong>（フロント: Next.js / API: FastAPI / DB: PostgreSQL）を公開するまでを、1つずつ画面を確認しながら進めます。VPC・セキュリティグループ・Route 53・証明書まで、登場するものはすべてこの資料の中で作ります。
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 14px;background:#121b25;border:1px solid #1c2836;border-radius:9px;font-size:13px;color:#cdd9e5"><span style="color:var(--accent,#ff9900)">▪</span>所要 6〜8時間（分割推奨）</div>
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 14px;background:#121b25;border:1px solid #1c2836;border-radius:9px;font-size:13px;color:#cdd9e5"><span style="color:var(--accent,#ff9900)">▪</span>前提知識ゼロでOK</div>
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 14px;background:#121b25;border:1px solid #1c2836;border-radius:9px;font-size:13px;color:#cdd9e5"><span style="color:var(--accent,#ff9900)">▪</span>📷 スクショは自分で貼って完成</div>
+        </div>
+      </header>
+
+      <!-- CHAPTERS -->
+
+      <section id="ch0" data-screen-label="00 全体像" style="padding:60px 0 56px;border-bottom:1px solid #1c2836;animation:fadeUp .5s ease both">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--accent,#ff9900);letter-spacing:.08em">CHAPTER 00</span>
+          <span style="flex:1;height:1px;background:#1c2836"></span>
+        </div>
+        <h2 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:31px;font-weight:700;margin:0 0 16px;letter-spacing:-.01em">全体像 — Webページが開くまで</h2>
+        <p style="font-size:16px;line-height:1.8;color:#aab6c2;margin:0 0 24px">手を動かす前に、これから作るものの全体像を掴みます。ブラウザに <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">https://example.com</code> と打ってからページが表示されるまで、裏では次のことが起きています。</p>
+
+        <div style="margin:24px 0;padding:28px 22px;background:#0a1119;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:22px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:96px"><div style="width:46px;height:46px;border-radius:11px;background:#3a4652;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.3)"><span style="font-size:20px">👤</span></div><div style="text-align:center"><div style="font-weight:600;font-size:12.5px">ブラウザ</div><div style="font-size:10.5px;color:#8b98a5">あなた</div></div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;color:#5f6f7e"><span style="color:var(--accent,#ff9900);font-size:20px">→</span><span style="font-size:9.5px;font-family:'IBM Plex Mono',monospace">①名前解決</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:96px"><img src="icons/route53.svg" alt="Route 53" style="width:46px;height:46px;border-radius:11px;box-shadow:0 3px 10px rgba(0,0,0,.3)" /><div style="text-align:center"><div style="font-weight:600;font-size:12.5px">Route 53</div><div style="font-size:10.5px;color:#8b98a5">DNS(住所録)</div></div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;color:#5f6f7e"><span style="color:var(--accent,#ff9900);font-size:20px">→</span><span style="font-size:9.5px;font-family:'IBM Plex Mono',monospace">②HTTPS接続</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:96px"><img src="icons/alb.svg" alt="ALB" style="width:46px;height:46px;border-radius:11px;box-shadow:0 3px 10px rgba(0,0,0,.3)" /><div style="text-align:center"><div style="font-weight:600;font-size:12.5px">ALB</div><div style="font-size:10.5px;color:#8b98a5">玄関・振り分け</div></div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;color:#5f6f7e"><span style="color:var(--accent,#ff9900);font-size:20px">→</span><span style="font-size:9.5px;font-family:'IBM Plex Mono',monospace">③画面生成</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:96px"><img src="icons/ecs.svg" alt="ECS" style="width:46px;height:46px;border-radius:11px;box-shadow:0 3px 10px rgba(0,0,0,.3)" /><div style="text-align:center"><div style="font-weight:600;font-size:12.5px">Next.js</div><div style="font-size:10.5px;color:#8b98a5">ECS/Fargate</div></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;padding-top:18px;border-top:1px dashed #1c2836">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;color:#5f6f7e"><span style="font-size:9.5px;font-family:'IBM Plex Mono',monospace">④ /api/* は</span><span style="font-size:9.5px;font-family:'IBM Plex Mono',monospace">API側へ</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:96px"><img src="icons/alb.svg" alt="ALB" style="width:40px;height:40px;border-radius:10px" /><div style="font-size:10.5px;color:#8b98a5">同じALB</div></div>
+            <div style="color:var(--accent,#ff9900);font-size:20px">→</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:96px"><img src="icons/fargate.svg" alt="Fargate" style="width:46px;height:46px;border-radius:11px;box-shadow:0 3px 10px rgba(0,0,0,.3)" /><div style="text-align:center"><div style="font-weight:600;font-size:12.5px">FastAPI</div><div style="font-size:10.5px;color:#8b98a5">ECS/Fargate</div></div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;color:#5f6f7e"><span style="color:var(--accent,#ff9900);font-size:20px">→</span><span style="font-size:9.5px;font-family:'IBM Plex Mono',monospace">⑤SQL</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:96px"><img src="icons/rds.svg" alt="RDS" style="width:46px;height:46px;border-radius:11px;box-shadow:0 3px 10px rgba(0,0,0,.3)" /><div style="text-align:center"><div style="font-weight:600;font-size:12.5px">PostgreSQL</div><div style="font-size:10.5px;color:#8b98a5">RDS</div></div></div>
+          </div>
+        </div>
+
+        <ol style="margin:12px 0 26px;padding-left:20px;font-size:14px;line-height:2;color:#c3cdd7">
+          <li><strong style="color:#e6edf3">名前解決</strong> — ブラウザは Route 53 に「example.com のIPアドレスは？」と聞き、ALBの住所を得る</li>
+          <li><strong style="color:#e6edf3">HTTPS接続</strong> — ALBが証明書(ACM)を使って暗号化通信を受け付け、リクエストを受け取る</li>
+          <li><strong style="color:#e6edf3">画面生成</strong> — ALBがNext.jsコンテナに転送。HTMLが返りページが表示される</li>
+          <li><strong style="color:#e6edf3">API呼び出し</strong> — ページ内のJSが <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">/api/...</code> を叩くと、ALBがパスを見てFastAPIコンテナへ振り分ける</li>
+          <li><strong style="color:#e6edf3">データ取得</strong> — FastAPIがRDS(PostgreSQL)にSQLを投げ、結果をJSONで返す</li>
+        </ol>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 12px">登場するサービスと役割</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px">
+          <div style="display:flex;gap:12px;padding:14px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><img src="icons/vpc.svg" alt="VPC" style="width:38px;height:38px;border-radius:9px;flex:0 0 auto" /><div><div style="font-size:13px;font-weight:600">VPC</div><div style="font-size:12px;color:#8b98a5;line-height:1.55">AWS内に作る自分専用のネットワーク。全ての土台</div></div></div>
+          <div style="display:flex;gap:12px;padding:14px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><img src="icons/ecs.svg" alt="ECS" style="width:38px;height:38px;border-radius:9px;flex:0 0 auto" /><div><div style="font-size:13px;font-weight:600">ECS on Fargate</div><div style="font-size:12px;color:#8b98a5;line-height:1.55">コンテナをサーバー管理なしで動かす実行基盤</div></div></div>
+          <div style="display:flex;gap:12px;padding:14px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><img src="icons/ecr.svg" alt="ECR" style="width:38px;height:38px;border-radius:9px;flex:0 0 auto" /><div><div style="font-size:13px;font-weight:600">ECR</div><div style="font-size:12px;color:#8b98a5;line-height:1.55">Dockerイメージの保管庫。ECSはここから取得する</div></div></div>
+          <div style="display:flex;gap:12px;padding:14px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><img src="icons/alb.svg" alt="ALB" style="width:38px;height:38px;border-radius:9px;flex:0 0 auto" /><div><div style="font-size:13px;font-weight:600">ALB</div><div style="font-size:12px;color:#8b98a5;line-height:1.55">リクエストの玄関。パスで振り分け、複数コンテナに分散</div></div></div>
+          <div style="display:flex;gap:12px;padding:14px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><img src="icons/rds.svg" alt="RDS" style="width:38px;height:38px;border-radius:9px;flex:0 0 auto" /><div><div style="font-size:13px;font-weight:600">RDS</div><div style="font-size:12px;color:#8b98a5;line-height:1.55">マネージドDB。バックアップやパッチをAWSが面倒見る</div></div></div>
+          <div style="display:flex;gap:12px;padding:14px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><img src="icons/ssm.svg" alt="SSM" style="width:38px;height:38px;border-radius:9px;flex:0 0 auto" /><div><div style="font-size:13px;font-weight:600">パラメータストア</div><div style="font-size:12px;color:#8b98a5;line-height:1.55">DBパスワード等の秘密情報の金庫。コードに書かない</div></div></div>
+          <div style="display:flex;gap:12px;padding:14px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><img src="icons/route53.svg" alt="Route53" style="width:38px;height:38px;border-radius:9px;flex:0 0 auto" /><div><div style="font-size:13px;font-weight:600">Route 53</div><div style="font-size:12px;color:#8b98a5;line-height:1.55">DNS。ドメイン名とALBを結びつける住所録</div></div></div>
+          <div style="display:flex;gap:12px;padding:14px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><img src="icons/acm.svg" alt="ACM" style="width:38px;height:38px;border-radius:9px;flex:0 0 auto" /><div><div style="font-size:13px;font-weight:600">ACM</div><div style="font-size:12px;color:#8b98a5;line-height:1.55">HTTPS用のサーバー証明書を無料で発行・自動更新</div></div></div>
+        </div>
+
+        <sc-if value="{{ showChecklist }}" hint-placeholder-val="{{ true }}">
+        <div style="margin:30px 0 4px;padding:16px 18px 10px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;padding:0 4px"><span style="font-size:13px">✅</span><span style="font-size:12.5px;font-weight:600;color:#8b98a5;letter-spacing:.04em">この章のチェック</span></div>
+          <sc-for list="{{ checks_ch0 }}" as="item" hint-placeholder-count="3">
+            <div data-id="{{ item.id }}" onClick="{{ toggleItem }}" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:9px 8px;border-radius:8px" style-hover="background:#131b26"><span style="{{ item.boxStyle }}">✓</span><span style="{{ item.txtStyle }}">{{ item.label }}</span></div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </section>
+
+      <section id="ch1" data-screen-label="01 環境準備" style="padding:56px 0;border-bottom:1px solid #1c2836;animation:fadeUp .5s ease both">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--accent,#ff9900);letter-spacing:.08em">CHAPTER 01</span>
+          <span style="flex:1;height:1px;background:#1c2836"></span>
+        </div>
+        <h2 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:31px;font-weight:700;margin:0 0 16px;letter-spacing:-.01em">環境準備</h2>
+        <p style="font-size:16px;line-height:1.8;color:#aab6c2;margin:0 0 24px">つまずかないための土台を最初に固めます。<strong style="color:#e6edf3">リージョンは全編 ap-northeast-1（東京）に統一</strong>。画面右上のリージョン表示を毎回確認する癖をつけてください。</p>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 12px">用意するもの</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:8px 0 8px">
+          <div style="padding:16px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><div style="font-size:13.5px;font-weight:600;margin-bottom:5px">AWSアカウント</div><div style="font-size:12.5px;color:#8b98a5;line-height:1.6">クレジットカード登録が必要。作成後すぐ請求アラートを設定。</div></div>
+          <div style="padding:16px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><div style="font-size:13.5px;font-weight:600;margin-bottom:5px">作業用IAMユーザー</div><div style="font-size:12.5px;color:#8b98a5;line-height:1.6">ルートユーザーでの作業は厳禁。管理者権限のIAMユーザーを1つ作る。</div></div>
+          <div style="padding:16px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><div style="font-size:13.5px;font-weight:600;margin-bottom:5px">Docker Desktop</div><div style="font-size:12.5px;color:#8b98a5;line-height:1.6">6章で使用。ローカルでコンテナをビルドするために必要。</div></div>
+          <div style="padding:16px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><div style="font-size:13.5px;font-weight:600;margin-bottom:5px">AWS CLI v2</div><div style="font-size:12.5px;color:#8b98a5;line-height:1.6">7章のECRプッシュで使用。aws configure まで済ませる。</div></div>
+        </div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 4px">手順 — 請求アラートの設定</h3>
+        <div style="display:flex;gap:13px;margin:14px 0;padding:15px 17px;background:rgba(255,153,0,.05);border:1px solid rgba(255,153,0,.18);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">🎯</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#d8cbb5"><strong style="color:var(--accent,#ff9900)">目的</strong> — 本ハンズオンでは NAT Gateway・RDS・ALB など「置いておくだけで課金される」リソースを作ります。想定外の請求に気づける仕組みを最初に用意します。</div>
+        </div>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">Billing and Cost Management コンソール</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">予算</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">予算を作成</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">テンプレートから「月次コスト予算」を選択、金額に例えば <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">50 USD</code>、通知先メールを入力して作成。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">2</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">画面右上のリージョンを「<strong style="color:#e6edf3">東京 ap-northeast-1</strong>」に切り替える。以降すべての操作をこのリージョンで行う。</div></div>
+          </div>
+        </div>
+        <div style="margin:14px 0"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="ss-ch1-budget" placeholder="📷 スクショ: 予算作成の完了画面（金額と通知先が見える状態）" hint-size="100%,220px" style="width:100%;height:220px"></x-import></div>
+        <div style="display:flex;gap:13px;margin:18px 0;padding:15px 17px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.22);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">✅</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#a8dab8"><strong style="color:#5fd685">実行するとこうなる</strong> — 予算一覧に作成した予算が表示され、しきい値超過時に登録メールへ通知が届くようになります。</div>
+        </div>
+
+        <div style="display:flex;gap:13px;margin:20px 0;padding:15px 17px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.24);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">⚠️</span>
+          <div style="font-size:13.5px;line-height:1.7;color:#e6a7a7"><strong style="color:#f0807f">課金の目安</strong> — この構成を丸1日動かすと NAT Gateway 約$1.1/日 + RDS(db.t4g.micro) 約$0.4/日 + ALB 約$0.6/日 + Fargate 約$0.9/日 ≒ <strong>1日あたり$3前後</strong>。学習が終わったら11章の手順で必ず削除してください。</div>
+        </div>
+
+        <sc-if value="{{ showChecklist }}" hint-placeholder-val="{{ true }}">
+        <div style="margin:30px 0 4px;padding:16px 18px 10px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;padding:0 4px"><span style="font-size:13px">✅</span><span style="font-size:12.5px;font-weight:600;color:#8b98a5;letter-spacing:.04em">この章のチェック</span></div>
+          <sc-for list="{{ checks_ch1 }}" as="item" hint-placeholder-count="4">
+            <div data-id="{{ item.id }}" onClick="{{ toggleItem }}" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:9px 8px;border-radius:8px" style-hover="background:#131b26"><span style="{{ item.boxStyle }}">✓</span><span style="{{ item.txtStyle }}">{{ item.label }}</span></div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </section>
+
+      <section id="ch2" data-screen-label="02 VPC" style="padding:56px 0;border-bottom:1px solid #1c2836;animation:fadeUp .5s ease both">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--accent,#ff9900);letter-spacing:.08em">CHAPTER 02</span>
+          <span style="flex:1;height:1px;background:#1c2836"></span>
+        </div>
+        <h2 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:31px;font-weight:700;margin:0 0 16px;letter-spacing:-.01em">VPC — ネットワークの土台</h2>
+        <p style="font-size:16px;line-height:1.8;color:#aab6c2;margin:0 0 24px">VPCは「AWS内に借りる自分専用の区画」。この中を<strong style="color:#e6edf3">インターネットから届く区画（パブリック）</strong>と<strong style="color:#e6edf3">届かない区画（プライベート）</strong>に分け、ALBは表に、アプリとDBは奥に置きます。</p>
+
+        <div style="margin:24px 0;padding:24px 22px;background:#0a1119;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><img src="icons/vpc.svg" alt="VPC" style="width:34px;height:34px;border-radius:8px" /><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8b98a5">VPC 10.0.0.0/16（今回作るもの）</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="padding:14px;border:1px dashed #3d6a4a;border-radius:11px;background:rgba(34,197,94,.04)">
+              <div style="font-size:11.5px;font-family:'IBM Plex Mono',monospace;color:#7fd99a;margin-bottom:8px">パブリックサブネット ×2 (AZ-a / AZ-b)</div>
+              <div style="font-size:12.5px;color:#c3cdd7;line-height:1.7">ALB と NAT Gateway を配置。インターネットゲートウェイ経由で外と直接通信できる。</div>
+            </div>
+            <div style="padding:14px;border:1px dashed #4a5a7a;border-radius:11px;background:rgba(77,157,255,.04)">
+              <div style="font-size:11.5px;font-family:'IBM Plex Mono',monospace;color:#7fb3f0;margin-bottom:8px">プライベートサブネット ×2 (AZ-a / AZ-b)</div>
+              <div style="font-size:12.5px;color:#c3cdd7;line-height:1.7">ECSタスクとRDSを配置。外から直接届かない。外向き通信はNAT経由のみ。</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:13px;margin:14px 0;padding:15px 17px;background:rgba(255,153,0,.05);border:1px solid rgba(255,153,0,.18);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">🎯</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#d8cbb5"><strong style="color:var(--accent,#ff9900)">VPCというサービスの目的</strong> — 誰がどこに入れるかをネットワークの層で制御するため。アプリやDBを直接インターネットに晒さない構成が、すべてのAWS設計の基本形です。</div>
+        </div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 4px">手順 — 「VPCなど」ウィザードで一括作成</h3>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">VPC コンソール</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">VPCを作成</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">作成するリソースで「<strong style="color:#e6edf3">VPCなど</strong>」を選択（VPC単体ではなく、サブネット・ルートテーブルまで一括で作れるウィザード）。名前タグに <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">handson</code>。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">2</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7;margin-bottom:8px">下記のとおり設定します。</div>
+              <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px">
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11.5px">IPv4 CIDR</span><span style="color:#e6edf3">10.0.0.0/16（既定のまま）</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11.5px">AZ数</span><span style="color:#e6edf3">2</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11.5px">パブリックサブネット</span><span style="color:#e6edf3">2</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11.5px">プライベートサブネット</span><span style="color:#e6edf3">2</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11.5px">NATゲートウェイ</span><span style="color:#e6edf3">1AZ内（学習用。本番は「AZごと」）</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11.5px">VPCエンドポイント</span><span style="color:#e6edf3">なし</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">3</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">右側の「プレビュー」で構成図を確認して「VPCを作成」。1〜2分で完了します。</div></div>
+          </div>
+        </div>
+        <div style="margin:14px 0"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="ss-ch2-vpc-map" placeholder="📷 スクショ: VPC作成完了後のリソースマップ（サブネット4つとNATが見える状態）" hint-size="100%,260px" style="width:100%;height:260px"></x-import></div>
+        <div style="display:flex;gap:13px;margin:18px 0;padding:15px 17px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.22);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">✅</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#a8dab8"><strong style="color:#5fd685">実行するとこうなる</strong> — VPC詳細の「リソースマップ」に、サブネット4つ・ルートテーブル・インターネットゲートウェイ・NATゲートウェイが線で結ばれて表示されます。この図が2章の内容そのものです。</div>
+        </div>
+        <div style="display:flex;gap:13px;margin:20px 0;padding:15px 17px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.24);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">⚠️</span>
+          <div style="font-size:13.5px;line-height:1.7;color:#e6a7a7"><strong style="color:#f0807f">課金注意</strong> — NAT Gateway はこの瞬間から時間課金（約$0.045/時+通信量）が始まります。数日空ける場合は11章を参考に一旦削除を。</div>
+        </div>
+
+        <sc-if value="{{ showChecklist }}" hint-placeholder-val="{{ true }}">
+        <div style="margin:30px 0 4px;padding:16px 18px 10px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;padding:0 4px"><span style="font-size:13px">✅</span><span style="font-size:12.5px;font-weight:600;color:#8b98a5;letter-spacing:.04em">この章のチェック</span></div>
+          <sc-for list="{{ checks_ch2 }}" as="item" hint-placeholder-count="3">
+            <div data-id="{{ item.id }}" onClick="{{ toggleItem }}" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:9px 8px;border-radius:8px" style-hover="background:#131b26"><span style="{{ item.boxStyle }}">✓</span><span style="{{ item.txtStyle }}">{{ item.label }}</span></div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </section>
+
+      <section id="ch3" data-screen-label="03 セキュリティグループ" style="padding:56px 0;border-bottom:1px solid #1c2836;animation:fadeUp .5s ease both">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--accent,#ff9900);letter-spacing:.08em">CHAPTER 03</span>
+          <span style="flex:1;height:1px;background:#1c2836"></span>
+        </div>
+        <h2 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:31px;font-weight:700;margin:0 0 16px;letter-spacing:-.01em">セキュリティグループ設計</h2>
+        <p style="font-size:16px;line-height:1.8;color:#aab6c2;margin:0 0 24px">セキュリティグループ(SG)は<strong style="color:#e6edf3">リソースごとの防火扉</strong>。「どこから・どのポートに入ってよいか」を決めます。今回は3枚の扉を鎖のようにつなぎます。</p>
+
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;margin:24px 0;padding:26px 20px;background:#0a1119;border:1px solid #1c2836;border-radius:13px">
+          <div style="padding:14px 16px;background:#111a24;border:1px solid #24323f;border-radius:11px;text-align:center;min-width:150px"><div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--accent,#ff9900);margin-bottom:4px">alb-sg</div><div style="font-size:12px;color:#c3cdd7;line-height:1.6">443/80 を<br><strong style="color:#e6edf3">全世界(0.0.0.0/0)</strong>から許可</div></div>
+          <div style="color:var(--accent,#ff9900);font-size:20px">→</div>
+          <div style="padding:14px 16px;background:#111a24;border:1px solid #24323f;border-radius:11px;text-align:center;min-width:150px"><div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--accent,#ff9900);margin-bottom:4px">app-sg</div><div style="font-size:12px;color:#c3cdd7;line-height:1.6">3000/8000 を<br><strong style="color:#e6edf3">alb-sgから来た通信のみ</strong>許可</div></div>
+          <div style="color:var(--accent,#ff9900);font-size:20px">→</div>
+          <div style="padding:14px 16px;background:#111a24;border:1px solid #24323f;border-radius:11px;text-align:center;min-width:150px"><div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--accent,#ff9900);margin-bottom:4px">db-sg</div><div style="font-size:12px;color:#c3cdd7;line-height:1.6">5432 を<br><strong style="color:#e6edf3">app-sgから来た通信のみ</strong>許可</div></div>
+        </div>
+
+        <div style="display:flex;gap:13px;margin:14px 0;padding:15px 17px;background:rgba(255,153,0,.05);border:1px solid rgba(255,153,0,.18);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">🎯</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#d8cbb5"><strong style="color:var(--accent,#ff9900)">この設計の目的</strong> — SGのソース(送信元)に<strong style="color:#e6edf3">IPアドレスではなく別のSG</strong>を指定できるのがポイント。「ALBを通った通信だけがアプリに届き、アプリを通った通信だけがDBに届く」一方通行の鎖を作ります。</div>
+        </div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 4px">手順 — 3つのSGを順に作成</h3>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">VPC コンソール</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">セキュリティグループ</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">セキュリティグループを作成</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">名前 <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">alb-sg</code>、VPCは2章で作った <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">handson-vpc</code> を選択。インバウンドルールに HTTPS(443)・HTTP(80)、ソース <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">0.0.0.0/0</code> を追加して作成。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">2</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">同様に <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">app-sg</code> を作成。インバウンドは カスタムTCP <strong style="color:#e6edf3">3000</strong> と <strong style="color:#e6edf3">8000</strong> の2行、ソースは「カスタム」で検索欄に <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">alb-sg</code> と入れてSGを選択。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">3</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7"><code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">db-sg</code> を作成。インバウンドは PostgreSQL(5432) 1行、ソースに <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">app-sg</code> を指定。</div></div>
+          </div>
+        </div>
+        <div style="margin:14px 0"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="ss-ch3-sg-list" placeholder="📷 スクショ: セキュリティグループ一覧（alb-sg / app-sg / db-sg の3つが並んだ状態）" hint-size="100%,200px" style="width:100%;height:200px"></x-import></div>
+        <div style="display:flex;gap:13px;margin:18px 0;padding:15px 17px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.22);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">✅</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#a8dab8"><strong style="color:#5fd685">実行するとこうなる</strong> — 3つのSGが一覧に並びます。db-sg のインバウンドを開くと、ソース欄に app-sg のID(sg-xxxx)が入っているはず。これが「SG参照」です。</div>
+        </div>
+
+        <sc-if value="{{ showChecklist }}" hint-placeholder-val="{{ true }}">
+        <div style="margin:30px 0 4px;padding:16px 18px 10px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;padding:0 4px"><span style="font-size:13px">✅</span><span style="font-size:12.5px;font-weight:600;color:#8b98a5;letter-spacing:.04em">この章のチェック</span></div>
+          <sc-for list="{{ checks_ch3 }}" as="item" hint-placeholder-count="2">
+            <div data-id="{{ item.id }}" onClick="{{ toggleItem }}" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:9px 8px;border-radius:8px" style-hover="background:#131b26"><span style="{{ item.boxStyle }}">✓</span><span style="{{ item.txtStyle }}">{{ item.label }}</span></div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </section>
+
+      <section id="ch4" data-screen-label="04 RDS" style="padding:56px 0;border-bottom:1px solid #1c2836;animation:fadeUp .5s ease both">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--accent,#ff9900);letter-spacing:.08em">CHAPTER 04</span>
+          <span style="flex:1;height:1px;background:#1c2836"></span>
+        </div>
+        <h2 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:31px;font-weight:700;margin:0 0 16px;letter-spacing:-.01em">RDS — PostgreSQL を立てる</h2>
+        <p style="font-size:16px;line-height:1.8;color:#aab6c2;margin:0 0 24px">DBサーバーを自分でインストール・運用する代わりに、AWSのマネージドDB「RDS」を使います。<strong style="color:#e6edf3">プライベートサブネットに置き、外からは一切届かない</strong>構成にします。</p>
+
+        <div style="display:flex;gap:13px;margin:14px 0;padding:15px 17px;background:rgba(255,153,0,.05);border:1px solid rgba(255,153,0,.18);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">🎯</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#d8cbb5"><strong style="color:var(--accent,#ff9900)">RDSというサービスの目的</strong> — バックアップ・パッチ適用・障害時の復旧をAWSに任せられるDB。EC2に自分でPostgreSQLを入れる運用と比べ、手間と事故リスクが大幅に減ります。</div>
+        </div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 4px">手順 — DBインスタンス作成</h3>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">RDS コンソール</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">データベースの作成</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">「標準作成」→ エンジン「PostgreSQL」を選択。テンプレートは「<strong style="color:#e6edf3">無料利用枠</strong>」（なければ「開発/テスト」）。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">2</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7;margin-bottom:8px">主な設定値：</div>
+              <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px">
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11.5px">DB識別子</span><span style="color:#e6edf3">handson-db</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11.5px">マスターユーザー</span><span style="color:#e6edf3">appuser／パスワードは「自己管理」で強いものを生成し控える</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11.5px">インスタンス</span><span style="color:#e6edf3">db.t4g.micro</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11.5px">VPC</span><span style="color:#e6edf3">handson-vpc</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11.5px">パブリックアクセス</span><span style="color:#e6edf3"><strong>なし</strong>（重要。外から直接つながせない）</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11.5px">セキュリティグループ</span><span style="color:#e6edf3">既存の db-sg を選択（defaultは外す）</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11.5px">最初のDB名</span><span style="color:#e6edf3">「追加設定」を開いて appdb と入力</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">3</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">「データベースの作成」をクリック。ステータスが「作成中」→「<strong style="color:#e6edf3">利用可能</strong>」になるまで5〜10分待つ。完了したらDB詳細画面の「接続とセキュリティ」から<strong style="color:#e6edf3">エンドポイント</strong>（xxx.rds.amazonaws.com）をコピーして控える。</div></div>
+          </div>
+        </div>
+        <div style="margin:14px 0"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="ss-ch4-rds" placeholder="📷 スクショ: DB詳細画面（ステータス「利用可能」とエンドポイントが見える状態）" hint-size="100%,240px" style="width:100%;height:240px"></x-import></div>
+        <div style="display:flex;gap:13px;margin:18px 0;padding:15px 17px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.22);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">✅</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#a8dab8"><strong style="color:#5fd685">実行するとこうなる</strong> — DBは起動しますが、パブリックアクセスなし＋db-sgの制限により、現時点ではどこからも接続できません。8章でECSタスク(app-sg)が動き始めて、初めて接続できるようになります。</div>
+        </div>
+
+        <sc-if value="{{ showChecklist }}" hint-placeholder-val="{{ true }}">
+        <div style="margin:30px 0 4px;padding:16px 18px 10px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;padding:0 4px"><span style="font-size:13px">✅</span><span style="font-size:12.5px;font-weight:600;color:#8b98a5;letter-spacing:.04em">この章のチェック</span></div>
+          <sc-for list="{{ checks_ch4 }}" as="item" hint-placeholder-count="3">
+            <div data-id="{{ item.id }}" onClick="{{ toggleItem }}" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:9px 8px;border-radius:8px" style-hover="background:#131b26"><span style="{{ item.boxStyle }}">✓</span><span style="{{ item.txtStyle }}">{{ item.label }}</span></div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </section>
+
+      <section id="ch5" data-screen-label="05 パラメータストア" style="padding:56px 0;border-bottom:1px solid #1c2836;animation:fadeUp .5s ease both">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--accent,#ff9900);letter-spacing:.08em">CHAPTER 05</span>
+          <span style="flex:1;height:1px;background:#1c2836"></span>
+        </div>
+        <h2 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:31px;font-weight:700;margin:0 0 16px;letter-spacing:-.01em">パラメータストアで秘密情報管理</h2>
+        <p style="font-size:16px;line-height:1.8;color:#aab6c2;margin:0 0 24px">DBのパスワードを<strong style="color:#e6edf3">コードや設定ファイルに直書きしない</strong>のが実務の鉄則。Systems Manager の「パラメータストア」に保存し、8章でECSタスクに環境変数として注入します。</p>
+
+        <div style="display:flex;gap:13px;margin:14px 0;padding:15px 17px;background:rgba(255,153,0,.05);border:1px solid rgba(255,153,0,.18);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">🎯</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#d8cbb5"><strong style="color:var(--accent,#ff9900)">パラメータストアの目的</strong> — 秘密情報の保管と配布を一元化するため。コードに書くとGitに残り漏洩します。無料で使え、暗号化(SecureString)もできます。ローテーション自動化まで必要になったら有償のSecrets Managerへ。</div>
+        </div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 4px">手順 — 接続情報を4つ保存</h3>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">Systems Manager コンソール</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">パラメータストア</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">パラメータの作成</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">次の4つを1つずつ作成します（名前は階層で整理するのが定石）。</div>
+              <div style="display:grid;grid-template-columns:auto auto 1fr;gap:6px 14px;font-size:12.5px;margin-top:10px">
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11px">/handson/db/host</span><span style="color:#8b98a5">String</span><span style="color:#e6edf3">4章で控えたRDSエンドポイント</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11px">/handson/db/name</span><span style="color:#8b98a5">String</span><span style="color:#e6edf3">appdb</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11px">/handson/db/user</span><span style="color:#8b98a5">String</span><span style="color:#e6edf3">appuser</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11px">/handson/db/password</span><span style="color:var(--accent,#ff9900)">SecureString</span><span style="color:#e6edf3">DBパスワード（暗号化して保存）</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">2</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">パスワードだけはタイプで「<strong style="color:#e6edf3">SecureString</strong>」を選ぶこと（KMSで暗号化される）。他はStringでOK。</div></div>
+          </div>
+        </div>
+        <div style="margin:14px 0"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="ss-ch5-params" placeholder="📷 スクショ: パラメータ一覧（/handson/db/ 配下の4つが並んだ状態）" hint-size="100%,200px" style="width:100%;height:200px"></x-import></div>
+        <div style="display:flex;gap:13px;margin:18px 0;padding:15px 17px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.22);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">✅</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#a8dab8"><strong style="color:#5fd685">実行するとこうなる</strong> — 一覧に4つのパラメータが並び、passwordのタイプ欄だけ「SecureString」と表示されます。値は画面上でマスクされます。</div>
+        </div>
+
+        <sc-if value="{{ showChecklist }}" hint-placeholder-val="{{ true }}">
+        <div style="margin:30px 0 4px;padding:16px 18px 10px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;padding:0 4px"><span style="font-size:13px">✅</span><span style="font-size:12.5px;font-weight:600;color:#8b98a5;letter-spacing:.04em">この章のチェック</span></div>
+          <sc-for list="{{ checks_ch5 }}" as="item" hint-placeholder-count="2">
+            <div data-id="{{ item.id }}" onClick="{{ toggleItem }}" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:9px 8px;border-radius:8px" style-hover="background:#131b26"><span style="{{ item.boxStyle }}">✓</span><span style="{{ item.txtStyle }}">{{ item.label }}</span></div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </section>
+
+      <section id="ch6" data-screen-label="06 Docker化" style="padding:56px 0;border-bottom:1px solid #1c2836;animation:fadeUp .5s ease both">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--accent,#ff9900);letter-spacing:.08em">CHAPTER 06</span>
+          <span style="flex:1;height:1px;background:#1c2836"></span>
+        </div>
+        <h2 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:31px;font-weight:700;margin:0 0 16px;letter-spacing:-.01em">アプリを Docker 化する</h2>
+        <p style="font-size:16px;line-height:1.8;color:#aab6c2;margin:0 0 24px">ECSで動かせる形＝<strong style="color:#e6edf3">コンテナイメージ</strong>にします。この章だけはAWSでなく手元のPCでの作業。Next.js と FastAPI それぞれに Dockerfile を書き、ローカルで動くことを確認してから次へ進みます。</p>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:26px 0 12px">FastAPI 側（最小構成）</h3>
+        <div data-code style="margin:16px 0;border:1px solid #23303f;border-radius:11px;overflow:hidden;background:#0a1119">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:#111a24;border-bottom:1px solid #1c2836"><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#7c8b99;letter-spacing:.05em">api/main.py</span><button onClick="{{ copyCode }}" style="display:flex;align-items:center;gap:6px;background:transparent;border:1px solid #2a3746;color:#8b98a5;font-size:11.5px;padding:4px 11px;border-radius:7px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .15s" style-hover="border-color:var(--accent,#ff9900);color:var(--accent,#ff9900)"><span style="font-size:12px">⧉</span><span data-lbl>コピー</span></button></div>
+          <pre style="margin:0;padding:15px 16px;overflow-x:auto"><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">import os
+import asyncpg
+from fastapi import FastAPI
+
+app = FastAPI()
+
+def dsn():
+    # 環境変数から接続情報を組み立てる（8章でECSが注入する）
+    return (
+        f"postgresql://{os.environ['DB_USER']}:{os.environ['DB_PASSWORD']}"
+        f"@{os.environ['DB_HOST']}:5432/{os.environ['DB_NAME']}"
+    )
+
+@app.get("/api/health")
+async def health():
+    return {"status": "ok"}
+
+@app.get("/api/messages")
+async def messages():
+    conn = await asyncpg.connect(dsn())
+    try:
+        await conn.execute(
+            "CREATE TABLE IF NOT EXISTS messages (id serial, body text)")
+        rows = await conn.fetch("SELECT id, body FROM messages ORDER BY id")
+        return [dict(r) for r in rows]
+    finally:
+        await conn.close()</code></pre>
+        </div>
+        <div data-code style="margin:16px 0;border:1px solid #23303f;border-radius:11px;overflow:hidden;background:#0a1119">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:#111a24;border-bottom:1px solid #1c2836"><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#7c8b99;letter-spacing:.05em">api/Dockerfile</span><button onClick="{{ copyCode }}" style="display:flex;align-items:center;gap:6px;background:transparent;border:1px solid #2a3746;color:#8b98a5;font-size:11.5px;padding:4px 11px;border-radius:7px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .15s" style-hover="border-color:var(--accent,#ff9900);color:var(--accent,#ff9900)"><span style="font-size:12px">⧉</span><span data-lbl>コピー</span></button></div>
+          <pre style="margin:0;padding:15px 16px;overflow-x:auto"><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">FROM python:3.13-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]</code></pre>
+        </div>
+        <p style="font-size:13.5px;line-height:1.8;color:#8b98a5;margin:8px 0 0"><code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">requirements.txt</code> は fastapi / uvicorn / asyncpg の3行。</p>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 12px">Next.js 側</h3>
+        <p style="font-size:14.5px;line-height:1.85;color:#c3cdd7;margin:0 0 16px">ポイントは2つ。① <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">next.config.js</code> に <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">output: "standalone"</code> を指定してイメージを軽くする。② API呼び出しは <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">fetch("/api/messages")</code> のように<strong style="color:#e6edf3">同一ドメインの相対パス</strong>で書く（ALBが振り分けてくれるので、APIのURLをフロントに埋め込む必要がない）。</p>
+        <div data-code style="margin:16px 0;border:1px solid #23303f;border-radius:11px;overflow:hidden;background:#0a1119">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:#111a24;border-bottom:1px solid #1c2836"><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#7c8b99;letter-spacing:.05em">front/Dockerfile（マルチステージ）</span><button onClick="{{ copyCode }}" style="display:flex;align-items:center;gap:6px;background:transparent;border:1px solid #2a3746;color:#8b98a5;font-size:11.5px;padding:4px 11px;border-radius:7px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .15s" style-hover="border-color:var(--accent,#ff9900);color:var(--accent,#ff9900)"><span style="font-size:12px">⧉</span><span data-lbl>コピー</span></button></div>
+          <pre style="margin:0;padding:15px 16px;overflow-x:auto"><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">FROM node:22-slim AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:22-slim
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=build /app/.next/standalone ./
+COPY --from=build /app/.next/static ./.next/static
+COPY --from=build /app/public ./public
+EXPOSE 3000
+CMD ["node", "server.js"]</code></pre>
+        </div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 12px">ローカルで通し確認（docker compose）</h3>
+        <div data-code style="margin:16px 0;border:1px solid #23303f;border-radius:11px;overflow:hidden;background:#0a1119">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:#111a24;border-bottom:1px solid #1c2836"><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#7c8b99;letter-spacing:.05em">compose.yaml</span><button onClick="{{ copyCode }}" style="display:flex;align-items:center;gap:6px;background:transparent;border:1px solid #2a3746;color:#8b98a5;font-size:11.5px;padding:4px 11px;border-radius:7px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .15s" style-hover="border-color:var(--accent,#ff9900);color:var(--accent,#ff9900)"><span style="font-size:12px">⧉</span><span data-lbl>コピー</span></button></div>
+          <pre style="margin:0;padding:15px 16px;overflow-x:auto"><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: localpass
+      POSTGRES_DB: appdb
+  api:
+    build: ./api
+    environment:
+      DB_HOST: db
+      DB_USER: appuser
+      DB_PASSWORD: localpass
+      DB_NAME: appdb
+    ports: ["8000:8000"]
+  front:
+    build: ./front
+    ports: ["3000:3000"]</code></pre>
+        </div>
+        <div data-code style="margin:16px 0;border:1px solid #23303f;border-radius:11px;overflow:hidden;background:#0a1119">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:#111a24;border-bottom:1px solid #1c2836"><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#7c8b99;letter-spacing:.05em">bash — 動作確認</span><button onClick="{{ copyCode }}" style="display:flex;align-items:center;gap:6px;background:transparent;border:1px solid #2a3746;color:#8b98a5;font-size:11.5px;padding:4px 11px;border-radius:7px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .15s" style-hover="border-color:var(--accent,#ff9900);color:var(--accent,#ff9900)"><span style="font-size:12px">⧉</span><span data-lbl>コピー</span></button></div>
+          <pre style="margin:0;padding:15px 16px;overflow-x:auto"><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">docker compose up --build
+
+# 別ターミナルで
+curl http://localhost:8000/api/health
+# =&gt; {"status":"ok"}
+# ブラウザで http://localhost:3000 を開きページ表示を確認</code></pre>
+        </div>
+        <div style="display:flex;gap:13px;margin:18px 0;padding:15px 17px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.22);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">✅</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#a8dab8"><strong style="color:#5fd685">実行するとこうなる</strong> — ローカルの3コンテナ（front / api / db）が起動し、ブラウザでページが表示されます。この「動く状態」を、7章以降でそのままAWSに持っていきます。</div>
+        </div>
+
+        <sc-if value="{{ showChecklist }}" hint-placeholder-val="{{ true }}">
+        <div style="margin:30px 0 4px;padding:16px 18px 10px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;padding:0 4px"><span style="font-size:13px">✅</span><span style="font-size:12.5px;font-weight:600;color:#8b98a5;letter-spacing:.04em">この章のチェック</span></div>
+          <sc-for list="{{ checks_ch6 }}" as="item" hint-placeholder-count="3">
+            <div data-id="{{ item.id }}" onClick="{{ toggleItem }}" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:9px 8px;border-radius:8px" style-hover="background:#131b26"><span style="{{ item.boxStyle }}">✓</span><span style="{{ item.txtStyle }}">{{ item.label }}</span></div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </section>
+
+      <section id="ch7" data-screen-label="07 ECR" style="padding:56px 0;border-bottom:1px solid #1c2836;animation:fadeUp .5s ease both">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--accent,#ff9900);letter-spacing:.08em">CHAPTER 07</span>
+          <span style="flex:1;height:1px;background:#1c2836"></span>
+        </div>
+        <h2 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:31px;font-weight:700;margin:0 0 16px;letter-spacing:-.01em">ECR — イメージ置き場</h2>
+        <p style="font-size:16px;line-height:1.8;color:#aab6c2;margin:0 0 24px">手元でビルドしたイメージをAWSに置きます。ECSは実行時にここからイメージを取得します。</p>
+
+        <div style="display:flex;gap:13px;margin:14px 0;padding:15px 17px;background:rgba(255,153,0,.05);border:1px solid rgba(255,153,0,.18);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">🎯</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#d8cbb5"><strong style="color:var(--accent,#ff9900)">ECRの目的</strong> — Docker Hubと同じ「コンテナレジストリ」のAWS版。同一リージョン内のECSからの取得が速く、IAMで取得権限を制御できます。</div>
+        </div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 4px">手順</h3>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">ECR コンソール</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">リポジトリを作成</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">「プライベート」で <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">handson-front</code> と <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">handson-api</code> の2つを作成。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">2</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">各リポジトリを開き「<strong style="color:#e6edf3">プッシュコマンドを表示</strong>」の内容を実行（下記はまとめたもの。ACCOUNT_IDは自分の12桁に置き換え）。</div></div>
+          </div>
+        </div>
+        <div data-code style="margin:16px 0;border:1px solid #23303f;border-radius:11px;overflow:hidden;background:#0a1119">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:#111a24;border-bottom:1px solid #1c2836"><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#7c8b99;letter-spacing:.05em">bash — ビルド&amp;プッシュ</span><button onClick="{{ copyCode }}" style="display:flex;align-items:center;gap:6px;background:transparent;border:1px solid #2a3746;color:#8b98a5;font-size:11.5px;padding:4px 11px;border-radius:7px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .15s" style-hover="border-color:var(--accent,#ff9900);color:var(--accent,#ff9900)"><span style="font-size:12px">⧉</span><span data-lbl>コピー</span></button></div>
+          <pre style="margin:0;padding:15px 16px;overflow-x:auto"><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">ACCOUNT_ID=123456789012
+REGISTRY=$ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com
+
+aws ecr get-login-password --region ap-northeast-1 | \
+  docker login --username AWS --password-stdin $REGISTRY
+
+# Fargate(x86_64)向けにビルドする点に注意（Apple Silicon の人は必須）
+docker build --platform linux/amd64 -t $REGISTRY/handson-front:v1 ./front
+docker push $REGISTRY/handson-front:v1
+
+docker build --platform linux/amd64 -t $REGISTRY/handson-api:v1 ./api
+docker push $REGISTRY/handson-api:v1</code></pre>
+        </div>
+        <div style="margin:14px 0"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="ss-ch7-ecr" placeholder="📷 スクショ: ECRリポジトリ内にイメージ(v1タグ)が表示された状態" hint-size="100%,200px" style="width:100%;height:200px"></x-import></div>
+        <div style="display:flex;gap:13px;margin:18px 0;padding:15px 17px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.22);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">✅</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#a8dab8"><strong style="color:#5fd685">実行するとこうなる</strong> — 各リポジトリの「イメージ」タブに <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">v1</code> タグのイメージが表示されます。このURI（<code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">...amazonaws.com/handson-front:v1</code>）を8章で使うので控えておく。</div>
+        </div>
+        <div style="display:flex;gap:13px;margin:20px 0;padding:15px 17px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.24);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">⚠️</span>
+          <div style="font-size:13.5px;line-height:1.7;color:#e6a7a7"><strong style="color:#f0807f">Apple Siliconの罠</strong> — M1/M2/M3 Macで <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">--platform linux/amd64</code> を付け忘れると、ECSタスクが「exec format error」で即死します。原因に気づきにくい定番トラブル。</div>
+        </div>
+
+        <sc-if value="{{ showChecklist }}" hint-placeholder-val="{{ true }}">
+        <div style="margin:30px 0 4px;padding:16px 18px 10px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;padding:0 4px"><span style="font-size:13px">✅</span><span style="font-size:12.5px;font-weight:600;color:#8b98a5;letter-spacing:.04em">この章のチェック</span></div>
+          <sc-for list="{{ checks_ch7 }}" as="item" hint-placeholder-count="2">
+            <div data-id="{{ item.id }}" onClick="{{ toggleItem }}" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:9px 8px;border-radius:8px" style-hover="background:#131b26"><span style="{{ item.boxStyle }}">✓</span><span style="{{ item.txtStyle }}">{{ item.label }}</span></div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </section>
+
+      <section id="ch8" data-screen-label="08 ECS" style="padding:56px 0;border-bottom:1px solid #1c2836;animation:fadeUp .5s ease both">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--accent,#ff9900);letter-spacing:.08em">CHAPTER 08</span>
+          <span style="flex:1;height:1px;background:#1c2836"></span>
+        </div>
+        <h2 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:31px;font-weight:700;margin:0 0 16px;letter-spacing:-.01em">ECS — クラスターとタスク定義</h2>
+        <p style="font-size:16px;line-height:1.8;color:#aab6c2;margin:0 0 24px">ECSの登場人物は3つ。<strong style="color:#e6edf3">クラスター</strong>（入れ物）、<strong style="color:#e6edf3">タスク定義</strong>（コンテナの設計図）、<strong style="color:#e6edf3">サービス</strong>（設計図どおりに常時N個動かし続ける仕組み・9章で作成）。Fargateを選ぶと、下で動くサーバーの管理が不要になります。</p>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:26px 0 4px">手順 1 — クラスター作成</h3>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">ECS コンソール</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">クラスター</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">クラスターの作成</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">名前 <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">handson-cluster</code>、インフラは「<strong style="color:#e6edf3">AWS Fargate</strong>」のみチェックで作成。</div></div>
+          </div>
+        </div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 4px">手順 2 — タスク定義（api側）</h3>
+        <div style="display:flex;gap:13px;margin:14px 0;padding:15px 17px;background:rgba(255,153,0,.05);border:1px solid rgba(255,153,0,.18);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">🎯</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#d8cbb5"><strong style="color:var(--accent,#ff9900)">2つのロールの違い</strong> — <strong style="color:#e6edf3">タスク実行ロール</strong>＝ECS自身がタスクを起動するための権限（ECRからのpull、パラメータストアの読み取り、ログ書き込み）。<strong style="color:#e6edf3">タスクロール</strong>＝アプリのコードがAWSを呼ぶ時の権限（今回は不要）。混同しやすいので注意。</div>
+        </div>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">ECS コンソール</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">タスク定義</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">新しいタスク定義の作成</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">ファミリー名 <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">handson-api</code>、起動タイプ Fargate、CPU 0.25 vCPU / メモリ 0.5 GB。タスク実行ロールは「新しいロールの作成」。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">2</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7;margin-bottom:8px">コンテナ設定：名前 <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">api</code>、イメージURIは7章で控えた <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">.../handson-api:v1</code>、コンテナポート <strong style="color:#e6edf3">8000</strong>。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">3</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7;margin-bottom:8px">「環境変数」セクションで、5章のパラメータを<strong style="color:#e6edf3">「ValueFrom」</strong>として注入：</div>
+              <div style="display:grid;grid-template-columns:auto auto 1fr;gap:6px 14px;font-size:12.5px">
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11px">DB_HOST</span><span style="color:#8b98a5">ValueFrom</span><span style="color:#e6edf3;font-family:'IBM Plex Mono',monospace;font-size:11px">/handson/db/host</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11px">DB_NAME</span><span style="color:#8b98a5">ValueFrom</span><span style="color:#e6edf3;font-family:'IBM Plex Mono',monospace;font-size:11px">/handson/db/name</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11px">DB_USER</span><span style="color:#8b98a5">ValueFrom</span><span style="color:#e6edf3;font-family:'IBM Plex Mono',monospace;font-size:11px">/handson/db/user</span>
+                <span style="color:#7c8b99;font-family:'IBM Plex Mono',monospace;font-size:11px">DB_PASSWORD</span><span style="color:#8b98a5">ValueFrom</span><span style="color:#e6edf3;font-family:'IBM Plex Mono',monospace;font-size:11px">/handson/db/password</span>
+              </div>
+              <div style="font-size:13px;line-height:1.7;color:#8b98a5;margin-top:8px">これで6章のコードの <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">os.environ[...]</code> に、起動時に値が入ります。コードに秘密が書かれない仕組みの完成。</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:13px;margin:18px 0;padding:15px 17px;background:rgba(77,157,255,.06);border:1px solid rgba(77,157,255,.24);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">📌</span>
+          <div style="font-size:13.5px;line-height:1.7;color:#a9c7ea">初回は「実行ロールにSSM読み取り権限がない」エラーでタスクが落ちることがあります。その場合はIAMコンソールで <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">ecsTaskExecutionRole</code> にインラインポリシーで <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">ssm:GetParameters</code>（対象 /handson/* ）を追加してください（2章のLambda資料・実行ロール追加と同じ手順です）。</div>
+        </div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 4px">手順 3 — タスク定義（front側）</h3>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">同様に ファミリー名 <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">handson-front</code>、イメージ <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">.../handson-front:v1</code>、ポート <strong style="color:#e6edf3">3000</strong> で作成。環境変数は不要（APIは相対パスで呼ぶため）。</div></div>
+          </div>
+        </div>
+        <div style="margin:14px 0"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="ss-ch8-taskdef" placeholder="📷 スクショ: タスク定義一覧（handson-api / handson-front が並んだ状態）" hint-size="100%,200px" style="width:100%;height:200px"></x-import></div>
+        <div style="display:flex;gap:13px;margin:18px 0;padding:15px 17px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.22);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">✅</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#a8dab8"><strong style="color:#5fd685">実行するとこうなる</strong> — タスク定義が2つ登録されます。まだコンテナは動いていません（設計図を書いただけ）。動かすのは9章の「サービス」です。</div>
+        </div>
+
+        <sc-if value="{{ showChecklist }}" hint-placeholder-val="{{ true }}">
+        <div style="margin:30px 0 4px;padding:16px 18px 10px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;padding:0 4px"><span style="font-size:13px">✅</span><span style="font-size:12.5px;font-weight:600;color:#8b98a5;letter-spacing:.04em">この章のチェック</span></div>
+          <sc-for list="{{ checks_ch8 }}" as="item" hint-placeholder-count="4">
+            <div data-id="{{ item.id }}" onClick="{{ toggleItem }}" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:9px 8px;border-radius:8px" style-hover="background:#131b26"><span style="{{ item.boxStyle }}">✓</span><span style="{{ item.txtStyle }}">{{ item.label }}</span></div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </section>
+
+      <section id="ch9" data-screen-label="09 ALB&サービス" style="padding:56px 0;border-bottom:1px solid #1c2836;animation:fadeUp .5s ease both">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--accent,#ff9900);letter-spacing:.08em">CHAPTER 09</span>
+          <span style="flex:1;height:1px;background:#1c2836"></span>
+        </div>
+        <h2 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:31px;font-weight:700;margin:0 0 16px;letter-spacing:-.01em">ALB &amp; サービス起動</h2>
+        <p style="font-size:16px;line-height:1.8;color:#aab6c2;margin:0 0 24px">いよいよ動かします。ALB（玄関）を立て、<strong style="color:#e6edf3">「/api/* はFastAPIへ、それ以外はNext.jsへ」</strong>という振り分けルールを設定し、ECSサービスでコンテナを常駐させます。</p>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:26px 0 4px">手順 1 — ターゲットグループを2つ作成</h3>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">EC2 コンソール</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">ターゲットグループ</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">ターゲットグループの作成</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">タイプは「<strong style="color:#e6edf3">IPアドレス</strong>」(Fargateはこれ)。名前 <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">front-tg</code>、プロトコルHTTP:3000、VPCは handson-vpc、ヘルスチェックパス <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">/</code>。ターゲットは登録せず作成（サービスが自動登録する）。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">2</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">同様に <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">api-tg</code>（HTTP:8000、ヘルスチェックパス <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">/api/health</code>）を作成。</div></div>
+          </div>
+        </div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 4px">手順 2 — ALB作成とパスルーティング</h3>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">EC2 コンソール</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">ロードバランサー</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">Application Load Balancer を作成</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">名前 <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">handson-alb</code>、「インターネット向け」、VPCは handson-vpc、マッピングで<strong style="color:#e6edf3">パブリックサブネット2つ</strong>を選択、SGは <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">alb-sg</code>。リスナー HTTP:80 の転送先に <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">front-tg</code> を指定して作成。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">2</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">作成したALB</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">リスナー HTTP:80</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">ルールの追加</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">条件「パス」= <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">/api/*</code>、アクション「転送」→ <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">api-tg</code>、優先度 1 で保存。これで振り分け完成。</div></div>
+          </div>
+        </div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 4px">手順 3 — ECSサービスを2つ起動</h3>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">handson-cluster</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">サービス</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">作成</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">タスク定義 <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">handson-api</code>、サービス名 <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">api-svc</code>、必要なタスク数 <strong style="color:#e6edf3">1</strong>。ネットワーキング：<strong style="color:#e6edf3">プライベートサブネット2つ</strong>・SGは <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">app-sg</code>・<strong style="color:#e6edf3">パブリックIPはオフ</strong>。ロードバランシングでALB → リスナー80:HTTP → <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">api-tg</code> を選択して作成。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">2</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">同様に <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">front-svc</code>（タスク定義 handson-front、ターゲットグループ front-tg）を作成。</div></div>
+          </div>
+        </div>
+        <div style="margin:14px 0"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="ss-ch9-services" placeholder="📷 スクショ: クラスター画面でサービス2つが「アクティブ」、タスクが「実行中」の状態" hint-size="100%,240px" style="width:100%;height:240px"></x-import></div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 12px">動作確認</h3>
+        <div data-code style="margin:16px 0;border:1px solid #23303f;border-radius:11px;overflow:hidden;background:#0a1119">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:#111a24;border-bottom:1px solid #1c2836"><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#7c8b99;letter-spacing:.05em">bash — ALBのDNS名で確認</span><button onClick="{{ copyCode }}" style="display:flex;align-items:center;gap:6px;background:transparent;border:1px solid #2a3746;color:#8b98a5;font-size:11.5px;padding:4px 11px;border-radius:7px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .15s" style-hover="border-color:var(--accent,#ff9900);color:var(--accent,#ff9900)"><span style="font-size:12px">⧉</span><span data-lbl>コピー</span></button></div>
+          <pre style="margin:0;padding:15px 16px;overflow-x:auto"><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre"># ALB詳細画面の「DNS名」をコピーして
+curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
+# =&gt; {"status":"ok"}
+
+# ブラウザで同じDNS名を開くと Next.js のページが表示される</code></pre>
+        </div>
+        <div style="display:flex;gap:13px;margin:18px 0;padding:15px 17px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.22);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">✅</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#a8dab8"><strong style="color:#5fd685">実行するとこうなる</strong> — ここが本ハンズオン最大の山場です。ブラウザにページが出れば、①〜⑤の流れ（ALB→Next→ALB→FastAPI→RDS）がすべて貫通しています。エラーの場合はサービスの「イベント」タブとタスクの「ログ」タブを見るのが定石（11章）。</div>
+        </div>
+
+        <sc-if value="{{ showChecklist }}" hint-placeholder-val="{{ true }}">
+        <div style="margin:30px 0 4px;padding:16px 18px 10px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;padding:0 4px"><span style="font-size:13px">✅</span><span style="font-size:12.5px;font-weight:600;color:#8b98a5;letter-spacing:.04em">この章のチェック</span></div>
+          <sc-for list="{{ checks_ch9 }}" as="item" hint-placeholder-count="4">
+            <div data-id="{{ item.id }}" onClick="{{ toggleItem }}" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:9px 8px;border-radius:8px" style-hover="background:#131b26"><span style="{{ item.boxStyle }}">✓</span><span style="{{ item.txtStyle }}">{{ item.label }}</span></div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </section>
+
+      <section id="ch10" data-screen-label="10 Route53&HTTPS" style="padding:56px 0;border-bottom:1px solid #1c2836;animation:fadeUp .5s ease both">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--accent,#ff9900);letter-spacing:.08em">CHAPTER 10</span>
+          <span style="flex:1;height:1px;background:#1c2836"></span>
+        </div>
+        <h2 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:31px;font-weight:700;margin:0 0 16px;letter-spacing:-.01em">Route 53 &amp; HTTPS 化</h2>
+        <p style="font-size:16px;line-height:1.8;color:#aab6c2;margin:0 0 24px">仕上げです。ALBの長いDNS名を<strong style="color:#e6edf3">自分のドメイン</strong>に置き換え、ACMの証明書で<strong style="color:#e6edf3">HTTPS</strong>にします。ドメイン代（.comで年約$14〜）だけは実費がかかります。</p>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:26px 0 4px">手順 1 — ドメイン取得</h3>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">Route 53 コンソール</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">登録済みドメイン</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">ドメインの登録</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">好きなドメイン名を検索して購入（連絡先情報の入力が必要。登録完了まで最大数十分）。既にお名前.com等で持っている場合はそのドメインのNSをRoute 53のホストゾーンに向ければ同じことができます。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">2</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">登録が完了すると「ホストゾーン」に自分のドメインが自動作成されている。これがこのドメインの住所録本体。</div></div>
+          </div>
+        </div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 4px">手順 2 — ACMで証明書を発行</h3>
+        <div style="display:flex;gap:13px;margin:14px 0;padding:15px 17px;background:rgba(255,153,0,.05);border:1px solid rgba(255,153,0,.18);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">🎯</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#d8cbb5"><strong style="color:var(--accent,#ff9900)">ACMの目的</strong> — HTTPSに必要なサーバー証明書を無料で発行し、期限前の更新も自動でやってくれるサービス。ALBとセットで使うのが定番。</div>
+        </div>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">Certificate Manager コンソール</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">証明書をリクエスト</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">「パブリック証明書」、ドメイン名に取得したドメイン（例 <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">example.com</code>）、検証方法「<strong style="color:#e6edf3">DNS検証</strong>」でリクエスト。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">2</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">証明書詳細画面の「<strong style="color:#e6edf3">Route 53 でレコードを作成</strong>」ボタンを押す（検証用のCNAMEが自動で追加される）。数分でステータスが「発行済み」になる。</div></div>
+          </div>
+        </div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 4px">手順 3 — HTTPSリスナーとAレコード</h3>
+        <div style="margin:14px 0;padding:0 18px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">1</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">handson-alb</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">リスナー</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">リスナーの追加</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7"><strong style="color:#e6edf3">HTTPS:443</strong>、証明書に手順2のものを選択、デフォルトアクションは <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">front-tg</code> へ転送。<code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">/api/*</code> → api-tg のルールもHTTP:80と同様に追加。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #141e28">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">2</div>
+            <div style="flex:1"><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">既存の HTTP:80 リスナーを編集し、アクションを「<strong style="color:#e6edf3">HTTPS 443 へリダイレクト</strong>」に変更（httpで来た人を自動でhttpsへ）。</div></div>
+          </div>
+          <div style="display:flex;gap:14px;padding:16px 0">
+            <div style="width:26px;height:26px;border-radius:7px;background:rgba(255,153,0,.14);color:var(--accent,#ff9900);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto">3</div>
+            <div style="flex:1"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">Route 53</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:#0a1119;border:1px solid #24323f;border-radius:6px;color:#cdd9e5">ホストゾーン</span><span style="color:#5f6f7e">›</span><span style="padding:3px 9px;background:rgba(255,153,0,.14);border:1px solid rgba(255,153,0,.3);border-radius:6px;color:var(--accent,#ff9900)">レコードを作成</span></div><div style="font-size:13.5px;line-height:1.75;color:#c3cdd7">レコードタイプ <strong style="color:#e6edf3">A</strong>、「<strong style="color:#e6edf3">エイリアス</strong>」をON → 「Application Load Balancer へのエイリアス」→ ap-northeast-1 → handson-alb を選択して作成。</div></div>
+          </div>
+        </div>
+        <div style="margin:14px 0"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="ss-ch10-https" placeholder="📷 スクショ: ブラウザで https://自分のドメイン が鍵マーク付きで表示された状態" hint-size="100%,240px" style="width:100%;height:240px"></x-import></div>
+        <div style="display:flex;gap:13px;margin:18px 0;padding:15px 17px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.22);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">✅</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#a8dab8"><strong style="color:#5fd685">実行するとこうなる</strong> — <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 6px;border-radius:5px;color:#e6b877">https://自分のドメイン</code> でページが開き、アドレスバーに鍵マークが付きます。http で開いても自動で https に転送されます。これで0章の図の全要素が完成です。</div>
+        </div>
+
+        <sc-if value="{{ showChecklist }}" hint-placeholder-val="{{ true }}">
+        <div style="margin:30px 0 4px;padding:16px 18px 10px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;padding:0 4px"><span style="font-size:13px">✅</span><span style="font-size:12.5px;font-weight:600;color:#8b98a5;letter-spacing:.04em">この章のチェック</span></div>
+          <sc-for list="{{ checks_ch10 }}" as="item" hint-placeholder-count="4">
+            <div data-id="{{ item.id }}" onClick="{{ toggleItem }}" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:9px 8px;border-radius:8px" style-hover="background:#131b26"><span style="{{ item.boxStyle }}">✓</span><span style="{{ item.txtStyle }}">{{ item.label }}</span></div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </section>
+
+      <section id="ch11" data-screen-label="11 運用と片付け" style="padding:56px 0 20px;animation:fadeUp .5s ease both">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--accent,#ff9900);letter-spacing:.08em">CHAPTER 11</span>
+          <span style="flex:1;height:1px;background:#1c2836"></span>
+        </div>
+        <h2 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:31px;font-weight:700;margin:0 0 16px;letter-spacing:-.01em">運用の基本と片付け</h2>
+        <p style="font-size:16px;line-height:1.8;color:#aab6c2;margin:0 0 24px">「動いた後」に毎日使う3つの操作と、課金を止める削除手順です。</p>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:26px 0 12px">日常の3操作</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:8px 0 20px">
+          <div style="padding:16px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><div style="font-size:13.5px;font-weight:600;margin-bottom:6px">ログを見る</div><div style="font-size:12.5px;color:#8b98a5;line-height:1.65">クラスター › サービス › タスク › 「ログ」タブ。コンテナの標準出力がそのままCloudWatch Logsに流れています。エラー調査はまずここ。</div></div>
+          <div style="padding:16px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><div style="font-size:13.5px;font-weight:600;margin-bottom:6px">新バージョンを出す</div><div style="font-size:12.5px;color:#8b98a5;line-height:1.65">7章の手順で <code style="font-family:'IBM Plex Mono',monospace;background:#0a1119;padding:1px 5px;border-radius:5px;color:#e6b877">:v2</code> をpush → タスク定義の「新しいリビジョンの作成」でタグを差し替え → サービスの「更新」で新リビジョンを選択。旧タスクと入れ替わるローリング更新が走ります。</div></div>
+          <div style="padding:16px;background:#111a24;border:1px solid #1c2836;border-radius:11px"><div style="font-size:13.5px;font-weight:600;margin-bottom:6px">増やす/減らす</div><div style="font-size:12.5px;color:#8b98a5;line-height:1.65">サービスの「必要なタスク数」を変えるだけで台数が増減。さらに「Auto Scaling」でCPU使用率に応じた自動増減も設定できます。</div></div>
+        </div>
+        <div style="margin:14px 0"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="ss-ch11-logs" placeholder="📷 スクショ: タスクの「ログ」タブでアプリのログが流れている状態" hint-size="100%,200px" style="width:100%;height:200px"></x-import></div>
+
+        <h3 style="font-family:'Space Grotesk','IBM Plex Sans JP',sans-serif;font-size:19px;font-weight:600;margin:30px 0 12px">片付け（課金を止める順番）</h3>
+        <div style="display:flex;gap:13px;margin:14px 0;padding:15px 17px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.24);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">⚠️</span>
+          <div style="font-size:13.5px;line-height:1.7;color:#e6a7a7"><strong style="color:#f0807f">削除は依存の逆順で</strong> — 使っている物が残っていると削除に失敗します。上から順に消してください。</div>
+        </div>
+        <ol style="margin:12px 0 20px;padding-left:20px;font-size:14px;line-height:2.1;color:#c3cdd7">
+          <li>ECSサービス2つ（タスク数を0に更新 → 削除）→ クラスター削除</li>
+          <li>ALB削除 → ターゲットグループ2つ削除</li>
+          <li>RDSインスタンス削除（最終スナップショット不要にチェック）</li>
+          <li>NAT Gateway削除 → 解放されたElastic IPも解放</li>
+          <li>VPC削除（サブネット等も一括で消える）</li>
+          <li>ECRリポジトリ2つ削除（イメージごと）</li>
+          <li>パラメータストアの4つ、CloudWatchロググループを削除</li>
+          <li>Route 53：Aレコード削除。ドメイン自体は年額課金なので更新設定を確認（自動更新オフに）</li>
+        </ol>
+        <div style="display:flex;gap:13px;margin:18px 0;padding:15px 17px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.22);border-radius:11px">
+          <span style="font-size:16px;flex:0 0 auto">✅</span>
+          <div style="font-size:13.5px;line-height:1.75;color:#a8dab8"><strong style="color:#5fd685">最後の確認</strong> — 翌日以降に Billing コンソールの「コスト詳細」を開き、課金が止まっていることを確認したら完了です。おつかれさまでした。</div>
+        </div>
+
+        <sc-if value="{{ showChecklist }}" hint-placeholder-val="{{ true }}">
+        <div style="margin:30px 0 4px;padding:16px 18px 10px;background:#0e1620;border:1px solid #1c2836;border-radius:13px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;padding:0 4px"><span style="font-size:13px">✅</span><span style="font-size:12.5px;font-weight:600;color:#8b98a5;letter-spacing:.04em">この章のチェック</span></div>
+          <sc-for list="{{ checks_ch11 }}" as="item" hint-placeholder-count="3">
+            <div data-id="{{ item.id }}" onClick="{{ toggleItem }}" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:9px 8px;border-radius:8px" style-hover="background:#131b26"><span style="{{ item.boxStyle }}">✓</span><span style="{{ item.txtStyle }}">{{ item.label }}</span></div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </section>
+
+      <footer style="margin-top:70px;padding-top:30px;border-top:1px solid #1c2836;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
+        <div style="font-size:12.5px;color:#5f6f7e;line-height:1.6">ECS on Fargate 実務ハンズオン資料 — 2026年7月版<br>NAT Gateway・RDS・ALBは置いておくだけで課金されます。終わったら必ず11章の削除手順を。</div>
+        <a href="#top" style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border:1px solid #2a3746;border-radius:9px;font-size:13px;color:#cdd9e5" style-hover="border-color:var(--accent,#ff9900);color:var(--accent,#ff9900)">↑ 先頭へ戻る</a>
+      </footer>
+
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:920},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#ff9900&quot;,&quot;options&quot;:[&quot;#ff9900&quot;,&quot;#00b8d4&quot;,&quot;#7c5cff&quot;,&quot;#22c55e&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;外観&quot;},&quot;codeFontSize&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:13,&quot;min&quot;:12,&quot;max&quot;:16,&quot;step&quot;:1,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;外観&quot;},&quot;showChecklist&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;挙動&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.chapters = [
+      { id: 'ch0', num: '00', title: '全体像 — Webページが開くまで' },
+      { id: 'ch1', num: '01', title: '環境準備' },
+      { id: 'ch2', num: '02', title: 'VPC — ネットワークの土台' },
+      { id: 'ch3', num: '03', title: 'セキュリティグループ設計' },
+      { id: 'ch4', num: '04', title: 'RDS — PostgreSQL を立てる' },
+      { id: 'ch5', num: '05', title: 'パラメータストアで秘密情報管理' },
+      { id: 'ch6', num: '06', title: 'アプリを Docker 化する' },
+      { id: 'ch7', num: '07', title: 'ECR — イメージ置き場' },
+      { id: 'ch8', num: '08', title: 'ECS — クラスターとタスク定義' },
+      { id: 'ch9', num: '09', title: 'ALB & サービス起動' },
+      { id: 'ch10', num: '10', title: 'Route 53 & HTTPS 化' },
+      { id: 'ch11', num: '11', title: '運用の基本と片付け' },
+    ];
+    this.checkData = {
+      ch0: [
+        { id: 'c0a', label: 'URL入力からページ表示までの流れを説明できる' },
+        { id: 'c0b', label: '登場する全サービスの役割を言える' },
+        { id: 'c0c', label: '今回の構成図を自分で描き直せる' },
+      ],
+      ch1: [
+        { id: 'c1a', label: 'AWSアカウント・請求アラートを設定した' },
+        { id: 'c1b', label: '作業用IAMユーザーでログインできた' },
+        { id: 'c1c', label: 'リージョンを us-east-1 に固定した' },
+        { id: 'c1d', label: 'Docker Desktop が動くことを確認した' },
+      ],
+      ch2: [
+        { id: 'c2a', label: 'VPCと4つのサブネットを作成した' },
+        { id: 'c2b', label: 'パブリック/プライベートの違いを理解した' },
+        { id: 'c2c', label: 'NAT Gateway の役割と課金を理解した' },
+      ],
+      ch3: [
+        { id: 'c3a', label: 'alb-sg / app-sg / db-sg を作成した' },
+        { id: 'c3b', label: 'SG同士の参照チェーンを理解した' },
+      ],
+      ch4: [
+        { id: 'c4a', label: 'RDS(PostgreSQL)を起動した' },
+        { id: 'c4b', label: 'エンドポイントを控えた' },
+        { id: 'c4c', label: '「パブリックアクセスなし」の意味を理解した' },
+      ],
+      ch5: [
+        { id: 'c5a', label: 'パラメータストアにDB接続情報を保存した' },
+        { id: 'c5b', label: 'SecureString と String の使い分けを理解した' },
+      ],
+      ch6: [
+        { id: 'c6a', label: 'Next.js を Docker 化しローカルで動かした' },
+        { id: 'c6b', label: 'FastAPI を Docker 化しローカルで動かした' },
+        { id: 'c6c', label: 'docker compose でDB込みの動作確認をした' },
+      ],
+      ch7: [
+        { id: 'c7a', label: 'ECRリポジトリを2つ作成した' },
+        { id: 'c7b', label: '2つのイメージを push した' },
+      ],
+      ch8: [
+        { id: 'c8a', label: 'クラスターを作成した' },
+        { id: 'c8b', label: 'タスク定義2つ(front/api)を作成した' },
+        { id: 'c8c', label: 'タスクロールと実行ロールの違いを理解した' },
+        { id: 'c8d', label: 'パラメータストアからの secrets 注入を設定した' },
+      ],
+      ch9: [
+        { id: 'c9a', label: 'ALBとターゲットグループを作成した' },
+        { id: 'c9b', label: '/api/* のパスルーティングを設定した' },
+        { id: 'c9c', label: 'ECSサービス2つを起動した' },
+        { id: 'c9d', label: 'ALBのDNS名でページが表示された' },
+      ],
+      ch10: [
+        { id: 'c10a', label: 'ドメインを取得しホストゾーンを確認した' },
+        { id: 'c10b', label: 'ACMで証明書を発行した' },
+        { id: 'c10c', label: 'HTTPSリスナーとリダイレクトを設定した' },
+        { id: 'c10d', label: '独自ドメインのHTTPSで表示された' },
+      ],
+      ch11: [
+        { id: 'c11a', label: 'ログとメトリクスの見方がわかった' },
+        { id: 'c11b', label: '新バージョンのデプロイ手順を理解した' },
+        { id: 'c11c', label: 'リソースを全て削除した(続けない場合)' },
+      ],
+    };
+    this.allIds = Object.values(this.checkData).flat().map(x => x.id);
+    this.state = { active: 'ch0', checked: this._load() };
+    this._onScroll = this._onScroll.bind(this);
+  }
+  _load() {
+    try { return JSON.parse(localStorage.getItem('ecs_handson_checks_v1') || '{}'); }
+    catch (e) { return {}; }
+  }
+  _save(c) {
+    try { localStorage.setItem('ecs_handson_checks_v1', JSON.stringify(c)); } catch (e) {}
+  }
+  componentDidMount() {
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+    this._onScroll();
+  }
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this._onScroll);
+  }
+  _onScroll() {
+    if (this._raf) return;
+    this._raf = requestAnimationFrame(() => {
+      this._raf = null;
+      let active = this.chapters[0].id;
+      const mark = window.innerHeight * 0.32;
+      for (const c of this.chapters) {
+        const el = document.getElementById(c.id);
+        if (el && el.getBoundingClientRect().top <= mark) active = c.id;
+      }
+      if (active !== this.state.active) this.setState({ active });
+    });
+  }
+  navClick = (e) => {
+    e.preventDefault();
+    const id = e.currentTarget.getAttribute('data-id');
+    const el = document.getElementById(id);
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 12, behavior: 'smooth' });
+  };
+  toggleItem = (e) => {
+    const id = e.currentTarget.getAttribute('data-id');
+    this.setState(s => {
+      const c = { ...s.checked, [id]: !s.checked[id] };
+      this._save(c);
+      return { checked: c };
+    });
+  };
+  copyCode = (e) => {
+    const btn = e.currentTarget;
+    const wrap = btn.closest('[data-code]');
+    const code = wrap && wrap.querySelector('code');
+    if (!code) return;
+    const text = code.innerText;
+    const done = () => {
+      const lbl = btn.querySelector('[data-lbl]');
+      if (!lbl) return;
+      const o = lbl.textContent;
+      lbl.textContent = 'コピー済み';
+      setTimeout(() => { lbl.textContent = o; }, 1400);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => {});
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e2) {}
+      document.body.removeChild(ta);
+    }
+  };
+  _decorate(arr) {
+    const checked = this.state.checked;
+    return (arr || []).map(it => {
+      const done = !!checked[it.id];
+      return {
+        ...it,
+        boxStyle: 'width:20px;height:20px;flex:0 0 auto;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid ' + (done ? 'var(--accent,#ff9900)' : '#3a4a5c') + ';background:' + (done ? 'var(--accent,#ff9900)' : 'transparent') + ';color:' + (done ? '#0b1016' : 'transparent') + ';transition:all .15s',
+        txtStyle: 'color:' + (done ? '#6b7885' : '#dbe4ec') + ';text-decoration:' + (done ? 'line-through' : 'none') + ';font-size:13.5px;line-height:1.5',
+      };
+    });
+  }
+  renderVals() {
+    const accent = this.props.accent || '#ff9900';
+    const total = this.allIds.length;
+    const done = this.allIds.filter(id => this.state.checked[id]).length;
+    const pct = total ? Math.round((done / total) * 100) : 0;
+    const navItems = this.chapters.map(c => {
+      const on = c.id === this.state.active;
+      return {
+        id: c.id, num: c.num, title: c.title, href: '#' + c.id,
+        style: 'display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:9px;cursor:pointer;text-decoration:none;transition:background .15s;background:' + (on ? 'rgba(255,153,0,.10)' : 'transparent') + ';color:' + (on ? '#e6edf3' : '#8b98a5'),
+        numStyle: 'font-family:\'IBM Plex Mono\',monospace;font-size:11px;font-weight:600;width:22px;flex:0 0 auto;color:' + (on ? 'var(--accent,#ff9900)' : '#5f6f7e'),
+        dotStyle: 'width:6px;height:6px;border-radius:99px;flex:0 0 auto;background:' + (on ? 'var(--accent,#ff9900)' : 'transparent'),
+      };
+    });
+    const out = {
+      accent,
+      codeFs: (this.props.codeFontSize || 13) + 'px',
+      navItems,
+      progressLabel: done + ' / ' + total,
+      progressWidth: pct + '%',
+      navClick: this.navClick,
+      toggleItem: this.toggleItem,
+      copyCode: this.copyCode,
+      showChecklist: this.props.showChecklist !== false,
+    };
+    for (const k of Object.keys(this.checkData)) {
+      out['checks_' + k] = this._decorate(this.checkData[k]);
+    }
+    return out;
+  }
+}
+</script>
+</body>
+</html>
