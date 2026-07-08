@@ -18,6 +18,9 @@
         --code-text: #e2e8f0;
         --warn-bg: #fff7e6;
         --warn-border: #f0c36d;
+
+        --tips-bg: #ecfeff;
+        --tips-border: #a5f3fc;
         --danger: #d1453b;
       }
 
@@ -245,6 +248,24 @@
         color: #92620c;
       }
 
+      .tips {
+        background: var(--tips-bg);
+        border: 1px solid var(--tips-border);
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin: 0 0 20px;
+        font-size: 0.92rem;
+      }
+
+      .tips-label {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: #0e7490;
+        margin-bottom: 6px;
+      }
+
       .card {
         background: var(--panel);
         border: 1px solid var(--border);
@@ -322,6 +343,9 @@
           --code-text: #d8dee9;
           --warn-bg: #2b2312;
           --warn-border: #7a5c1c;
+
+          --tips-bg: #0f2b30;
+          --tips-border: #155e63;
         }
 
         code {
@@ -352,8 +376,8 @@
           <li><a href="#step2">4. 手順2: Docker Compose で PostgreSQL を起動する</a></li>
           <li><a href="#step3">5. 手順3: Prisma を導入し、データモデルを定義する</a></li>
           <li><a href="#step4">6. 手順4: Prisma Client のシングルトンを作る</a></li>
-          <li><a href="#step5">7. 手順5: Route Handlers（API）を実装する</a></li>
-          <li><a href="#step6">8. 手順6: 4つのページを実装する</a></li>
+          <li><a href="#step5">7. 手順5: Route Handlers（API）を実装する（バックエンド）</a></li>
+          <li><a href="#step6">8. 手順6: 4つのページを実装する（フロントエンド）</a></li>
           <li><a href="#step7">9. 手順7: スタイルを移植する</a></li>
           <li><a href="#step8">10. 手順8: 動作確認する</a></li>
           <li><a href="#mapping">11. 新旧対応表</a></li>
@@ -468,6 +492,19 @@ cd recipe-app</code></pre>
         </div>
         <p>インストール後、バージョンが表示されれば成功です。</p>
         <pre><code>bun --version</code></pre>
+        <div class="tips">
+          <div class="tips-label">TIPS: bun とは</div>
+          <p style="margin:0 0 8px">
+            <strong>bun</strong> は JavaScript/TypeScript のパッケージ管理・実行ツールです。<br />
+            役割としては <code>npm</code> や <code>yarn</code> と同じだと考えてください。
+          </p>
+          <p style="margin:0">
+            このハンズオンで繰り返し出てくる<br />
+            <code>bun add パッケージ名</code><br />
+            は <code>npm install パッケージ名</code> に相当するコマンドで、<br />
+            「パッケージを <code>package.json</code> に追加してインストールする」という意味です。
+          </p>
+        </div>
 
         <h3>Docker のインストール</h3>
         <p>
@@ -915,8 +952,13 @@ model Recipe {
       <section id="step4">
         <h2>6. 手順4: Prisma Client のシングルトンを作る</h2>
         <p>
+          <strong>シングルトンパターン</strong>とは、あるインスタンス（ここでは
+          <code>PrismaClient</code>）をアプリ全体で1つだけ作り、以降はそれを使い回す設計のことです。
+        </p>
+        <p>
           Next.js の開発サーバーはホットリロードのたびにモジュールを再評価するため、
-          毎回 <code>new PrismaClient()</code> すると接続数が増え続けてしまいます。定石のシングルトンパターンで防ぎます。
+          対策なしに毎回 <code>new PrismaClient()</code> すると、その都度新しいインスタンスが作られて接続数が増え続けてしまいます。
+          そこで「すでにインスタンスがあれば使い回し、無ければ新規作成する」という形でシングルトンパターンを実現します。
         </p>
         <p>
           <code>schema.prisma</code> の <code>datasource</code>
@@ -925,6 +967,17 @@ model Recipe {
           側で接続文字列を指定します。
         </p>
         <pre><code>bun add @prisma/adapter-pg</code></pre>
+        <p>
+          bun はパッケージ追加時に <code>node_modules</code>
+          を再構築することがあり、その際に手順3で生成された Prisma Client
+          （<code>node_modules/.prisma</code>）が失われる場合があります。
+          念のためここで生成し直しておきます。
+        </p>
+        <pre><code>bunx prisma generate</code></pre>
+        <p>
+          <code>next-learning/lib/</code> ディレクトリを新規作成し、その中に
+          <code>prisma.ts</code> というファイルを作成して、以下の内容をそのまま書きます。
+        </p>
         <p class="filename">next-learning/lib/prisma.ts</p>
         <pre><code>import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -982,11 +1035,48 @@ if (process.env.NODE_ENV !== 'production') {
       <section id="step5">
         <h2>7. 手順5: Route Handlers（API）を実装する</h2>
         <p>
-          Server Actions ではなく、REST 的にエンドポイントを分ける
-          <strong>Route Handlers</strong> を使います。検索ロジックは旧コードの
-          <code>src/domain/search.js</code> の <code>findRecipesByIngredientsOrName()</code>
-          （スペース区切りの各検索語について、料理名または材料名のどれかに含まれることを
-          <strong>すべての検索語でAND</strong> 判定するロジック）をそのまま TypeScript に移植します。
+          ここから<strong>バックエンド（データを保存・検索するAPI）</strong>を作ります。<br />
+          画面（フロントエンド）はまだ作らず、まず API 単体が正しく動く状態を目指します。
+        </p>
+        <p>
+          <strong>Route Handlers</strong> は、<code>app/</code> 配下に
+          <code>route.ts</code> を置くことで API エンドポイントを作れる Next.js の仕組みです。<br />
+          （詳細は Next.js学習ページの「Route Handlers」発展編を参照）
+        </p>
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>ポイント</th>
+              <th>内容</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>パスとURLの対応</td>
+              <td><code>app/api/recipes/route.ts</code> → <code>/api/recipes</code></td>
+            </tr>
+            <tr>
+              <td>動的セグメント</td>
+              <td>
+                <code>app/api/recipes/[id]/route.ts</code> の <code>[id]</code> は、
+                <code>/api/recipes/12</code> のようなリクエストで
+                <code>params</code> の <code>id</code> に <code>"12"</code> として渡る
+              </td>
+            </tr>
+            <tr>
+              <td>関数名は予約名</td>
+              <td>
+                <code>GET</code> / <code>POST</code> / <code>PATCH</code> /
+                <code>PUT</code> / <code>DELETE</code> は Next.js が認識する決まった名前。
+                対応する HTTP メソッドのリクエスト時にその名前の関数が呼ばれる
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          Server Actions ではなく、REST 的にエンドポイントを分ける Route Handlers を使います。<br />
+          検索ロジックは旧コードの <code>src/domain/search.js</code> の
+          <code>findRecipesByIngredientsOrName()</code> を、そのまま TypeScript に移植します。
         </p>
 
         <h3>検索ロジックの移植（<code>lib/search.ts</code>）</h3>
@@ -1139,11 +1229,12 @@ export async function POST(request: NextRequest) {
         <pre><code>import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-type Params = { params: { id: string } };
+type Params = { params: Promise&lt;{ id: string }&gt; };
 
 export async function GET(_request: NextRequest, { params }: Params) {
+  const { id } = await params;
   const recipe = await prisma.recipe.findUnique({
-    where: { id: Number(params.id) },
+    where: { id: Number(id) },
   });
 
   if (!recipe) {
@@ -1154,6 +1245,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
 }
 
 export async function PATCH(request: NextRequest, { params }: Params) {
+  const { id } = await params;
   const body = await request.json();
   const name = typeof body.name === 'string' ? body.name.trim() : '';
 
@@ -1166,7 +1258,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
   try {
     const recipe = await prisma.recipe.update({
-      where: { id: Number(params.id) },
+      where: { id: Number(id) },
       data: {
         name,
         ingredients: body.ingredients ?? [],
@@ -1181,9 +1273,11 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 }
 
 export async function DELETE(_request: NextRequest, { params }: Params) {
+  const { id } = await params;
+
   try {
     const recipe = await prisma.recipe.delete({
-      where: { id: Number(params.id) },
+      where: { id: Number(id) },
     });
     return NextResponse.json(recipe);
   } catch {
@@ -1203,6 +1297,13 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
               <td>
                 <code>/api/recipes/12</code> のように動的セグメントを受け取るフォルダ命名規則。値は
                 <code>params.id</code> に文字列で入るため <code>Number()</code> で変換する
+              </td>
+            </tr>
+            <tr>
+              <td><code>params: Promise&lt;{'{'} id: string {'}'}&gt;</code></td>
+              <td>
+                このバージョンの Next.js では <code>params</code> が Promise になっているため、
+                <code>await params</code> で中身を取り出してから使う
               </td>
             </tr>
             <tr>
@@ -1227,10 +1328,71 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
             </tr>
           </tbody>
         </table>
+
+        <h3>バックエンドの動作確認（curl）</h3>
+        <p>
+          フロントエンドはまだ無いので、<code>curl</code> で API を直接叩いて
+          最低限の CRUD が動くことを確認します。
+        </p>
+        <p>
+          まず開発サーバーを起動します。<br />
+          （すでに起動済みならこの手順は不要です）
+        </p>
+        <pre><code>bun run dev</code></pre>
+        <p>
+          別のターミナルを開いて、以下の <code>curl</code> コマンドを実行してください。
+        </p>
+        <p>
+          <code>id</code> は連番ではなく、<code>schema.prisma</code> の
+          <code>@default(uuid())</code> によりランダムな値（UUID）で発行されます。<br />
+          そのため <code>:id</code> の部分は、登録レスポンスに含まれる実際の値に
+          毎回置き換える必要があります
+          （例: <code>:id</code> → <code>3f2e9a1c-8b7d-4e6a-9c1f-2d5b6e8a0f3c</code>）。
+        </p>
+        <p>
+          CRUD操作の前後で一覧・検索を挟み、データが期待通りに変化しているかを
+          都度確認しながら進めます。
+        </p>
+        <pre><code># 1. 登録前の一覧取得（まだ無いことを確認）
+curl http://localhost:3000/api/recipes
+
+# 2. 新規登録（レスポンスのidを次以降の:idに使う）
+curl -X POST http://localhost:3000/api/recipes \
+  -H "Content-Type: application/json" \
+  -d '{"name":"親子丼"}'
+
+# 3. 登録後の一覧取得（増えていることを確認）
+curl http://localhost:3000/api/recipes
+
+# 4. 検索（登録した名前でヒットすることを確認）
+curl "http://localhost:3000/api/recipes?q=親子丼"
+
+# 5. 更新（:id は手順2のレスポンスに含まれるidに置き換える。コピペ厳禁）
+curl -X PATCH http://localhost:3000/api/recipes/:id \
+  -H "Content-Type: application/json" \
+  -d '{"name":"他人丼"}'
+
+# 6. 更新後の検索（新しい名前でヒットすることを確認）
+curl "http://localhost:3000/api/recipes?q=他人丼"
+
+# 7. 削除（:id は同様に置き換える）
+curl -X DELETE http://localhost:3000/api/recipes/:id
+
+# 8. 削除後の一覧取得（消えていることを確認）
+curl http://localhost:3000/api/recipes</code></pre>
+        <p>
+          Postman・Insomnia などの API クライアントは、idを変数として自動で
+          使い回せるため、エンドポイントが増えると有用です。<br />
+          VSCode拡張としても提供されています。
+        </p>
       </section>
 
       <section id="step6">
         <h2>8. 手順6: 4つのページを実装する</h2>
+        <p>
+          ここからは<strong>フロントエンド（画面）</strong>を作ります。<br />
+          手順5で作ったAPIを、画面から<code>fetch</code>で呼び出す形になります。
+        </p>
         <p>
           旧コードの4ページ構成（<code>index.html</code> = 検索トップ、
           <code>recipes.html</code> = 登録済み一覧、<code>register.html</code> =
