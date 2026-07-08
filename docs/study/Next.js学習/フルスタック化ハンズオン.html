@@ -1518,12 +1518,12 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
           <code>curl</code> コマンドを実行してください。
         </p>
         <p>
-          <code>id</code> は連番ではなく、<code>schema.prisma</code> の
-          <code>@default(uuid())</code>
-          によりランダムな値（UUID）で発行されます。<br />
+          <code>id</code> は <code>schema.prisma</code> の
+          <code>@default(autoincrement())</code>
+          により、登録するたびに 1, 2, 3...
+          と連番で発行されます。<br />
           そのため <code>:id</code> の部分は、登録レスポンスに含まれる実際の値に
-          毎回置き換える必要があります （例: <code>:id</code> →
-          <code>3f2e9a1c-8b7d-4e6a-9c1f-2d5b6e8a0f3c</code>）。
+          毎回置き換える必要があります （例: <code>:id</code> → <code>1</code>）。
         </p>
         <p>
           CRUD操作の前後で一覧・検索を挟み、データが期待通りに変化しているかを
@@ -1978,7 +1978,7 @@ bunx prisma studio</code></pre>
       </section>
 
       <section id="step7">
-        <h2>9. 手順7: 既存スタイルを Tailwind に移植する</h2>
+        <h2>9. 手順7: 既存スタイルを Tailwind CSSに移植する</h2>
         <p>
           手順1で Tailwind CSS を Yes で選んだため、プロジェクト作成直後の
           <code>app/globals.css</code>
@@ -1989,15 +1989,9 @@ bunx prisma studio</code></pre>
         </p>
         <pre><code>@import "tailwindcss";</code></pre>
         <p>
-          ここでの方針は<strong
-            >「既存 CSS をそのまま貼り付けて共存させる」ではなく、
-            <code>styles.css</code> のルールを実際に Tailwind
-            のユーティリティクラスへ置き換える（移植する）</strong
-          >ことです。ただし <code>color-mix()</code>
-          によるホバーブレンドや、位置・サイズ指定付きの背景画像のように
-          ユーティリティだけで綺麗に表現しづらいものは、
-          <code>@theme</code> で CSS 変数として定義した上で Tailwind
-          のアービトラリバリュー構文（<code>[...]</code>）から参照する形で残します。
+          <code>styles.css</code> のルールをTailwind CSSへ移植します。<br />
+          移植することでスタイルの管理方法が一本化され、Tailwind
+          の補完・未使用クラスの自動パージといった恩恵をアプリ全体で受けられます。
         </p>
 
         <h3>7-1. デザイントークンを <code>@theme</code> に移植する</h3>
@@ -2131,14 +2125,14 @@ body {
             <tr>
               <td><code>.app-shell</code></td>
               <td>
-                <code>mx-auto w-[min(1120px,calc(100%-32px))] pt-10 pb-14</code>
+                <code>mx-auto max-w-280 px-4 pt-10 pb-14</code>
               </td>
             </tr>
             <tr>
               <td><code>.page-header</code>（背景画像 + 影 + 枠線）</td>
               <td>
                 <code
-                  >grid min-h-[300px] items-end rounded-lg border p-[34px]
+                  >grid min-h-75 items-end rounded-lg border p-8.5
                   border-[color-mix(in_srgb,var(--color-primary)_22%,var(--color-border))]
                   bg-surface bg-[url('/assets/icon.svg')] bg-no-repeat
                   bg-[position:right_34px_top_34px] bg-[length:150px]
@@ -2190,7 +2184,7 @@ body {
               <td><code>.button.primary</code></td>
               <td>
                 <code
-                  >min-h-[42px] rounded-lg border border-transparent px-4
+                  >min-h-10.5 rounded-lg border border-transparent px-4
                   font-bold bg-primary text-white hover:bg-primary-strong</code
                 >
               </td>
@@ -2199,7 +2193,7 @@ body {
               <td><code>.button.secondary</code></td>
               <td>
                 <code
-                  >min-h-[42px] rounded-lg border border-border px-4 font-bold
+                  >min-h-10.5 rounded-lg border border-border px-4 font-bold
                   bg-surface-strong text-text
                   hover:bg-[color-mix(in_srgb,var(--color-surface-strong)_82%,var(--color-primary))]</code
                 >
@@ -2240,8 +2234,221 @@ body {
           </tbody>
         </table>
 
+        <h3>7-3. 各ページにクラスを適用する</h3>
+        <p>
+          手順6で作った各ページの JSX に、7-2
+          の対応表どおりクラスを反映した最終形です。<br />
+          構造（要素の入れ子）は手順6から変えず、<code>className</code>
+          を追加するだけです。
+        </p>
+
+        <p>
+          <code>.page-header</code> の背景画像には、静的サイト版の
+          <code>assets/icon.svg</code> をそのまま使います。<br />
+          Next.js では <code>public/</code>
+          配下に置いたファイルがルート直下のパスで配信されるので、次のようにコピーしておきます。
+        </p>
+        <pre><code>mkdir -p public/assets
+cp ../assets/icon.svg public/assets/icon.svg</code></pre>
+        <p>
+          コピーを忘れると、<code>bg-[url('/assets/icon.svg')]</code>
+          が解決できず開発サーバーのログに
+          <code>GET /assets/icon.svg 404</code> が出ます。
+        </p>
+
+        <p class="filename">next-learning/app/search-page.tsx</p>
+        <pre><code>'use client';
+
+import { useState } from 'react';
+import type { Recipe } from '@prisma/client';
+
+export function SearchPage({ initialRecipes }: { initialRecipes: Recipe[] }) {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState&lt;Recipe[]&gt;([]);
+  const [searched, setSearched] = useState(false);
+
+  async function handleSearch() {
+    const response = await fetch(
+      `/api/recipes?q=${encodeURIComponent(query)}`,
+      { cache: 'no-store' },
+    );
+    setResults(await response.json());
+    setSearched(true);
+  }
+
+  return (
+    &lt;main className="mx-auto max-w-280 px-4 pt-10 pb-14"&gt;
+      &lt;header
+        className="grid min-h-75 items-end rounded-lg border p-8.5
+          border-[color-mix(in_srgb,var(--color-primary)_22%,var(--color-border))]
+          bg-surface bg-[url('/assets/icon.svg')] bg-no-repeat
+          bg-position-[right_34px_top_34px] bg-size-[150px] shadow-card"
+      &gt;
+        &lt;div className="max-w-190"&gt;
+          &lt;h1 className="mb-5.5 max-w-180 text-[clamp(2.1rem,5vw,4rem)] leading-[1.05]"&gt;
+            献立検索
+          &lt;/h1&gt;
+          &lt;div
+            className="inline-grid w-fit max-w-full rounded-lg border border-l-4
+              border-[color-mix(in_srgb,var(--color-accent)_28%,var(--color-border))]
+              border-l-accent bg-tip-bg p-4"
+          &gt;
+            &lt;p className="max-w-[62ch] text-[0.95rem] font-semibold text-text"&gt;
+              材料や料理名をスペース区切りで検索できます。
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/header&gt;
+
+      &lt;section className="mt-6 rounded-lg border border-border bg-surface p-6 shadow-card"&gt;
+        &lt;input
+          value={query}
+          onChange={(e) =&gt; setQuery(e.target.value)}
+          placeholder="材料や料理名をスペース区切りで入力"
+          className="min-h-11 w-full rounded-lg border border-border bg-field-bg
+            px-3 text-text outline-none
+            focus:border-primary focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-warning)_54%,transparent)]"
+        /&gt;
+        &lt;button
+          onClick={handleSearch}
+          className="mt-3.5 min-h-10.5 rounded-lg border border-transparent bg-primary
+            px-4 font-bold text-white hover:bg-primary-strong"
+        &gt;
+          検索
+        &lt;/button&gt;
+
+        {searched ? (
+          &lt;ul className="mt-4 grid gap-3"&gt;
+            {results.map((r) =&gt; (
+              &lt;li
+                key={r.id}
+                className="rounded-lg border border-border bg-surface-muted p-4"
+              &gt;
+                {r.name}
+              &lt;/li&gt;
+            ))}
+          &lt;/ul&gt;
+        ) : (
+          &lt;p className="mt-4 text-muted"&gt;登録件数: {initialRecipes.length}件&lt;/p&gt;
+        )}
+      &lt;/section&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+
+        <p class="filename">next-learning/app/recipes/page.tsx</p>
+        <pre><code>import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
+
+export default async function RecipesPage() {
+  const recipes = await prisma.recipe.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return (
+    &lt;main className="mx-auto max-w-280 px-4 pt-10 pb-14"&gt;
+      &lt;header
+        className="grid min-h-75 items-end rounded-lg border p-8.5
+          border-[color-mix(in_srgb,var(--color-primary)_22%,var(--color-border))]
+          bg-surface bg-[url('/assets/icon.svg')] bg-no-repeat
+          bg-position-[right_34px_top_34px] bg-size-[150px] shadow-card"
+      &gt;
+        &lt;h1 className="max-w-180 text-[clamp(2.1rem,5vw,4rem)] leading-[1.05]"&gt;
+          登録済みレシピ
+        &lt;/h1&gt;
+      &lt;/header&gt;
+
+      &lt;section className="mt-6 rounded-lg border border-border bg-surface p-6 shadow-card"&gt;
+        &lt;ul className="grid gap-3"&gt;
+          {recipes.map((recipe) =&gt; (
+            &lt;li
+              key={recipe.id}
+              className="rounded-lg border border-border bg-surface-muted p-4"
+            &gt;
+              &lt;Link
+                href={`/recipes/${recipe.id}`}
+                className="font-bold text-primary hover:underline"
+              &gt;
+                {recipe.name}
+              &lt;/Link&gt;
+            &lt;/li&gt;
+          ))}
+        &lt;/ul&gt;
+      &lt;/section&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+
+        <p class="filename">next-learning/app/register/page.tsx</p>
+        <pre><code>'use client';
+
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { parseFormattedRecipe } from '@/lib/parser';
+
+export default function RegisterPage() {
+  const router = useRouter();
+  const [text, setText] = useState('');
+
+  async function handleSubmit() {
+    const parsed = parseFormattedRecipe(text);
+    if (!parsed.name) return;
+
+    await fetch('/api/recipes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(parsed),
+    });
+
+    router.push('/recipes');
+  }
+
+  return (
+    &lt;main className="mx-auto max-w-280 px-4 pt-10 pb-14"&gt;
+      &lt;header
+        className="grid min-h-75 items-end rounded-lg border p-8.5
+          border-[color-mix(in_srgb,var(--color-primary)_22%,var(--color-border))]
+          bg-surface bg-[url('/assets/icon.svg')] bg-no-repeat
+          bg-position-[right_34px_top_34px] bg-size-[150px] shadow-card"
+      &gt;
+        &lt;h1 className="max-w-180 text-[clamp(2.1rem,5vw,4rem)] leading-[1.05]"&gt;
+          レシピ登録
+        &lt;/h1&gt;
+      &lt;/header&gt;
+
+      &lt;section className="mt-6 grid gap-3.5 rounded-lg border border-border bg-surface p-6 shadow-card"&gt;
+        &lt;textarea
+          value={text}
+          onChange={(e) =&gt; setText(e.target.value)}
+          placeholder={'料理名\n親子丼\n材料\n- 鶏肉|150g\n- 玉ねぎ|1/2個\n手順\n1. 鶏肉を切る\n2. 玉ねぎを煮る'}
+          rows={12}
+          className="w-full resize-y rounded-lg border border-border bg-field-bg p-3.5
+            text-text outline-none
+            focus:border-primary focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-warning)_54%,transparent)]"
+        /&gt;
+        &lt;button
+          onClick={handleSubmit}
+          className="min-h-10.5 rounded-lg border border-transparent bg-primary
+            px-4 font-bold text-white hover:bg-primary-strong"
+        &gt;
+          登録
+        &lt;/button&gt;
+      &lt;/section&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+
+        <p>
+          <code>app/recipes/[id]/page.tsx</code
+          >（<code>RecipeDetail</code>）はまだ
+          <code>return null</code>
+          のスタブなので、ここではクラスを適用していません。<br />
+          実装する際は、フォーム部分は <code>register/page.tsx</code>
+          と同じクラスの並びを流用してください。
+        </p>
+
         <h3>
-          7-3. Tailwind の知見（今回のハンズオンで押さえておきたいポイント）
+          7-4. Tailwind の知見（今回のハンズオンで押さえておきたいポイント）
         </h3>
         <ul>
           <li>
@@ -2298,37 +2505,59 @@ body {
       <section id="step8">
         <h2>10. 手順8: 動作確認する</h2>
         <p>
-          PostgreSQL
-          コンテナが起動していることを確認してから開発サーバーを起動します。
+          手順7でTailwind CSSを当てたので、ここが
+          <strong>見た目・機能ともに完成形のフルスタックアプリ</strong>
+          の動作確認になります。
         </p>
-        <pre><code>docker compose up -d
-bun run dev</code></pre>
         <p>
-          ブラウザで
-          <code>http://localhost:3000</code> を開き、次を一通り確認します。
+          PostgreSQL コンテナの起動および開発サーバーとDB確認用の Prisma Studio
+          を起動します<br />
+          （ターミナルを2つ使います）。
         </p>
-        <ul class="plain">
+        <pre><code># ターミナル1: Next.js の開発サーバー（画面とAPIが同時に動く）
+docker compose up -d
+bun run dev
+
+# ターミナル2: DBの中身をブラウザで見られるツール
+bunx prisma studio</code></pre>
+        <ol>
           <li>
-            トップページで材料・料理名によるキーワード検索ができる（スペース区切りの複数語）
+            <code>http://localhost:3000/</code>
+            を開き、Tailwindのスタイルが当たっていることを確認する。
           </li>
           <li>
-            「料理名 / 材料 / 手順 /
-            参考URL」形式のテキストを貼り付けてレシピを登録できる
+            トップページの登録をクリックし、<code>/register</code>
+            に遷移することを確認する。<br />
+            レシピを1件登録する。
           </li>
-          <li>一覧ページから詳細ページに遷移できる</li>
-          <li>詳細ページで編集・保存ができる</li>
-          <li>詳細ページで削除でき、Undo（元に戻す）が機能する</li>
-        </ul>
-        <div class="callout">
-          <strong>localStorage 版との違いを確認するテスト:</strong>
-          <code>Ctrl-C</code> で
-          <code>bun run dev</code>
-          を止めて再度起動しても、データが残っていることを確認してください。さらに
-          <code>docker compose restart</code>
-          でDBコンテナを再起動しても消えないことも確認できます（named volume
-          に永続化されているため）。ブラウザの localStorage
-          を消してもデータには一切影響しません。
-        </div>
+          <li>
+            Prisma Studio を再読み込みし、
+            <code>Recipe</code> テーブルに1件追加されていることを確認する。
+          </li>
+          <li>
+            <code>/recipes</code>（登録済み一覧）に遷移し、
+            登録した内容が一覧に出ていることを確認する。
+          </li>
+          <li>
+            トップページ（<code>/</code>）に戻り、検索欄に登録した料理名または
+            材料名を入力してヒットすることを確認する。
+          </li>
+          <li>
+            検索結果または一覧から該当レシピのリンクをクリックし、
+            <code>/recipes/[id]</code>（詳細）に遷移することを確認する。<br />
+            内容を編集して保存する。
+          </li>
+          <li>
+            Prisma Studio
+            を再読み込みし、編集内容が反映されていることを確認する。
+          </li>
+          <li>
+            同じ詳細ページで削除し、Undoトーストの「元に戻す」で復元できることを
+            確認する。<br />
+            最後に改めて削除し、Prisma Studio を再読み込みして
+            レコードが消えていることを確認する。
+          </li>
+        </ol>
       </section>
 
       <section id="mapping">

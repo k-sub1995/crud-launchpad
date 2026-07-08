@@ -1548,6 +1548,20 @@ docker run hello-world</pre>
     <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0"><strong>Prisma</strong>は、TypeScript/JavaScriptからDBを操作するための<strong>ORM（Object-Relational Mapper）</strong>です。<br><br><code>schema.prisma</code>というファイル1つにテーブル構造（モデル）を定義すると、そこから型安全なクライアント（Prisma Client）が自動生成され、SQL文を手で書かずにDB操作ができるようになります。</p>
 
     <div style="margin-top:8px;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:24px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:16px">準備の流れ（スキーマを書いてからコードで使えるまで）</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">schema.prisma<br><span style="font-weight:400;font-size:11px">データモデルを定義</span></span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">migrate dev<br><span style="font-weight:400;font-size:11px">PostgreSQLにテーブルを作る</span></span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#ecfeff;border:1px solid #a5f3fc;color:#0e7490;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">generate<br><span style="font-weight:400;font-size:11px">TypeScript用のClientを生成</span></span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e6f4ec;border:1px solid #bfe3cd;color:#1a7f4b;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">コード<br><span style="font-weight:400;font-size:11px">prisma.recipe.findMany()</span></span>
+      </div>
+      <p style="margin:18px 0 0 0;font-size:15px;background:#f0faf4;border-radius:10px;padding:12px 16px">migrateとgenerateは別の役割です。<strong>migrateはDBにテーブルを作る</strong>、<strong>generateはコードから呼べる型付きClientを作る</strong>、という違いを分けて覚えると混乱しません。<br><br><code>migrate dev</code>は成功すると内部で<code>generate</code>も自動実行してくれるため、通常は1コマンドで両方揃います。</p>
+    </div>
+
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:24px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
       <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:16px">アプリのコードからDBに届くまで</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
         <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">アプリのコード<br><span style="font-weight:400;font-size:11px">prisma.recipe.findMany()</span></span>
