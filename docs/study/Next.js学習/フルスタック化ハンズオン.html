@@ -823,8 +823,10 @@ volumes:
 bunx prisma init --datasource-provider postgresql</code></pre>
         <p>
           <code>prisma init</code> により <code>prisma/schema.prisma</code> ・
-          <code>.env</code> ・<code>prisma.config.ts</code> の3つが生成されます。
-          <code>.env</code> を Docker Compose の PostgreSQL に向けます。
+          <code>.env</code> ・<code>prisma.config.ts</code> の3つが生成されます。<br />
+          <code>.env</code> はダミーの接続先が入った状態で生成されるため、
+          手順2の Docker Compose で起動した PostgreSQL に向くよう
+          中身を以下の内容で置き換えてください。
         </p>
         <p class="filename">next-learning/.env</p>
         <pre><code>DATABASE_URL="postgresql://postgres:postgres@localhost:5454/recipe_app"</code></pre>
