@@ -13,9 +13,16 @@ const FIXED_MESSAGE_SETS = {
     'カニは横歩きが得意だけど真っ直ぐも歩けるらしい',
     'カニペンギンコンビ、水族館の人気者になれる予感がする',
   ],
+  kaniPenStory: [
+    'ある日、カニとペンギンが波打ち際でばったり出会った',
+    'ペンギンが泳ぎを自慢すると、カニは横歩きで華麗に応戦した',
+    'お互い一歩も譲らず、いつしか二人は best friend になっていた',
+    'それ以来、浜辺ではカニとペンギンが並んで歩く姿がよく見られるらしい',
+    'Pruduced by Claude Sonnet 5...',
+  ],
 };
 
-const ACTIVE_FIXED_MESSAGE_SET = 'kaniPenguin';
+const ACTIVE_FIXED_MESSAGE_SET = 'kaniPenStory';
 
 const form = document.querySelector('#entry-form');
 const entryIdInput = document.querySelector('#entry-id');
