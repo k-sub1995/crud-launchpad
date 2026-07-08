@@ -89,9 +89,9 @@ body { margin: 0; background: #f7fafc; }
     </div>
 
     <!-- TOC cards -->
-    <div style="margin-top:28px;font-size:13px;font-weight:700;letter-spacing:0.08em;color:#6b7280">本編（01–08）</div>
+    <div style="margin-top:28px;font-size:13px;font-weight:700;letter-spacing:0.08em;color:#6b7280">本編（01–10）</div>
     <div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px">
-      <sc-for list="{{ tocItems }}" as="tc" hint-placeholder-count="8">
+      <sc-for list="{{ tocItems }}" as="tc" hint-placeholder-count="10">
         <button onClick="{{ tc.go }}" style="text-align:left;border:1px solid #e5e7eb;cursor:pointer;font-family:inherit;background:#ffffff;border-radius:12px;padding:16px 18px;box-shadow:0 4px 12px rgba(15,23,42,0.04);min-height:44px" style-hover="border-color:#1a7f4b">
           <div style="display:flex;gap:10px;align-items:baseline">
             <span style="font-family:ui-monospace,Menlo,monospace;font-size:13px;font-weight:700;color:#1a7f4b">{{ tc.num }}</span>
@@ -100,6 +100,46 @@ body { margin: 0; background: #f7fafc; }
           <p style="margin:6px 0 0 0;font-size:13px;color:#6b7280;line-height:1.6">{{ tc.desc }}</p>
         </button>
       </sc-for>
+    </div>
+
+    <!-- Extra TOC cards -->
+    <div style="margin-top:28px;font-size:13px;font-weight:700;letter-spacing:0.08em;color:#92580a">発展編 — Route Handlers（本編とは別立て・4ページ）</div>
+    <div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px">
+      <sc-for list="{{ extraToc }}" as="ec" hint-placeholder-count="4">
+        <button onClick="{{ ec.go }}" style="text-align:left;border:1px solid #f3ddb8;cursor:pointer;font-family:inherit;background:#fffdf5;border-radius:12px;padding:16px 18px;box-shadow:0 4px 12px rgba(15,23,42,0.04);min-height:44px" style-hover="border-color:#92580a">
+          <div style="display:flex;gap:10px;align-items:baseline">
+            <span style="font-family:ui-monospace,Menlo,monospace;font-size:13px;font-weight:700;color:#92580a">{{ ec.num }}</span>
+            <strong style="font-size:15px;color:#0f172a">{{ ec.label }}</strong>
+          </div>
+          <p style="margin:6px 0 0 0;font-size:13px;color:#6b7280;line-height:1.6">{{ ec.desc }}</p>
+        </button>
+      </sc-for>
+    </div>
+
+    <!-- Extra2 TOC cards -->
+    <div style="margin-top:28px;font-size:13px;font-weight:700;letter-spacing:0.08em;color:#0e7490">環境構築編 — bun / Docker / Postgres / ECS Fargate（4ページ）</div>
+    <div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px">
+      <sc-for list="{{ extraToc2 }}" as="ec2" hint-placeholder-count="4">
+        <button onClick="{{ ec2.go }}" style="text-align:left;border:1px solid #a5f3fc;cursor:pointer;font-family:inherit;background:#ecfeff;border-radius:12px;padding:16px 18px;box-shadow:0 4px 12px rgba(15,23,42,0.04);min-height:44px" style-hover="border-color:#0e7490">
+          <div style="display:flex;gap:10px;align-items:baseline">
+            <span style="font-family:ui-monospace,Menlo,monospace;font-size:13px;font-weight:700;color:#0e7490">{{ ec2.num }}</span>
+            <strong style="font-size:15px;color:#0f172a">{{ ec2.label }}</strong>
+          </div>
+          <p style="margin:6px 0 0 0;font-size:13px;color:#6b7280;line-height:1.6">{{ ec2.desc }}</p>
+        </button>
+      </sc-for>
+    </div>
+
+    <!-- Practice TOC card -->
+    <div style="margin-top:28px;font-size:13px;font-weight:700;letter-spacing:0.08em;color:#7c3aed">実践編 — フルスタック化ハンズオン（別ファイル・recipe-appを丸ごと構築）</div>
+    <div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px">
+      <a href="./フルスタック化ハンズオン.html" style="text-decoration:none;display:block;text-align:left;border:1px solid #ddd6fe;cursor:pointer;font-family:inherit;background:#f5f3ff;border-radius:12px;padding:16px 18px;box-shadow:0 4px 12px rgba(15,23,42,0.04);min-height:44px">
+        <div style="display:flex;gap:10px;align-items:baseline">
+          <span style="font-family:ui-monospace,Menlo,monospace;font-size:13px;font-weight:700;color:#7c3aed">実践</span>
+          <strong style="font-size:15px;color:#0f172a">フルスタック化ハンズオン</strong>
+        </div>
+        <p style="margin:6px 0 0 0;font-size:13px;color:#6b7280;line-height:1.6">発展編・環境構築編は「recipe-appに手を加えるとしたら」の概念解説。こちらは実際にbun / Docker / PostgreSQL(Prisma) / Route Handlersを使い、next-learning/という新しいNext.jsプロジェクトを1つ丸ごと動かす実践版です。</p>
+      </a>
     </div>
   </div>
 
@@ -501,8 +541,8 @@ ReactDOM.createRoot(
 }</pre>
       </div>
       <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
-        <strong style="color:#0f172a">02章・05章との関係</strong><br><br>
-        フォルダに置く <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">loading.tsx</span>（05章）は、実は<strong>ページ全体を自動でSuspenseで包む</strong>簡易版です。<br><br>ページの一部分だけを段階的に出したいときは、自分で <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">&lt;Suspense&gt;</span> を明示的に使います。
+        <strong style="color:#0f172a">03章・06章との関係</strong><br><br>
+        フォルダに置く <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">loading.tsx</span>（06章）は、実は<strong>ページ全体を自動でSuspenseで包む</strong>簡易版です。<br><br>ページの一部分だけを段階的に出したいときは、自分で <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">&lt;Suspense&gt;</span> を明示的に使います。
       </div>
     </div>
   </div>
@@ -605,10 +645,95 @@ ReactDOM.createRoot(
     </sc-if>
   </div>
 
-  <!-- ======== PAGE 2: ROUTING ======== -->
-  <div data-screen-label="02 ルーティング" style="display:{{ pg14 }}">
+  <!-- ======== PAGE 1b: SETUP ======== -->
+  <div data-screen-label="02 セットアップ" style="display:{{ pg14 }}">
     <div style="display:flex;align-items:baseline;gap:14px">
       <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">02</span>
+      <h2 style="font-size:25px;margin:0">セットアップ — Next.js導入コマンド（2026年7月時点）</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">現在の安定版は<strong>Next.js 16系（Turbopackがdev/build両方の既定バンドラー）</strong>です。<br><br>コマンド1つでプロジェクトが作れ、その後の対話式プロンプトに答えるだけで<strong>TypeScript・Biome・Tailwind CSS・App Router</strong>が揃った状態が出来上がります。<br><br>下のコマンドと回答例をそのままコピペすれば、このページで扱うレシピアプリの土台が動き出します。</p>
+
+    <div style="display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">① プロジェクト作成コマンド</div>
+    <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:13px;line-height:1.85;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5"># bunを使う場合</span>
+bunx create-next-app@latest recipe-next
+
+<span style="color:#7c8aa5"># npm/pnpm/yarnでもOK</span>
+npx create-next-app@latest recipe-next</pre>
+
+    <div style="margin-top:20px;display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">② 対話プロンプトへの回答（コピペ用の推奨値）</div>
+    <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);overflow:hidden">
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:0;font-size:12px;font-weight:700;letter-spacing:0.05em;color:#6b7280;background:#f8fafc;padding:12px 16px">
+        <span>質問（プロンプト）</span><span>推奨する回答</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13.5px;color:#334155">
+        <span>What is your project named?</span><span style="font-family:ui-monospace,Menlo,monospace;color:#1a7f4b">recipe-next</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13.5px;color:#334155">
+        <span>Would you like to use the recommended Next.js defaults?</span><span style="font-family:ui-monospace,Menlo,monospace;color:#1a7f4b">Yes, use recommended defaults</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13px;color:#6b7280;background:#fafbfc">
+        <span colspan="2" style="grid-column:span 2">↑ これを選ぶだけで、下の④項目すべてが自動で決まります（customizeを選んだ場合のみ、下の個別プロンプトが続きます）。</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13.5px;color:#334155">
+        <span>Would you like to use TypeScript?</span><span style="font-family:ui-monospace,Menlo,monospace;color:#1a7f4b">Yes</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13.5px;color:#334155">
+        <span>Which linter would you like to use?</span><span style="font-family:ui-monospace,Menlo,monospace;color:#1a7f4b">Biome</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13.5px;color:#334155">
+        <span>Would you like to use React Compiler?</span><span style="font-family:ui-monospace,Menlo,monospace;color:#1a7f4b">No（学習用途はまずNoでOK）</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13.5px;color:#334155">
+        <span>Would you like to use Tailwind CSS?</span><span style="font-family:ui-monospace,Menlo,monospace;color:#1a7f4b">Yes</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13.5px;color:#334155">
+        <span>Would you like your code inside a `src/` directory?</span><span style="font-family:ui-monospace,Menlo,monospace;color:#1a7f4b">Yes</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13.5px;color:#334155">
+        <span>Would you like to use App Router? (recommended)</span><span style="font-family:ui-monospace,Menlo,monospace;color:#1a7f4b">Yes</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13.5px;color:#334155">
+        <span>Would you like to customize the import alias (`@/*`)?</span><span style="font-family:ui-monospace,Menlo,monospace;color:#1a7f4b">No（@/* のままでOK）</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13.5px;color:#334155">
+        <span>Would you like to include AGENTS.md?</span><span style="font-family:ui-monospace,Menlo,monospace;color:#1a7f4b">Yes（生成AIに渡す前提なら特に推奨）</span>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">③ 全部ノンインタラクティブで作る場合（フラグ指定）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.85;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">bunx create-next-app@latest recipe-next \
+  --typescript --tailwind --biome \
+  --app --src-dir \
+  --import-alias "@/*" \
+  --use-bun
+
+cd recipe-next
+bun dev</pre>
+        <p style="margin:8px 0 0 0;font-size:12px;color:#9ca3af">※ <span style="font-family:ui-monospace,Menlo,monospace">--biome</span> フラグが使えない場合は、フラグなしで実行し②の対話プロンプトで「Biome」を選んでください。</p>
+        <p style="margin:8px 0 0 0;font-size:12px;color:#9ca3af">※ VSCodeで保存時の自動フォーマット・エラー表示を効かせるには、拡張機能「Biome」（biomejs.biome）を入れてください。入れないとCLI実行時しかlint/formatが効きません。</p>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">④ 出来上がる構成と既定値</div>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;font-size:13.5px;color:#4b5563">
+          TypeScript・Tailwind CSS・<strong>Biome</strong>（ESLintの代わり）・App Router・<strong>Turbopack</strong>・import alias <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.92em">@/*</span> が、<strong>bun</strong>で依存関係インストール済みの状態で作成されます。<br><br><span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">bun dev</span> は内部で <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">next dev</span> を実行し、Turbopackが既定バンドラーとして動くため、<code>--turbopack</code>のようなフラグは今は不要です。フォーマット・lintは <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">bunx biome check --write .</span> で実行します。
+        </div>
+      </div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#f0faf4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#1a7f4b">Q. viteのReactアプリから、このままファイルを持ってきていい？</strong><br>
+      <span style="color:#4b5563">A. コンポーネントの中身（JSX・state・ロジック）はそのまま使えます。<br><br>変わるのは置き場所と拡張子だけです。<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">src/components/</span> にJSX（またはTSX）を置き、ページになる部分だけ <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">src/app/</span> 配下のフォルダ構成に組み替えます。詳しくは次の03章から。</span>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- ======== PAGE 2: ROUTING ======== -->
+  <div data-screen-label="03 ルーティング" style="display:{{ pg15 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">03</span>
       <h2 style="font-size:25px;margin:0">ファイルベースルーティング — フォルダ構成がURLになる</h2>
     </div>
     <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">元のJS版は <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">detail.html?id=1</span> とHTMLファイルを行き来していました。<br><br>今のReact版（react-learning/）はURLを使わず、<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">viewMode</span> というstateと3画面（検索・一覧 / レシピ登録 / 登録済み一覧）を切り替えています。<br><br>Next.jsではこの3画面が<strong>フォルダ＝URL</strong>に戻ります。設定ファイルは不要で、フォルダを掘るとURLが生えます。<br><br>下のデモでフォルダをクリックして、対応するURLを確かめてください。</p>
@@ -689,9 +814,9 @@ export default async function DetailPage(
   </div>
 
   <!-- ======== PAGE 3: SERVER/CLIENT ======== -->
-  <div data-screen-label="03 サーバー/クライアント" style="display:{{ pg15 }}">
+  <div data-screen-label="04 サーバー/クライアント" style="display:{{ pg16 }}">
     <div style="display:flex;align-items:baseline;gap:14px">
-      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">03</span>
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">04</span>
       <h2 style="font-size:25px;margin:0">サーバー / クライアントコンポーネント — 一番の新概念</h2>
     </div>
     <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">Next.jsのコンポーネントは、<strong>デフォルトで全部サーバーコンポーネント</strong>です。<br><br>サーバーで1回実行されてHTMLになり、ブラウザにはJSが送られません。<br><br>useStateやonClickを使いたい部品にだけ、先頭に <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">"use client"</span> と書いてクライアントコンポーネントにします。<br><br>「サーバー / クライアント」は<strong>どこで実行されるか</strong>の区別で、03章冒頭の用語辞典の「CSR/SSR」（<strong>いつ・どういう頻度で</strong>HTMLを作るか）とは別の軸です。<br><br>下のデモで、部品ごとにどちらにすべきか試してみてください。</p>
@@ -742,9 +867,9 @@ export function SearchBox({ query, onChange }) {
   </div>
 
   <!-- ======== PAGE 4: USE CLIENT BOUNDARY ======== -->
-  <div data-screen-label="04 \"use client\" の境界線" style="display:{{ pg16 }}">
+  <div data-screen-label="05 \"use client\" の境界線" style="display:{{ pg17 }}">
     <div style="display:flex;align-items:baseline;gap:14px">
-      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">04</span>
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">05</span>
       <h2 style="font-size:25px;margin:0">"use client" が届く範囲</h2>
     </div>
     <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">前ページで「対話が必要な部品だけに "use client" をつける」と書きましたが、その指示がどこまで効くのか、よくある誤解を含めて掘り下げます。</p>
@@ -829,9 +954,9 @@ export async function registerRecipe(formData) {
   </div>
 
   <!-- ======== PAGE 5: DATA FETCH ======== -->
-  <div data-screen-label="05 データ取得" style="display:{{ pg17 }}">
+  <div data-screen-label="06 データ取得" style="display:{{ pg18 }}">
     <div style="display:flex;align-items:baseline;gap:14px">
-      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">05</span>
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">06</span>
       <h2 style="font-size:25px;margin:0">データ取得 — useEffectの「後から取る」をやめる</h2>
     </div>
     <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">レシピデータの読み書きの場面です。<br><br>今のApp.jsxは「useStateの初期値でlocalStorageから復元 → 変更のたびにuseEffectで保存」という形で、データの置き場は<strong>ブラウザの中</strong>でした。<br><br>Next.jsではこの読み書きがサーバー側へ移り、<strong>コンポーネント自体をasyncにして、描画の前にawaitで取得</strong>します。</p>
@@ -887,9 +1012,9 @@ export async function saveRecipe(recipe) {
   </div>
 
   <!-- ======== PAGE 6: RENDERING ======== -->
-  <div data-screen-label="06 レンダリング方式" style="display:{{ pg18 }}">
+  <div data-screen-label="07 レンダリング方式" style="display:{{ pg19 }}">
     <div style="display:flex;align-items:baseline;gap:14px">
-      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">06</span>
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">07</span>
       <h2 style="font-size:25px;margin:0">レンダリング方式 — いつHTMLを作るかを選ぶ</h2>
     </div>
     <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">Next.js最大の武器は「HTMLを<strong>いつ</strong>作るか」をページごとに選べることです。<br><br>下のデモで方式を切り替えて、タイムラインの違いを見比べてください。</p>
@@ -932,9 +1057,9 @@ export async function saveRecipe(recipe) {
   </div>
 
   <!-- ======== PAGE 7: LINK & LAYOUT ======== -->
-  <div data-screen-label="07 Linkとレイアウト" style="display:{{ pg19 }}">
+  <div data-screen-label="08 Linkとレイアウト" style="display:{{ pg20 }}">
     <div style="display:flex;align-items:baseline;gap:14px">
-      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">07</span>
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">08</span>
       <h2 style="font-size:25px;margin:0">Linkとレイアウト — ページ間で共有するもの</h2>
     </div>
     <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">複数ページになると「共通のヘッダー」と「ページ移動」の扱いが必要になります。<br><br>今のReact版は、app-header（タイトル＋view-switcherの3ボタン）をApp.jsxに直書きし、タイトルも画面切替もviewModeの三項演算子で制御しています。<br><br>Next.jsでは <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">layout.tsx</span> と <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">&lt;Link&gt;</span> が担当します。</p>
@@ -998,9 +1123,9 @@ export default function RootLayout(
   </div>
 
   <!-- ======== PAGE 8: FULL PICTURE ======== -->
-  <div data-screen-label="08 総合構成" style="display:{{ pg20 }}">
+  <div data-screen-label="09 総合構成" style="display:{{ pg21 }}">
     <div style="display:flex;align-items:baseline;gap:14px">
-      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">08</span>
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">09</span>
       <h2 style="font-size:25px;margin:0">総合 — レシピアプリのNext.js版 全体構成</h2>
     </div>
     <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">ここまでの概念を組み合わせると、レシピアプリはこういう構成になります。<br><br>ポイントは<strong>「ほとんどサーバー、対話する部品だけクライアント」</strong>という境界の引き方です。</p>
@@ -1046,9 +1171,9 @@ export default function RootLayout(
   </div>
 
   <!-- ======== PAGE 9: SUMMARY ======== -->
-  <div data-screen-label="09 対応表" style="display:{{ pg21 }}">
+  <div data-screen-label="10 対応表" style="display:{{ pg22 }}">
     <div style="display:flex;align-items:baseline;gap:14px">
-      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">09</span>
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#1a7f4b">10</span>
       <h2 style="font-size:25px;margin:0">置き換え対応表 — Reactの知識はこうなる</h2>
     </div>
     <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">React→Next.jsのチートシートです。<br><br>左の書き方・考え方が、Next.jsでは右になります。</p>
@@ -1086,8 +1211,530 @@ export default function RootLayout(
         <span style="color:#9ca3af;font-weight:700">→</span>
         <span style="background:#e6f4ec;border:1px solid #bfe3cd;color:#1a7f4b;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">④ Server Actionsで登録・編集・削除</span>
       </div>
-      <p style="margin:16px 0 0 0;font-size:14px;color:#6b7280">公式チュートリアル: <a href="https://nextjs.org/learn" target="_blank" rel="noopener noreferrer" style="color:#1a7f4b;font-weight:600">nextjs.org/learn</a> ／ 前作の資料: <a href="../React学習/React学習ページ.dc.html" style="color:#ff6b6b;font-weight:600">JavaScript → React 置き換えマップ</a></p>
+      <p style="margin:16px 0 0 0;font-size:14px;color:#6b7280">公式チュートリアル: <a href="https://nextjs.org/learn" target="_blank" rel="noopener noreferrer" style="color:#1a7f4b;font-weight:600">nextjs.org/learn</a> ／ 前作の資料: <a href="React学習ページ v2.dc.html" style="color:#ff6b6b;font-weight:600">JavaScript → React 置き換えマップ</a></p>
     </div>
+  </div>
+
+  <!-- ======== EXTRA 1: ROUTE HANDLERS — WHERE ======== -->
+  <div data-screen-label="発展1 Route Handlers ①" style="display:{{ pg23 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#92580a;background:#fdf1e0;padding:2px 10px;border-radius:6px">発展1</span>
+      <h2 style="font-size:25px;margin:0">Route Handlers ① — どこがバックエンドか見分ける</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">ここからは本編（01–10）を終えた後の<strong>発展編</strong>です。<br><br>06章でServer Actionsを扱いましたが、Server Actionsは「同じNext.jsアプリの中のフォーム・ボタン」からしか呼べません。<br><br><strong>外部（スマホアプリ・別ドメインのフロント・webhookなど）からもJSONで叩けるAPIが要る場合</strong>は、<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">app/api/.../route.ts</span> という<strong>Route Handler</strong>を使います。<br><br>この4ページは、今のApp.jsxのどの関数が「バックエンド行き」かを名指しし、そのままコピペで動くRoute Handlerのコードと、生成AIに渡すプロンプトまで用意しています。</p>
+
+    <!-- Section 1: どこがバックエンドか -->
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:22px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:14px">① 今のApp.jsxで、バックエンドに切り出せる箇所はここ</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+        <div style="border:1px solid #bfe3cd;background:#f0faf4;border-radius:10px;padding:14px 16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <strong style="font-size:14px;color:#0f172a;font-family:ui-monospace,Menlo,monospace">parseRecipeText()</strong>
+            <span style="background:#1a7f4b;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px">API化</span>
+          </div>
+          <p style="margin:0;font-size:13px;color:#4b5563">Reactに一切依存しない純粋関数。<strong>そのままlib/parseRecipeText.tsに移植</strong>できます。全Route Handlerの共通部品になります。</p>
+        </div>
+        <div style="border:1px solid #bfe3cd;background:#f0faf4;border-radius:10px;padding:14px 16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <strong style="font-size:14px;color:#0f172a;font-family:ui-monospace,Menlo,monospace">handleRegister() / addRecipe()</strong>
+            <span style="background:#1a7f4b;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px">API化</span>
+          </div>
+          <p style="margin:0;font-size:13px;color:#4b5563">バリデーション＋配列への追加。<strong>POST /api/recipes</strong>に切り出します。window.alertのメッセージはそのままエラーレスポンスの文言に転用できます。</p>
+        </div>
+        <div style="border:1px solid #bfe3cd;background:#f0faf4;border-radius:10px;padding:14px 16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <strong style="font-size:14px;color:#0f172a;font-family:ui-monospace,Menlo,monospace">saveEdit() / deleteRecipe()</strong>
+            <span style="background:#1a7f4b;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px">API化</span>
+          </div>
+          <p style="margin:0;font-size:13px;color:#4b5563">idを指定した更新・削除。<strong>PATCH / DELETE /api/recipes/[id]</strong>に切り出します。</p>
+        </div>
+        <div style="border:1px solid #bfe3cd;background:#f0faf4;border-radius:10px;padding:14px 16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <strong style="font-size:14px;color:#0f172a;font-family:ui-monospace,Menlo,monospace">recipes（一覧そのもの）</strong>
+            <span style="background:#1a7f4b;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px">API化</span>
+          </div>
+          <p style="margin:0;font-size:13px;color:#4b5563">今はlocalStorageにあるデータ本体。DBに移した上で<strong>GET /api/recipes</strong>が返す対象になります。</p>
+        </div>
+        <div style="border:1px solid #c9dcf6;background:#f7faff;border-radius:10px;padding:14px 16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <strong style="font-size:14px;color:#0f172a;font-family:ui-monospace,Menlo,monospace">SearchBox / startEdit / cancelEdit</strong>
+            <span style="background:#1d55b4;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px">クライアント残留</span>
+          </div>
+          <p style="margin:0;font-size:13px;color:#4b5563">queryの絞り込みや、textareaに入れる文字列の組み立てなど<strong>画面の状態だけ</strong>を扱う処理。API化せず"use client"側に残します。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: ファイル構成 -->
+    <div style="margin-top:20px;background:#0f172a;border-radius:12px;padding:20px 22px">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#94a3b8;margin-bottom:10px">② 追加するファイル構成</div>
+      <pre style="margin:0;background:transparent;color:#e2e8f0;padding:0;font-size:12.5px;line-height:1.85;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">app/
+└── api/
+    └── recipes/
+        ├── route.ts        <span style="color:#7c8aa5">GET（一覧）・POST（新規登録）</span>
+        └── [id]/
+            └── route.ts    <span style="color:#7c8aa5">PATCH（編集保存）・DELETE（削除）</span>
+lib/
+├── parseRecipeText.ts      <span style="color:#7c8aa5">App.jsxの同名関数をそのまま移植</span>
+└── recipes.ts              <span style="color:#7c8aa5">DBアクセス（getRecipes/addRecipe/updateRecipe/deleteRecipe）</span></pre>
+    </div>
+  </div>
+
+  <!-- ======== EXTRA 2: ROUTE HANDLERS — GET/POST ======== -->
+  <div data-screen-label="発展2 Route Handlers ②" style="display:{{ pg24 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#92580a;background:#fdf1e0;padding:2px 10px;border-radius:6px">発展2</span>
+      <h2 style="font-size:25px;margin:0">Route Handlers ② — 一覧取得と新規登録（GET / POST）</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">今のhandleRegister関数を、そのまま<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">app/api/recipes/route.ts</span>にコピペで移植します。</p>
+
+    <!-- Section 3: code — POST/GET -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">今のApp.jsx（この部分をコピペ元にする）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12px;line-height:1.7;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// この2つの関数の中身を、そのままRoute Handlerへ貼り付ける</span>
+const handleRegister &#61; (recipeText, recipeUrl) =&gt; {
+  const trimmedText &#61; recipeText.trim();
+  if (!trimmedText) {
+    window.alert("レシピのテキストを入力してください。");
+    return false;
+  }
+  const parsedRecipe &#61; parseRecipeText(trimmedText, recipeUrl);
+  if (!parsedRecipe) {
+    window.alert("料理名の形式が正しくありません。\n" +
+      "「料理名」の行の次にタイトルを入力してください。");
+    return false;
+  }
+  setRecipes(prev =&gt; [
+    ...prev, { id: Date.now(), ...parsedRecipe }
+  ]);
+  return true;
+};</pre>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">app/api/recipes/route.ts（コピペで動く）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12px;line-height:1.7;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">import { NextResponse } from "next/server";
+import { getRecipes, addRecipe } from "@/lib/recipes";
+import { parseRecipeText } from "@/lib/parseRecipeText";
+
+<span style="color:#7c8aa5">// GET /api/recipes → 一覧取得</span>
+export async function GET() {
+  const recipes = await getRecipes();
+  return NextResponse.json(recipes);
+}
+
+<span style="color:#7c8aa5">// POST /api/recipes → 新規登録（handleRegister相当）</span>
+export async function POST(request: Request) {
+  const { recipeText, recipeUrl } = await request.json();
+  const trimmed = recipeText?.trim();
+  if (!trimmed) {
+    return NextResponse.json(
+      { error: "レシピのテキストを入力してください。" },
+      { status: 400 }
+    );
+  }
+  const parsed = parseRecipeText(trimmed, recipeUrl);
+  if (!parsed) {
+    return NextResponse.json(
+      { error: "料理名の形式が正しくありません。" },
+      { status: 400 }
+    );
+  }
+  const created = await addRecipe(parsed);
+  return NextResponse.json(created, { status: 201 });
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== EXTRA 3: ROUTE HANDLERS — PATCH/DELETE + CLIENT ======== -->
+  <div data-screen-label="発展3 Route Handlers ③" style="display:{{ pg25 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#92580a;background:#fdf1e0;padding:2px 10px;border-radius:6px">発展3</span>
+      <h2 style="font-size:25px;margin:0">Route Handlers ③ — 編集・削除と呼び出し側（PATCH / DELETE）</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">今のsaveEdit / deleteRecipeを同様に移植し、クライアント側はfetchで叫ぶ形に書き換えます。</p>
+
+    <!-- Section 4: code — PATCH/DELETE -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">今のApp.jsx（saveEdit / deleteRecipe）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12px;line-height:1.7;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">const saveEdit &#61; () =&gt; {
+  const parsedRecipe &#61; parseRecipeText(editRecipeText.trim(), "");
+  if (!parsedRecipe) {
+    window.alert("料理名の形式が正しくありません。");
+    return;
+  }
+  setRecipes(prev =&gt; prev.map(r =&gt;
+    r.id &#61;&#61;&#61; editingRecipeId ? { ...r, ...parsedRecipe } : r
+  ));
+};
+
+const deleteRecipe &#61; (id) =&gt; {
+  setRecipes(prev =&gt; prev.filter(r =&gt; r.id !== id));
+};</pre>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">app/api/recipes/[id]/route.ts</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12px;line-height:1.7;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">import { NextResponse } from "next/server";
+import { updateRecipe, deleteRecipe } from "@/lib/recipes";
+import { parseRecipeText } from "@/lib/parseRecipeText";
+
+<span style="color:#7c8aa5">// PATCH /api/recipes/1 → 編集保存（saveEdit相当）</span>
+export async function PATCH(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const { editRecipeText } = await request.json();
+  const parsed = parseRecipeText(editRecipeText?.trim() ?? "", "");
+  if (!parsed) {
+    return NextResponse.json(
+      { error: "料理名の形式が正しくありません。" },
+      { status: 400 }
+    );
+  }
+  const updated = await updateRecipe(params.id, parsed);
+  return NextResponse.json(updated);
+}
+
+<span style="color:#7c8aa5">// DELETE /api/recipes/1 → 削除（deleteRecipe相当）</span>
+export async function DELETE(
+  _request: Request,
+  { params }: { params: { id: string } }
+) {
+  await deleteRecipe(params.id);
+  return NextResponse.json({ ok: true });
+}</pre>
+      </div>
+    </div>
+
+    <!-- Section 5: client side -->
+    <div style="margin-top:20px">
+      <div style="display:inline-flex;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">③ 呼び出し側 — RegisterRecipeForm.tsx（"use client"のまま）</div>
+      <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12px;line-height:1.7;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// 今: props.onRegister(recipeText, recipeUrl) を呼んでいた場所</span>
+<span style="color:#7c8aa5">// → fetchでRoute Handlerを直接叩く形に変わる</span>
+const handleSubmit &#61; async () =&gt; {
+  const res = await fetch("/api/recipes", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ recipeText, recipeUrl }),
+  });
+
+  if (!res.ok) {
+    const { error } = await res.json();
+    window.alert(error); <span style="color:#7c8aa5">// 今と同じアラート文言</span>
+    return;
+  }
+
+  setRecipeText("");
+  setRecipeUrl("");
+  router.push("/recipes"); <span style="color:#7c8aa5">// next/navigationのuseRouter</span>
+};</pre>
+    </div>
+  </div>
+
+  <!-- ======== EXTRA 4: ROUTE HANDLERS — AI PROMPT + COMPARISON ======== -->
+  <div data-screen-label="発展4 Route Handlers ④" style="display:{{ pg26 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#92580a;background:#fdf1e0;padding:2px 10px;border-radius:6px">発展4</span>
+      <h2 style="font-size:25px;margin:0">Route Handlers ④ — 初見でも作れるAIプロンプトと使い分け</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">このファイル一式を自分で書く必要はありません。下のプロンプトに、App.jsxのコードを貼り付けて生成AIに渡せばOKです。</p>
+
+    <!-- Section 6: AI prompt -->
+    <div style="background:#fffdf5;border:1px solid #f3ddb8;border-radius:14px;padding:22px 24px">
+      <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px;margin-bottom:12px">④ 初見でもOK — 生成AIに渡すプロンプト例（コピペして使う）</div>
+      <pre style="margin:0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.85;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;white-space:pre-wrap">以下はReactコンポーネント（App.jsx）の一部です。
+この中の handleRegister / saveEdit / deleteRecipe / recipes(state) を、
+Next.jsのRoute Handlerに切り出してください。
+
+条件:
+- app/api/recipes/route.ts に GET（一覧）と POST（新規登録）
+- app/api/recipes/[id]/route.ts に PATCH（編集保存）と DELETE（削除）
+- parseRecipeText は純粋関数なので lib/parseRecipeText.ts に移動し、
+  そちらからimportして使う
+- バリデーションで失敗した場合、元のwindow.alertの文言を
+  そのままJSONのerrorメッセージとして使う（status 400）
+- 呼び出し側（RegisterRecipeForm.tsx）もfetch("/api/recipes")を
+  使う形に書き換えて
+
+---（ここに App.jsx と対象コンポーネントの中身を貼り付け）---</pre>
+      <p style="margin:12px 0 0 0;font-size:13px;color:#92580a">貼り付けるコードは、発展1ページの「今のApp.jsx」コード欄をそのままコピーすればOKです。</p>
+    </div>
+
+    <!-- Section 7: Route Handler vs Server Action -->
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);overflow:hidden">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;font-size:12px;font-weight:700;letter-spacing:0.05em;color:#6b7280;background:#f8fafc;padding:12px 16px">
+        <span></span><span>Server Action（06章）</span><span>Route Handler（発展編）</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13px;color:#334155">
+        <span style="font-weight:700;color:#0f172a">呼び出し元</span><span>同じNext.jsアプリのフォーム・コンポーネント</span><span>フォーム／外部アプリ／モバイル／webhookなど何からでも</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13px;color:#334155">
+        <span style="font-weight:700;color:#0f172a">URLとして公開される？</span><span>されない（内部RPC的な仕組み）</span><span>される（/api/recipesが公開APIになる）</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f1f5f9;font-size:13px;color:#334155">
+        <span style="font-weight:700;color:#0f172a">まず選ぶべきは？</span><span colspan="2" style="grid-column:span 2;color:#1a7f4b;font-weight:600">基本はServer Action。外部連携が要る時だけRoute Handlerを足す。</span>
+      </div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#f0faf4;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#1a7f4b">Q. Server Actionsで全部やってるのに、なぜRoute Handlerも要る？</strong><br>
+      <span style="color:#4b5563">A. このレシピアプリ単体なら不要です。<br><br>ただし「スマホアプリからも同じレシピを見たい」「外部サービスからwebhookでレシピを受け取りたい」など、<strong>Next.js以外のクライアントからアクセスさせたい</strong>瞬間に必要になります。<br><br>まずServer Actionsで作り、外部連携の要件が出てからRoute Handlerに切り出す、で十分です。</span>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- ======== EXTRA 5: ENV — bun/Docker CHECK ======== -->
+  <div data-screen-label="環境1 事前準備" style="display:{{ pg27 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#0e7490;background:#ecfeff;padding:2px 10px;border-radius:6px">環境1</span>
+      <h2 style="font-size:25px;margin:0">事前準備 — bun / Docker が入っているか確認する</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">ここからは<strong>環境構築編</strong>です。想定スタックは<strong>フロント/バックエンドともにNext.js・DBはPostgres・DockerでローカルDB起動・本番はECS on Fargate</strong>。<br><br>まずは <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">bun</span> と <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">Docker</span> が入っているかを確認し、入っていなければここでインストールします。</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">① bunの確認・インストール</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.85;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5"># まずバージョン確認（入っていればOK、次のページへ）</span>
+bun --version
+
+<span style="color:#7c8aa5"># 見つからない場合 — macOS / Linux</span>
+curl -fsSL https://bun.sh/install | bash
+<span style="color:#7c8aa5"># ターミナルを開き直すか、以下でPATHを反映</span>
+source ~/.bashrc   <span style="color:#7c8aa5"># zshなら ~/.zshrc</span>
+
+<span style="color:#7c8aa5"># 見つからない場合 — Windows（PowerShell）</span>
+powershell -c "irm bun.sh/install.ps1 | iex"
+
+<span style="color:#7c8aa5"># 再度確認</span>
+bun --version</pre>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">② Dockerの確認・インストール</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.85;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5"># バージョン確認（Compose V2が同梱されているか含めて）</span>
+docker --version
+docker compose version
+
+<span style="color:#7c8aa5"># 見つからない場合 — macOS / Windows</span>
+<span style="color:#7c8aa5"># Docker Desktopをインストール（GUIアプリ）</span>
+<span style="color:#7c8aa5"># https://www.docker.com/products/docker-desktop/</span>
+
+<span style="color:#7c8aa5"># 見つからない場合 — Linux（公式スクリプト）</span>
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+<span style="color:#7c8aa5"># 一度ログアウト/ログインしてから確認</span>
+
+<span style="color:#7c8aa5"># 動作確認</span>
+docker run hello-world</pre>
+      </div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#ecfeff;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#0e7490">Q. bunとDockerは両方必須？</strong><br>
+      <span style="color:#4b5563">A. bunはこのスタックの実行・パッケージ管理そのものなので必須です。<br><br>Dockerは「ローカルにPostgresを立てる」「本番と同じ形でビルドを試す」ために使います。ローカルのPostgresを別の方法（例: Homebrewで直接起動）で用意するならDocker自体は必須ではありませんが、本番がECS Fargate（コンテナ実行基盤）である以上、最終的にはDockerでのビルドが必要になります。</span>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- ======== EXTRA 6: ENV — POSTGRES PACKAGES ======== -->
+  <div data-screen-label="環境2 Postgresパッケージ" style="display:{{ pg28 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#0e7490;background:#ecfeff;padding:2px 10px;border-radius:6px">環境2</span>
+      <h2 style="font-size:25px;margin:0">追加パッケージ — Postgresに接続する</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">02章の <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">create-next-app</span> の既定構成にはDB接続用のライブラリは含まれません。<br><br>Postgresへの接続には<strong>ORMのPrisma</strong>を追加します（スキーマファイル1つから型安全なクライアントを自動生成でき、Server Components / Server Actions / Route Handlersのどこからでも同じ書き方で使えます）。</p>
+
+    <div style="display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">① 追加インストール</div>
+    <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:13px;line-height:1.85;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5"># 本番でも使うランタイム依存</span>
+bun add @prisma/client
+
+<span style="color:#7c8aa5"># 開発時ツール（マイグレーション・スキーマ管理）</span>
+bun add -d prisma
+
+<span style="color:#7c8aa5"># 初期化（prisma/schema.prisma と .env の雛形を作成）</span>
+bunx prisma init --datasource-provider postgresql</pre>
+
+    <div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">② prisma/schema.prisma</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12px;line-height:1.7;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Recipe {
+  id          Int      @id @default(autoincrement())
+  name        String
+  ingredients Json
+  steps       String[]
+  url         String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}</pre>
+        <div style="margin-top:20px;display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">③ .env</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.85;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">DATABASE_URL="postgresql://postgres:postgres@localhost:5432/recipe_app"</pre>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">④ lib/db.ts（Prisma Clientのシングルトン）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12px;line-height:1.7;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">import { PrismaClient } from "@prisma/client";
+
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
+export const prisma =
+  globalForPrisma.prisma ?? new PrismaClient();
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+}</pre>
+        <p style="margin:10px 0 0 0;font-size:12px;color:#9ca3af">※ グローバルに1個だけ保持するのは、開発中のホットリロードでPrisma Clientが何個も作られるのを防ぐためのお決まりパターンです。</p>
+      </div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#ecfeff;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#0e7490">Q. スキーマを変更したら何をすればいい？</strong><br>
+      <span style="color:#4b5563">A. schema.prismaを編集したら、開発中は<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">bunx prisma migrate dev --name 変更内容</span>を実行します。これがマイグレーションファイルの作成・DB反映・Prisma Clientの型再生成を一度にやってくれます。<br><br>本ページの lib/db.ts と、06章のgetRecipes/addRecipeは、そのままこのprismaクライアント（<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">prisma.recipe.findMany()</span>など）を呼ぶ形で置き換えられます。</span>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- ======== EXTRA 7: ENV — DOCKER COMPOSE ======== -->
+  <div data-screen-label="環境3 Docker Compose" style="display:{{ pg29 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#0e7490;background:#ecfeff;padding:2px 10px;border-radius:6px">環境3</span>
+      <h2 style="font-size:25px;margin:0">Docker Compose — ローカルにPostgresを起動する</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">Next.jsアプリ自体は<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">bun dev</span>でホスト上で動かし（Turbopackのホットリロードが速いため）、<strong>Postgresだけ</strong>をDocker Composeでコンテナ起動するのがローカル開発の基本形です。</p>
+
+    <div style="display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">① docker-compose.yml（プロジェクト直下に作成）</div>
+    <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.8;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: recipe_app
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:</pre>
+
+    <div style="margin-top:20px;display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">② 起動・停止コマンド</div>
+    <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:13px;line-height:1.85;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5"># バックグラウンドで起動</span>
+docker compose up -d
+
+<span style="color:#7c8aa5"># 状態確認</span>
+docker compose ps
+
+<span style="color:#7c8aa5"># マイグレーション反映（Prisma）</span>
+bunx prisma migrate dev
+
+<span style="color:#7c8aa5"># Next.js開発サーバーはホストで起動</span>
+bun dev
+
+<span style="color:#7c8aa5"># 停止（データは残す）</span>
+docker compose stop
+
+<span style="color:#7c8aa5"># 完全に削除（データも消える）</span>
+docker compose down -v</pre>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#ecfeff;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#0e7490">Q. Next.jsアプリ自体もdocker-compose.ymlに入れなくていいの？</strong><br>
+      <span style="color:#4b5563">A. ローカル開発中は入れないほうが快適です。Turbopackのファイル監視がコンテナ越しだと遅くなりがちなので、アプリはホストでbun devが基本形です。<br><br>アプリをコンテナ化するのは、次のページで扱う「本番＝ECS Fargate」に向けたビルド確認のときです。</span>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- ======== EXTRA 8: ENV — ECS FARGATE DOCKERFILE ======== -->
+  <div data-screen-label="環境4 ECS Fargate向けDockerfile" style="display:{{ pg30 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#0e7490;background:#ecfeff;padding:2px 10px;border-radius:6px">環境4</span>
+      <h2 style="font-size:25px;margin:0">本番デプロイ想定 — ECS on Fargate向けにビルドする</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">ECS Fargateはコンテナ実行基盤なので、本番用には<strong>Next.jsをDockerイメージ化</strong>する必要があります。<br><br><span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">next.config.ts</span> に <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">output: "standalone"</span> を指定すると、イメージサイズを抑えた実行専用の出力が作れます。</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">① next.config.ts</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.8;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  output: "standalone",
+};
+
+export default nextConfig;</pre>
+        <div style="margin-top:20px;display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">② .dockerignore</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.8;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">node_modules
+.next
+.git
+.env*</pre>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">③ Dockerfile（マルチステージ・bunベース）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:11.5px;line-height:1.7;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5"># 1. 依存関係のインストール</span>
+FROM oven/bun:1 AS deps
+WORKDIR /app
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
+
+<span style="color:#7c8aa5"># 2. ビルド</span>
+FROM oven/bun:1 AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN bunx prisma generate
+RUN bun run build
+
+<span style="color:#7c8aa5"># 3. 実行専用の軽量イメージ</span>
+FROM oven/bun:1-slim AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+EXPOSE 3000
+CMD ["bun", "server.js"]</pre>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">④ ビルド確認 → ECRへpush</div>
+    <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:13px;line-height:1.85;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5"># ローカルでイメージビルド・起動確認</span>
+docker build -t recipe-next .
+docker run -p 3000:3000 --env-file .env.local recipe-next
+
+<span style="color:#7c8aa5"># ECRへpush（アカウントID/リージョンは自分の環境に置き換え）</span>
+aws ecr get-login-password --region ap-northeast-1 \
+  | docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.ap-northeast-1.amazonaws.com
+docker tag recipe-next:latest <ACCOUNT_ID>.dkr.ecr.ap-northeast-1.amazonaws.com/recipe-next:latest
+docker push <ACCOUNT_ID>.dkr.ecr.ap-northeast-1.amazonaws.com/recipe-next:latest</pre>
+
+    <div style="margin-top:16px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
+      <strong style="color:#0f172a">ECS Fargateタスク定義で気にする点</strong><br><br>
+      ・コンテナのポートは3000（上のDockerfileのEXPOSEに合わせる）<br>
+      ・<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">DATABASE_URL</span> はSecrets Manager／SSM Parameter Storeから注入し、タスク定義に平文で書かない<br>
+      ・PostgresはローカルのDocker Composeとは別に、本番は<strong>Amazon RDS for PostgreSQL</strong>を使うのが基本形（ECS Fargateのコンテナは"ステートレス"に保つ）<br>
+      ・ALBのヘルスチェックパスは <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">/</span> かAPI用の軽量なRoute Handler（例: <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">/api/health</span>）を用意する<br>
+      ・ログはawslogsドライバでCloudWatch Logsへ
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#ecfeff;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#0e7490">Q. ローカルのdocker-compose.ymlに、本番用のDockerfileをそのまま組み込める？</strong><br>
+      <span style="color:#4b5563">A. 組み込めます。docker-compose.ymlのdbサービスに加えて、appサービスとして<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">build: .</span>を追加すれば「アプリもDB も丸ごとdocker compose up」構成にできます。<br><br>ただし開発中はホットリロードの速さを優先し、本ページの構成（アプリはホスト・DBだけコンテナ）から始めるのがおすすめです。</span>
+    </div>
+    </sc-if>
   </div>
 
   <!-- pager spacer so fixed footer doesn't cover content -->
@@ -1136,6 +1783,7 @@ class Component extends DCLogic {
   CHAPTERS = [
     { label: "目次・全体像", desc: "" },
     { label: "Next.jsとは", desc: "Vite+Reactに何が足されるか。CSRとSSRの違い" },
+    { label: "セットアップ", desc: "2026年7月時点の導入コマンドと対話プロンプトの回答例" },
     { label: "ルーティング", desc: "viewModeの3画面切替が、フォルダ＝URLになる" },
     { label: "サーバー/クライアント", desc: "一番の新概念。\"use client\"で境界線を引く" },
     { label: "\"use client\"の境界線", desc: "どこまで効くか。use serverとの違い" },
@@ -1146,11 +1794,26 @@ class Component extends DCLogic {
     { label: "対応表と注意点", desc: "チートシート＋ハマりどころTOP4" }
   ];
 
+  EXTRA = [
+    { label: "Route Handlers ① どこがバックエンドか", desc: "App.jsxのどの関数がAPI化向きかを見分け＋追加ファイル構成" },
+    { label: "Route Handlers ② GET/POST", desc: "一覧取得と新規登録をコピペで実装" },
+    { label: "Route Handlers ③ PATCH/DELETE", desc: "編集・削除と、呼び出し側のfetch化" },
+    { label: "Route Handlers ④ AIプロンプト", desc: "生成AIに渡すプロンプトとServer Actionとの使い分け" }
+  ];
+
+  EXTRA2 = [
+    { label: "事前準備 — bun/Docker確認", desc: "bun・Dockerのバージョン確認とインストール手順" },
+    { label: "Postgresパッケージ", desc: "Prismaの追加installとschema.prisma、db.ts" },
+    { label: "Docker Compose", desc: "ローカルPostgresの起動・停止コマンド" },
+    { label: "ECS Fargate向けDockerfile", desc: "standalone出力とマルチステージビルド、ECR push" }
+  ];
+
   ROUTES = [
     { tree: "├── page.tsx", url: "/", note: "検索・一覧。今のviewMode===\"search\"の画面（SearchBox＋結果リスト）がここに相当します。", old: 'viewMode === "search"' },
     { tree: "├── register/page.tsx", url: "/register", note: "レシピ登録（RegisterRecipeForm）。URLになるので、リロードしても登録画面のままですし、URLを共有・ブックマークもできます。", old: 'viewMode === "register"' },
     { tree: "├── recipes/page.tsx", url: "/recipes", note: "登録済み一覧（RecipeList＋RecipeCard）。ネストしたフォルダはそのままネストしたURLになります。", old: 'viewMode === "registered"' },
-    { tree: "└── recipes/[id]/page.tsx", url: "/recipes/1", note: "[id]は可変部分。今は一覧の中で編集していますが、レシピ1件ごとの詳細URLを新設できます（JS版のdetail.html?id=1の復活）。params.idで値を受け取ります。", old: "detail.html?id=1（JS版）" }
+    { tree: "├── recipes/[id]/page.tsx", url: "/recipes/1", note: "[id]は可変部分。今は一覧の中で編集していますが、レシピ1件ごとの詳細URLを新設できます（JS版のdetail.html?id=1の復活）。params.idで値を受け取ります。", old: "detail.html?id=1（JS版）" },
+    { tree: "└── api/recipes/route.ts", url: "/api/recipes", note: "画面ではなくJSONを返すRoute Handler。GETで一覧、POSTで新規登録を返します。詳細は発展編で扱います。", old: "—（新規）" }
   ];
 
   QUIZ = [
@@ -1203,15 +1866,16 @@ class Component extends DCLogic {
 
   MAPPING = [
     { left: "vite（npm run dev / build）", right: "next dev / next build に置き換わる（01章）" },
-    { left: "viewMode のstateで3画面切替", right: "app/ の3フォルダ＝URL（/・/register・/recipes）（02章）" },
-    { left: "<button onClick={() => setViewMode(…)}>", right: "layout.tsx の <Link href=…>。自動prefetch付き（07章）" },
-    { left: "h1をviewModeの三項演算子で切替", right: "各page.tsxが自分の<h1>を持つ（07章）" },
-    { left: "App.jsxの全コードがブラウザで実行", right: "デフォルトはサーバー。SearchBoxなど対話部品だけ \"use client\"（03・04章）" },
-    { left: "useState(() => localStorageから復元)", right: "asyncなサーバーコンポーネントで await getRecipes()（05章）" },
-    { left: "useEffectでlocalStorageへ保存", right: "Server Actions + revalidatePath（04・08章）" },
-    { left: "parseRecipeText（App.jsx内の純JS）", right: "lib/へ無変更で移植し、サーバー側で実行（08章）" },
+    { left: "viewMode のstateで3画面切替", right: "app/ の3フォルダ＝URL（/・/register・/recipes）（03章）" },
+    { left: "<button onClick={() => setViewMode(…)}>", right: "layout.tsx の <Link href=…>。自動prefetch付き（08章）" },
+    { left: "h1をviewModeの三項演算子で切替", right: "各page.tsxが自分の<h1>を持つ（08章）" },
+    { left: "App.jsxの全コードがブラウザで実行", right: "デフォルトはサーバー。SearchBoxなど対話部品だけ \"use client\"（04・05章）" },
+    { left: "useState(() => localStorageから復元)", right: "asyncなサーバーコンポーネントで await getRecipes()（06章）" },
+    { left: "useEffectでlocalStorageへ保存", right: "Server Actions + revalidatePath（05・09章）" },
+    { left: "parseRecipeText（App.jsx内の純JS）", right: "lib/へ無変更で移植し、サーバー側で実行（09章）" },
     { left: 'window.alert("…形式が正しくありません")', right: "Server Actionの戻り値＋useActionStateでエラー表示" },
-    { left: "map/filter/スプレッドでの更新、key={recipe.id}", right: "そのまま使う（Reactの知識は不変）" }
+    { left: "map/filter/スプレッドでの更新、key={recipe.id}", right: "そのまま使う（Reactの知識は不変）" },
+    { left: "外部からのアクセスが必要なら", right: "app/api/recipes/route.ts の Route Handlerに切り出し（発展編）" }
   ];
 
   componentDidMount() {
@@ -1236,7 +1900,7 @@ class Component extends DCLogic {
     const s = this.state;
     const page = s.page;
     const pg = {};
-    for (let i = 0; i <= 21; i++) pg["pg" + i] = (page === i) ? "block" : "none";
+    for (let i = 0; i <= 30; i++) pg["pg" + i] = (page === i) ? "block" : "none";
 
     const labelOf = (n) => {
       if (n === 0) return "目次・全体像";
@@ -1247,6 +1911,8 @@ class Component extends DCLogic {
       if (n >= 5 && n <= 8) return "0" + n + " " + this.GLOSSARY[n - 5].label;
       if (n === 9) return "09 全体まとめ";
       if (n >= 10 && n <= 12) return "1" + (n - 10) + " " + this.GLOSSARY[n - 6].label;
+      if (n >= 23 && n <= 26) return "発展" + (n - 22) + " " + this.EXTRA[n - 23].label;
+      if (n >= 27 && n <= 30) return "環境" + (n - 26) + " " + this.EXTRA2[n - 27].label;
       const c = n - 12;
       return String(c).padStart(2, "0") + " " + this.CHAPTERS[c].label;
     };
@@ -1279,6 +1945,16 @@ class Component extends DCLogic {
         ...this.CHAPTERS.slice(1).map((c, i) => {
           const p = i + 13;
           return { isItem: true, isHeader: false, num: String(i + 1).padStart(2, "0"), label: c.label, go: () => this.goPage(p), bg: page === p ? "#1a7f4b" : "transparent", color: page === p ? "#ffffff" : "#334155", weight: page === p ? 700 : 500 };
+        }),
+        { isHeader: true, isItem: false, label: "発展編 — Route Handlers" },
+        ...this.EXTRA.map((e, i) => {
+          const p = i + 23;
+          return { isItem: true, isHeader: false, num: "発展" + (i + 1), label: e.label, go: () => this.goPage(p), bg: page === p ? "#92580a" : "transparent", color: page === p ? "#ffffff" : "#334155", weight: page === p ? 700 : 500 };
+        }),
+        { isHeader: true, isItem: false, label: "環境構築編 — bun/Docker/Postgres/ECS" },
+        ...this.EXTRA2.map((e, i) => {
+          const p = i + 27;
+          return { isItem: true, isHeader: false, num: "環境" + (i + 1), label: e.label, go: () => this.goPage(p), bg: page === p ? "#0e7490" : "transparent", color: page === p ? "#ffffff" : "#334155", weight: page === p ? 700 : 500 };
         })
       ],
       glossaryToc: [
@@ -1296,13 +1972,25 @@ class Component extends DCLogic {
         desc: c.desc,
         go: () => this.goPage(i + 13)
       })),
-      pageIndicator: page === 0 ? "全9章 + 用語01–12" : (page <= 12 ? "用語ディープダイブ / 01–12" : "第" + (page - 12) + "章 / 全9章"),
+      extraToc: this.EXTRA.map((e, i) => ({
+        num: "発展" + (i + 1),
+        label: e.label,
+        desc: e.desc,
+        go: () => this.goPage(i + 23)
+      })),
+      extraToc2: this.EXTRA2.map((e, i) => ({
+        num: "環境" + (i + 1),
+        label: e.label,
+        desc: e.desc,
+        go: () => this.goPage(i + 27)
+      })),
+      pageIndicator: page === 0 ? "全10章 + 用語01–12" : (page <= 12 ? "用語ディープダイブ / 01–12" : page <= 22 ? "第" + (page - 12) + "章 / 全10章" : page <= 26 ? "発展編 " + (page - 22) + "/4" : "環境構築編 " + (page - 26) + "/4"),
       pagerDisplay: page === 0 ? "none" : "block",
       goPrev: () => this.goPage(Math.max(0, page - 1)),
-      goNext: () => this.goPage(Math.min(21, page + 1)),
+      goNext: () => this.goPage(Math.min(30, page + 1)),
       prevLabel: labelOf(Math.max(0, page - 1)),
-      hasNext: page < 21,
-      nextLabel: page < 21 ? labelOf(page + 1) : "",
+      hasNext: page < 30,
+      nextLabel: page < 30 ? labelOf(page + 1) : "",
 
       // ch2 routing demo
       routeItems: this.ROUTES.map((r, i) => ({

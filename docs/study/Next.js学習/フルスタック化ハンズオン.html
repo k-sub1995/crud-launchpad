@@ -1,0 +1,1506 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>フルスタック化ハンズオン | recipe-app を Next.js + Route Handlers + PostgreSQL に作り替える</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f7f5;
+        --panel: #ffffff;
+        --text: #1f2328;
+        --muted: #6b7280;
+        --border: #e2e2df;
+        --accent: #1a7f4b;
+        --accent-soft: #e6f4ec;
+        --code-bg: #0f172a;
+        --code-text: #e2e8f0;
+        --warn-bg: #fff7e6;
+        --warn-border: #f0c36d;
+        --danger: #d1453b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic",
+          system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.75;
+      }
+
+      main {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 32px 20px 96px;
+      }
+
+      header.doc-header {
+        padding: 40px 0 24px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 32px;
+      }
+
+      header.doc-header h1 {
+        font-size: 1.6rem;
+        margin: 0 0 8px;
+      }
+
+      header.doc-header p {
+        color: var(--muted);
+        margin: 0;
+      }
+
+      nav.toc {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 40px;
+      }
+
+      nav.toc h2 {
+        font-size: 1rem;
+        margin: 0 0 12px;
+      }
+
+      nav.toc ol {
+        margin: 0;
+        padding-left: 1.2em;
+      }
+
+      nav.toc li {
+        margin: 4px 0;
+      }
+
+      nav.toc a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      nav.toc a:hover {
+        text-decoration: underline;
+      }
+
+      section {
+        margin-bottom: 48px;
+      }
+
+      h2 {
+        font-size: 1.3rem;
+        border-left: 6px solid var(--accent);
+        padding-left: 12px;
+        margin: 0 0 16px;
+      }
+
+      h3 {
+        font-size: 1.05rem;
+        margin: 28px 0 12px;
+      }
+
+      h4 {
+        font-size: 0.95rem;
+        margin: 20px 0 8px;
+        color: var(--muted);
+      }
+
+      p {
+        margin: 0 0 12px;
+      }
+
+      code {
+        background: #eef0ef;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+      }
+
+      pre {
+        position: relative;
+        background: var(--code-bg);
+        color: var(--code-text);
+        padding: 16px 18px;
+        border-radius: 10px;
+        overflow-x: auto;
+        font-size: 0.85rem;
+        line-height: 1.6;
+        margin: 0 0 16px;
+      }
+
+      pre code {
+        background: none;
+        padding: 0;
+        color: inherit;
+      }
+
+      .copy-button {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--code-text);
+        padding: 0;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      .copy-button svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        fill: none;
+      }
+
+      .copy-button:hover {
+        background: rgba(255, 255, 255, 0.18);
+      }
+
+      .copy-button.copied {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #0b0e14;
+      }
+
+      .filename {
+        display: inline-block;
+        font-size: 0.8rem;
+        color: var(--muted);
+        margin: 0 0 4px;
+        font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 0 20px;
+        font-size: 0.9rem;
+      }
+
+      table.code-explain {
+        display: block;
+        overflow-x: auto;
+      }
+
+      th,
+      td {
+        border: 1px solid var(--border);
+        padding: 8px 10px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: var(--accent-soft);
+      }
+
+      td:first-child,
+      th:first-child {
+        white-space: nowrap;
+        font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+        color: var(--muted);
+      }
+
+      .callout {
+        background: var(--warn-bg);
+        border: 1px solid var(--warn-border);
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin: 0 0 20px;
+        font-size: 0.92rem;
+      }
+
+      .callout strong {
+        color: #92620c;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px 22px;
+        margin: 0 0 20px;
+      }
+
+      .step-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-right: 8px;
+      }
+
+      .footer-nav {
+        margin-top: 48px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .footer-nav a {
+        color: var(--accent);
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      ul.plain {
+        padding-left: 1.2em;
+      }
+
+      .os-tabs {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      @media (min-width: 720px) {
+        .os-tabs {
+          grid-template-columns: 1fr 1fr 1fr;
+        }
+      }
+
+      .os-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 16px;
+        background: var(--panel);
+      }
+
+      .os-card h4 {
+        margin-top: 0;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          --bg: #16181d;
+          --panel: #1e2127;
+          --text: #e6e8ec;
+          --muted: #9aa1ab;
+          --border: #2c303a;
+          --accent: #4fd190;
+          --accent-soft: #16352a;
+          --code-bg: #0b0e14;
+          --code-text: #d8dee9;
+          --warn-bg: #2b2312;
+          --warn-border: #7a5c1c;
+        }
+
+        code {
+          background: #2a2d34;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="doc-header">
+        <h1>フルスタック化ハンズオン</h1>
+        <p>
+          献立検索アプリ「recipe-app」（<code>react-learning</code>
+          ブランチ）を、Next.js（App Router）+ Route Handlers +
+          PostgreSQL（Prisma）のフルスタック構成に作り替える手順書です。bun と
+          Docker が未導入でも最初から進められるように書いています。
+        </p>
+      </header>
+
+      <nav class="toc" aria-label="目次">
+        <h2>目次</h2>
+        <ol>
+          <li><a href="#about">1. この教材について</a></li>
+          <li><a href="#prep">2. 事前準備（リポジトリの取得 / bun / Docker のインストール）</a></li>
+          <li><a href="#step1">3. 手順1: プロジェクトを scaffold し、Biome を導入する</a></li>
+          <li><a href="#step2">4. 手順2: Docker Compose で PostgreSQL を起動する</a></li>
+          <li><a href="#step3">5. 手順3: Prisma を導入し、データモデルを定義する</a></li>
+          <li><a href="#step4">6. 手順4: Prisma Client のシングルトンを作る</a></li>
+          <li><a href="#step5">7. 手順5: Route Handlers（API）を実装する</a></li>
+          <li><a href="#step6">8. 手順6: 4つのページを実装する</a></li>
+          <li><a href="#step7">9. 手順7: スタイルを移植する</a></li>
+          <li><a href="#step8">10. 手順8: 動作確認する</a></li>
+          <li><a href="#mapping">11. 新旧対応表</a></li>
+          <li><a href="#next">12. 次のステップ（ECS Fargate / Vercel + Neon）</a></li>
+        </ol>
+      </nav>
+
+      <section id="about">
+        <h2>1. この教材について</h2>
+        <p>
+          <code>recipe-app</code> は「献立検索アプリ」で、もともとは
+          <code>index.html</code> / <code>recipes.html</code> /
+          <code>register.html</code> / <code>detail.html</code> と
+          <code>src/</code> 以下のバニラ JS だけで動く、データを
+          <code>localStorage</code> に保存する静的サイトでした。
+          <code>react-learning</code> ブランチではこれを Vite + React
+          （<code>react-learning/</code> ディレクトリ）に置き換える学習が進められています。
+        </p>
+        <p>
+          この教材はその次のステップとして、<code>react-learning/</code> と
+          並列の新ディレクトリ <code>next-learning/</code> に、同じ CRUD
+          （料理の登録・検索・更新・削除）体験を次の構成で作り替えます。
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>旧（バニラ JS / React 版）</th>
+              <th>新（フルスタック）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>フレームワーク</td>
+              <td>なし → React（Vite）</td>
+              <td>Next.js（App Router）</td>
+            </tr>
+            <tr>
+              <td>データ保存先</td>
+              <td>ブラウザの localStorage</td>
+              <td>PostgreSQL（サーバー側DB）</td>
+            </tr>
+            <tr>
+              <td>API</td>
+              <td>なし（直接 localStorage 読み書き）</td>
+              <td>Route Handlers（REST風の <code>/api/recipes</code>）</td>
+            </tr>
+            <tr>
+              <td>DB アクセス</td>
+              <td>-</td>
+              <td>Prisma ORM</td>
+            </tr>
+            <tr>
+              <td>パッケージ管理</td>
+              <td>npm</td>
+              <td>bun</td>
+            </tr>
+            <tr>
+              <td>Lint / Format</td>
+              <td>-</td>
+              <td>Biome</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout">
+          <strong>ホスティングが変わる点に注意:</strong>
+          この構成は Node.js の実行環境と PostgreSQL への接続が必要になるため、
+          <code>react-learning/</code> が使っている GitHub Pages（<code>deploy.yml</code>
+          による静的ファイル配信）ではそのままでは動きません。本番運用する場合は
+          Vercel（+ Neon などの PostgreSQL）や、Node サーバーを動かせる ECS on
+          Fargate（+ RDS/Aurora）などが選択肢になります（このハンズオンではローカル環境での動作確認までを扱います）。
+        </div>
+        <p>
+          既存の <code>index.html</code> 等のバニラ JS 版・<code>react-learning/</code>
+          の React 版はどちらもそのまま残し、リポジトリ直下に新しく
+          <code>next-learning/</code> ディレクトリを作ってその中に構築します。既存ファイルは一切変更しません。
+        </p>
+      </section>
+
+      <section id="prep">
+        <h2>2. 事前準備（リポジトリの取得 / bun / Docker のインストール）</h2>
+
+        <h3>recipe-app リポジトリを取得する</h3>
+        <pre><code>git clone -b react-learning https://github.com/yhk-0707/recipe-app.git
+cd recipe-app</code></pre>
+        <p>
+          すでに bun と Docker が入っている場合は下のインストール手順は読み飛ばして
+          <a href="#step1">手順1</a> に進んでください。
+        </p>
+
+        <h3>bun のインストール</h3>
+        <div class="os-tabs">
+          <div class="os-card">
+            <h4>macOS / Linux</h4>
+            <pre><code>curl -fsSL https://bun.sh/install | bash</code></pre>
+            <p style="margin:0;font-size:0.85rem;color:var(--muted)">
+              インストール後、表示に従ってシェルを再起動するか
+              <code>source ~/.bashrc</code>（または <code>~/.zshrc</code>）を実行してください。
+            </p>
+          </div>
+          <div class="os-card">
+            <h4>Windows</h4>
+            <pre><code>powershell -c "irm bun.sh/install.ps1 | iex"</code></pre>
+            <p style="margin:0;font-size:0.85rem;color:var(--muted)">
+              PowerShell で実行します。WSL2 を使っている場合は左の macOS / Linux 手順と同じコマンドが使えます。
+            </p>
+          </div>
+          <div class="os-card">
+            <h4>Homebrew（macOS）</h4>
+            <pre><code>brew install oven-sh/bun/bun</code></pre>
+          </div>
+        </div>
+        <p>インストール後、バージョンが表示されれば成功です。</p>
+        <pre><code>bun --version</code></pre>
+
+        <h3>Docker のインストール</h3>
+        <p>
+          ローカルで PostgreSQL を動かすために Docker（Docker Compose 機能込み）を使います。
+        </p>
+        <div class="os-tabs">
+          <div class="os-card">
+            <h4>macOS / Windows</h4>
+            <p style="font-size:0.9rem">
+              <strong>Docker Desktop</strong>
+              をインストールしてください。インストーラは
+              Docker 公式サイトの Get Docker ページから入手します。インストール後にアプリを起動しておく必要があります。
+            </p>
+          </div>
+          <div class="os-card">
+            <h4>Linux</h4>
+            <p style="font-size:0.9rem">
+              ディストリビューションのパッケージマネージャで
+              <strong>Docker Engine</strong> と
+              <strong>Docker Compose プラグイン</strong>
+              を導入します（例: Ubuntu なら公式の apt リポジトリ手順に従います）。
+            </p>
+          </div>
+        </div>
+        <p>インストール後、以下がどちらもエラーなく表示されれば準備完了です。</p>
+        <pre><code>docker --version
+docker compose version</code></pre>
+      </section>
+
+      <section id="step1">
+        <h2>3. 手順1: プロジェクトを scaffold し、Biome を導入する</h2>
+        <p>
+          recipe-app リポジトリのルートで次を実行します（<code>react-learning/</code>
+          と並ぶディレクトリとして作られます）。
+        </p>
+        <pre><code>bunx create-next-app@latest next-learning</code></pre>
+        <p>対話形式でいくつか質問されます。回答は次のとおりです。</p>
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>質問</th>
+              <th>回答</th>
+              <th>理由</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TypeScript を使いますか？</td>
+              <td>Yes</td>
+              <td>厳密な型付けのため</td>
+            </tr>
+            <tr>
+              <td>ESLint を使いますか？</td>
+              <td>No</td>
+              <td>Lint/Format は ESLint ではなく Biome を使うため</td>
+            </tr>
+            <tr>
+              <td>Tailwind CSS を使いますか？</td>
+              <td>No</td>
+              <td>既存の <code>style.css</code> をそのまま移植するため</td>
+            </tr>
+            <tr>
+              <td><code>src/</code> ディレクトリを使いますか？</td>
+              <td>No</td>
+              <td>ルート直下に <code>app/</code> を置くシンプルな構成にするため</td>
+            </tr>
+            <tr>
+              <td>App Router を使いますか？</td>
+              <td>Yes</td>
+              <td>Route Handlers を使うため（Pages Router ではなく App Router が前提）</td>
+            </tr>
+            <tr>
+              <td>import alias をカスタマイズしますか？</td>
+              <td>No（デフォルトの <code>@/*</code> のまま Enter）</td>
+              <td>特に変更する理由がないため</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>完了すると <code>next-learning/</code> ディレクトリが作られます。以降のコマンドはこのディレクトリの中で実行します。</p>
+        <pre><code>cd next-learning</code></pre>
+        <p>続けて ESLint の代わりに Biome を Lint / Format ツールとして導入します。</p>
+        <pre><code>bun add -D --exact @biomejs/biome
+bunx biome init</code></pre>
+        <p>生成された <code>biome.json</code> を次のように設定します。</p>
+        <p class="filename">next-learning/biome.json</p>
+        <pre><code>{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "organizeImports": { "enabled": true },
+  "linter": {
+    "enabled": true,
+    "rules": { "recommended": true }
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2
+  }
+}</code></pre>
+        <p><code>package.json</code> の <code>scripts</code> に lint/format コマンドを追加します。</p>
+        <p class="filename">next-learning/package.json（抜粋）</p>
+        <pre><code>"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "biome check .",
+  "format": "biome format --write ."
+}</code></pre>
+        <p>動作確認:</p>
+        <pre><code>bun run lint</code></pre>
+      </section>
+
+      <section id="step2">
+        <h2>4. 手順2: Docker Compose で PostgreSQL を起動する</h2>
+        <p>
+          <code>next-learning/</code> 直下に <code>docker-compose.yml</code> を作成します。
+        </p>
+        <p class="filename">next-learning/docker-compose.yml</p>
+        <pre><code>services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: recipe_app
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:</code></pre>
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>行</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>image: postgres:16-alpine</code></td>
+              <td>軽量な Alpine ベースの PostgreSQL 16 公式イメージを使う</td>
+            </tr>
+            <tr>
+              <td><code>environment</code></td>
+              <td>初回起動時にこのユーザー/パスワード/DB名で初期化される</td>
+            </tr>
+            <tr>
+              <td><code>ports</code></td>
+              <td>ホストの 5432 番をコンテナの 5432 番（PostgreSQLの既定ポート）に接続</td>
+            </tr>
+            <tr>
+              <td><code>volumes</code></td>
+              <td>
+                named volume <code>db-data</code> にデータを永続化する。これが無いとコンテナを消したときにデータも消える
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p>起動します。</p>
+        <pre><code>docker compose up -d</code></pre>
+        <p>起動確認:</p>
+        <pre><code>docker compose ps</code></pre>
+      </section>
+
+      <section id="step3">
+        <h2>5. 手順3: Prisma を導入し、データモデルを定義する</h2>
+        <pre><code>bun add prisma @prisma/client
+bunx prisma init --datasource-provider postgresql</code></pre>
+        <p>
+          <code>prisma init</code> により <code>prisma/schema.prisma</code> と
+          <code>.env</code> が生成されます。<code>.env</code> を Docker
+          Compose の PostgreSQL に向けます。
+        </p>
+        <p class="filename">next-learning/.env</p>
+        <pre><code>DATABASE_URL="postgresql://postgres:postgres@localhost:5432/recipe_app"</code></pre>
+        <p>
+          旧コードの <code>src/data/recipes.js</code> にある
+          <code>normalizeRecipe()</code> は、レシピを常に
+          <code>{ id, name, ingredients: [{ name, amount }], steps: string[], url }</code>
+          という形に正規化していました。<code>schema.prisma</code> ではこの形をそのまま
+          モデル化します。<code>ingredients</code> は名前と分量を持つオブジェクトの配列なので
+          <code>Json</code> 型で、<code>steps</code> は文字列の配列なので PostgreSQL
+          のネイティブ配列型（<code>String[]</code>）で保持し、テーブルを分けずにシンプルに保ちます。
+        </p>
+        <p class="filename">next-learning/prisma/schema.prisma</p>
+        <pre><code>generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Recipe {
+  id          Int      @id @default(autoincrement())
+  name        String
+  ingredients Json
+  steps       String[]
+  url         String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}</code></pre>
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>行</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>generator client</code></td>
+              <td>この schema から TypeScript 用の Prisma Client を生成する設定</td>
+            </tr>
+            <tr>
+              <td><code>datasource db</code></td>
+              <td>接続先DBの種類（postgresql）と接続文字列（環境変数から取得）</td>
+            </tr>
+            <tr>
+              <td><code>id Int @id @default(autoincrement())</code></td>
+              <td>
+                主キー。旧コードの <code>addRecipe()</code> がIDに
+                <code>Date.now()</code> を使っていた部分を、DBの自動採番に置き換える
+              </td>
+            </tr>
+            <tr>
+              <td><code>ingredients Json</code></td>
+              <td>
+                <code>[{"{"} name: "醤油", amount: "大さじ1" {"}"}, ...]</code>
+                という配列をそのままJSONとして保存する。旧コードの
+                <code>normalizeIngredients()</code> が返す構造と1対1
+              </td>
+            </tr>
+            <tr>
+              <td><code>steps String[]</code></td>
+              <td>
+                手順の配列。旧コードの <code>normalizeSteps()</code> が返す
+                <code>string[]</code> にそのまま対応する PostgreSQL の配列型
+              </td>
+            </tr>
+            <tr>
+              <td><code>url String?</code></td>
+              <td>参考URLは未入力の場合もあるため任意（nullable）</td>
+            </tr>
+            <tr>
+              <td><code>updatedAt DateTime @updatedAt</code></td>
+              <td>更新のたびに Prisma が自動で現在時刻に書き換える</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>マイグレーションを実行してテーブルを作成します。</p>
+        <pre><code>bunx prisma migrate dev --name init</code></pre>
+        <p>
+          これで PostgreSQL 内に <code>Recipe</code> テーブルが作られ、
+          Prisma Client の型も生成されます。
+        </p>
+      </section>
+
+      <section id="step4">
+        <h2>6. 手順4: Prisma Client のシングルトンを作る</h2>
+        <p>
+          Next.js の開発サーバーはホットリロードのたびにモジュールを再評価するため、
+          毎回 <code>new PrismaClient()</code> すると接続数が増え続けてしまいます。定石のシングルトンパターンで防ぎます。
+        </p>
+        <p class="filename">next-learning/lib/prisma.ts</p>
+        <pre><code>import { PrismaClient } from '@prisma/client';
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma;
+}</code></pre>
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>行</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>globalThis as unknown as {'{'} prisma?: ... {'}'}</code></td>
+              <td>
+                <code>globalThis</code>（プロセス全体で共有される領域）に
+                <code>prisma</code> という一時保管場所を型安全に用意する
+              </td>
+            </tr>
+            <tr>
+              <td><code>globalForPrisma.prisma ?? new PrismaClient()</code></td>
+              <td>すでに保管された instance があればそれを再利用し、無ければ新規作成</td>
+            </tr>
+            <tr>
+              <td><code>if (NODE_ENV !== 'production')</code></td>
+              <td>
+                開発時（ホットリロードが起きる環境）だけ <code>globalThis</code>
+                に保存する。本番では毎回プロセスが新しいので不要
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="step5">
+        <h2>7. 手順5: Route Handlers（API）を実装する</h2>
+        <p>
+          Server Actions ではなく、REST 的にエンドポイントを分ける
+          <strong>Route Handlers</strong> を使います。検索ロジックは旧コードの
+          <code>src/domain/search.js</code> の <code>findRecipesByIngredientsOrName()</code>
+          （スペース区切りの各検索語について、料理名または材料名のどれかに含まれることを
+          <strong>すべての検索語でAND</strong> 判定するロジック）をそのまま TypeScript に移植します。
+        </p>
+
+        <h3>検索ロジックの移植（<code>lib/search.ts</code>）</h3>
+        <p class="filename">next-learning/lib/search.ts</p>
+        <pre><code>import type { Recipe } from '@prisma/client';
+
+export function normalizeSearchInput(input: string): string[] {
+  return input
+    .split(' ')
+    .map((item) =&gt; item.trim().toLowerCase())
+    .filter((item) =&gt; item !== '');
+}
+
+export function findRecipesByIngredientsOrName(
+  recipes: Recipe[],
+  searchTerms: string[],
+): Recipe[] {
+  if (searchTerms.length === 0) {
+    return recipes;
+  }
+
+  return recipes.filter((recipe) =&gt; {
+    const recipeName = recipe.name.toLowerCase();
+    const ingredients = recipe.ingredients as { name: string; amount: string }[];
+    const ingredientNames = ingredients.map((i) =&gt; i.name.toLowerCase());
+
+    return searchTerms.every(
+      (term) =&gt;
+        recipeName.includes(term) ||
+        ingredientNames.some((name) =&gt; name.includes(term)),
+    );
+  });
+}</code></pre>
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>行</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>normalizeSearchInput</code></td>
+              <td>旧コードと同じくスペース区切りで検索語に分割し、空要素を除去する</td>
+            </tr>
+            <tr>
+              <td><code>recipe.ingredients as {'{'} name; amount {'}'}[]</code></td>
+              <td>
+                Prisma の <code>Json</code> 型は TypeScript 上 <code>JsonValue</code>
+                になるため、実際に保存している形にキャストして扱う
+              </td>
+            </tr>
+            <tr>
+              <td><code>searchTerms.every(...)</code></td>
+              <td>
+                旧コードと同じ「すべての検索語について、料理名か材料名のどちらかに一致する」判定（AND across terms, OR within a term）
+              </td>
+            </tr>
+            <tr>
+              <td>検索語が空の場合</td>
+              <td>
+                旧コードの <code>findRecipesByIngredientsOrName</code> は空配列を返す仕様だったが、一覧取得と共通化するためここでは全件を返すようにしている（一覧ページ用途を兼ねるための変更点）
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3><code>app/api/recipes/route.ts</code>（一覧取得 / 検索 / 新規登録）</h3>
+        <p class="filename">next-learning/app/api/recipes/route.ts</p>
+        <pre><code>import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { findRecipesByIngredientsOrName, normalizeSearchInput } from '@/lib/search';
+
+export async function GET(request: NextRequest) {
+  const q = request.nextUrl.searchParams.get('q')?.trim() ?? '';
+
+  const recipes = await prisma.recipe.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
+
+  if (!q) {
+    return NextResponse.json(recipes);
+  }
+
+  const searchTerms = normalizeSearchInput(q);
+  return NextResponse.json(findRecipesByIngredientsOrName(recipes, searchTerms));
+}
+
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  const name = typeof body.name === 'string' ? body.name.trim() : '';
+
+  if (!name) {
+    return NextResponse.json(
+      { message: '料理名を入力してください。' },
+      { status: 400 },
+    );
+  }
+
+  const recipe = await prisma.recipe.create({
+    data: {
+      name,
+      ingredients: body.ingredients ?? [],
+      steps: Array.isArray(body.steps) ? body.steps : [],
+      url: typeof body.url === 'string' ? body.url : null,
+    },
+  });
+
+  return NextResponse.json(recipe, { status: 201 });
+}</code></pre>
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>行</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>request.nextUrl.searchParams.get('q')</code></td>
+              <td>
+                URLクエリ（例: <code>/api/recipes?q=醤油 卵</code>）から検索語を取得。旧コードの
+                <code>searchRecipe()</code> が読んでいた入力欄の値に相当
+              </td>
+            </tr>
+            <tr>
+              <td>DBから全件取得してからフィルタする理由</td>
+              <td>
+                旧ロジックが「料理名 or 材料名」という単純な文字列一致のANDなので、Prismaの
+                <code>where</code> 句だけでは表現しづらい。データ件数が学習用途の規模であれば
+                アプリ層でのフィルタで十分なため、まず全件取得してから移植済みロジックへ渡している
+              </td>
+            </tr>
+            <tr>
+              <td><code>POST</code> の <code>name</code> 必須チェック</td>
+              <td>旧コードの登録フォームが料理名必須だったのと同じルールをサーバー側でも再現</td>
+            </tr>
+            <tr>
+              <td><code>prisma.recipe.create({'{'} data: {'{'} ... {'}'} {'}'})</code></td>
+              <td>
+                <code>id</code> / <code>createdAt</code> / <code>updatedAt</code>
+                は schema の default 設定により自動生成される
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3><code>app/api/recipes/[id]/route.ts</code>（詳細取得 / 更新 / 削除）</h3>
+        <p class="filename">next-learning/app/api/recipes/[id]/route.ts</p>
+        <pre><code>import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+
+type Params = { params: { id: string } };
+
+export async function GET(_request: NextRequest, { params }: Params) {
+  const recipe = await prisma.recipe.findUnique({
+    where: { id: Number(params.id) },
+  });
+
+  if (!recipe) {
+    return NextResponse.json({ message: '見つかりません。' }, { status: 404 });
+  }
+
+  return NextResponse.json(recipe);
+}
+
+export async function PATCH(request: NextRequest, { params }: Params) {
+  const body = await request.json();
+  const name = typeof body.name === 'string' ? body.name.trim() : '';
+
+  if (!name) {
+    return NextResponse.json(
+      { message: '料理名を入力してください。' },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const recipe = await prisma.recipe.update({
+      where: { id: Number(params.id) },
+      data: {
+        name,
+        ingredients: body.ingredients ?? [],
+        steps: Array.isArray(body.steps) ? body.steps : [],
+        url: typeof body.url === 'string' ? body.url : null,
+      },
+    });
+    return NextResponse.json(recipe);
+  } catch {
+    return NextResponse.json({ message: '見つかりません。' }, { status: 404 });
+  }
+}
+
+export async function DELETE(_request: NextRequest, { params }: Params) {
+  try {
+    const recipe = await prisma.recipe.delete({
+      where: { id: Number(params.id) },
+    });
+    return NextResponse.json(recipe);
+  } catch {
+    return NextResponse.json({ message: '見つかりません。' }, { status: 404 });
+  }
+}</code></pre>
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>行</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>[id]</code> ディレクトリ</td>
+              <td>
+                <code>/api/recipes/12</code> のように動的セグメントを受け取るフォルダ命名規則。値は
+                <code>params.id</code> に文字列で入るため <code>Number()</code> で変換する
+              </td>
+            </tr>
+            <tr>
+              <td><code>GET</code></td>
+              <td>
+                旧コードの <code>getRecipeById(id)</code>（詳細ページ・編集フォームの初期表示用）に相当
+              </td>
+            </tr>
+            <tr>
+              <td><code>PATCH</code></td>
+              <td>
+                旧コードの <code>updateRecipe(id, recipe)</code> に相当。対象の
+                <code>id</code> が無ければ Prisma が例外を投げるので 404 を返す
+              </td>
+            </tr>
+            <tr>
+              <td><code>DELETE</code></td>
+              <td>
+                旧コードの <code>deleteRecipe(id)</code> に相当。詳細ページのUndoトーストで
+                復元できるよう、削除したレシピ自体をレスポンスとして返す
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="step6">
+        <h2>8. 手順6: 4つのページを実装する</h2>
+        <p>
+          旧コードの4ページ構成（<code>index.html</code> = 検索トップ、
+          <code>recipes.html</code> = 登録済み一覧、<code>register.html</code> =
+          登録フォーム、<code>detail.html</code> = 詳細）を、そのまま4つの
+          App Router のルートとして再現します。
+        </p>
+
+        <h3>テキスト解析ユーティリティの移植（<code>lib/parser.ts</code>）</h3>
+        <p>
+          登録フォームでは「料理名 / 材料 / 手順 / 参考URL」の見出しを付けたテキストを貼り付けて登録する
+          <code>src/domain/parser.js</code> の <code>parseFormattedRecipe()</code>
+          のUXをそのまま維持します。パース自体はブラウザ側（Client Component）で行い、結果を構造化データとして
+          <code>POST</code> / <code>PATCH</code> に送信します。
+        </p>
+        <p class="filename">next-learning/lib/parser.ts</p>
+        <pre><code>export type ParsedRecipe = {
+  name: string;
+  ingredients: { name: string; amount: string }[];
+  steps: string[];
+  url: string;
+};
+
+export function parseFormattedRecipe(text: string): ParsedRecipe {
+  const lines = text.split('\n');
+  let name = '';
+  const ingredients: { name: string; amount: string }[] = [];
+  const steps: string[] = [];
+  let url = '';
+  let mode = '';
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith('料理名')) {
+      mode = 'title';
+      continue;
+    }
+    if (mode === 'title' && trimmed !== '') {
+      name = trimmed;
+      mode = '';
+      continue;
+    }
+    if (trimmed.startsWith('材料')) {
+      mode = 'ingredients';
+      continue;
+    }
+    if (trimmed.startsWith('手順')) {
+      mode = 'steps';
+      continue;
+    }
+    if (trimmed.startsWith('参考URL')) {
+      const value = trimmed.replace(/.*参考URL[:：]?\s*/, '').trim();
+      if (value) {
+        url = value;
+      } else {
+        mode = 'url';
+      }
+      continue;
+    }
+    if (mode === 'url' && trimmed !== '') {
+      url = trimmed;
+      mode = '';
+      continue;
+    }
+    if (mode === 'ingredients' &amp;&amp; trimmed.startsWith('-')) {
+      const item = trimmed.replace(/^-/, '').trim();
+      const parts = item.split('|');
+      ingredients.push({
+        name: parts[0]?.trim() ?? '',
+        amount: parts[1]?.trim() ?? '',
+      });
+      continue;
+    }
+    if (mode === 'steps' &amp;&amp; trimmed !== '') {
+      steps.push(trimmed.replace(/^\d+\./, '').trim());
+    }
+  }
+
+  return { name, ingredients, steps, url };
+}</code></pre>
+        <p>
+          このファイルは旧コードの <code>src/domain/parser.js</code>
+          をロジックそのまま TypeScript の型付きに書き換えただけで、状態遷移（<code>mode</code>
+          による行ごとの解釈）は完全に一致しています。
+        </p>
+
+        <h3><code>app/page.tsx</code>（検索トップ、旧 <code>index.html</code>）</h3>
+        <p class="filename">next-learning/app/page.tsx</p>
+        <pre><code>import { prisma } from '@/lib/prisma';
+import { SearchPage } from './search-page';
+
+export default async function Home() {
+  const recipes = await prisma.recipe.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return &lt;SearchPage initialRecipes={recipes} /&gt;;
+}</code></pre>
+        <p class="filename">next-learning/app/search-page.tsx（抜粋）</p>
+        <pre><code>'use client';
+
+import { useState } from 'react';
+import type { Recipe } from '@prisma/client';
+
+export function SearchPage({ initialRecipes }: { initialRecipes: Recipe[] }) {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState&lt;Recipe[]&gt;([]);
+  const [searched, setSearched] = useState(false);
+
+  async function handleSearch() {
+    const response = await fetch(
+      `/api/recipes?q=${encodeURIComponent(query)}`,
+      { cache: 'no-store' },
+    );
+    setResults(await response.json());
+    setSearched(true);
+  }
+
+  return (
+    &lt;main&gt;
+      &lt;h1&gt;献立検索&lt;/h1&gt;
+      &lt;input
+        value={query}
+        onChange={(e) =&gt; setQuery(e.target.value)}
+        placeholder="材料や料理名をスペース区切りで入力"
+      /&gt;
+      &lt;button onClick={handleSearch}&gt;検索&lt;/button&gt;
+
+      {searched ? (
+        &lt;ul&gt;
+          {results.map((r) =&gt; (
+            &lt;li key={r.id}&gt;{r.name}&lt;/li&gt;
+          ))}
+        &lt;/ul&gt;
+      ) : (
+        &lt;p&gt;登録件数: {initialRecipes.length}件&lt;/p&gt;
+      )}
+    &lt;/main&gt;
+  );
+}</code></pre>
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>行</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>app/page.tsx</code>（Server Component）</td>
+              <td>初期表示件数などサーバー側で取得できるデータを直接渡す。旧コードの初回 <code>initializeApp()</code> に相当</td>
+            </tr>
+            <tr>
+              <td><code>handleSearch</code></td>
+              <td>
+                旧コードの <code>searchRecipe()</code> → <code>findRecipesByIngredientsOrName</code>
+                の呼び出しを、<code>GET /api/recipes?q=...</code> への fetch に置き換えたもの
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3><code>app/recipes/page.tsx</code>（登録済み一覧、旧 <code>recipes.html</code>）</h3>
+        <p class="filename">next-learning/app/recipes/page.tsx</p>
+        <pre><code>import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
+
+export default async function RecipesPage() {
+  const recipes = await prisma.recipe.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return (
+    &lt;main&gt;
+      &lt;h1&gt;登録済みレシピ&lt;/h1&gt;
+      &lt;ul&gt;
+        {recipes.map((recipe) =&gt; (
+          &lt;li key={recipe.id}&gt;
+            &lt;Link href={`/recipes/${recipe.id}`}&gt;{recipe.name}&lt;/Link&gt;
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+        <p>
+          Server Component で <code>prisma.recipe.findMany()</code>
+          を直接呼ぶだけで一覧表示できる。旧コードの
+          <code>displayRecipeList()</code>（DOM文字列組み立て）に相当する処理は不要になり、JSXの
+          <code>.map()</code> に置き換わる。
+
+        </p>
+
+        <h3><code>app/register/page.tsx</code>（登録フォーム、旧 <code>register.html</code>）</h3>
+        <p class="filename">next-learning/app/register/page.tsx（抜粋）</p>
+        <pre><code>'use client';
+
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { parseFormattedRecipe } from '@/lib/parser';
+
+export default function RegisterPage() {
+  const router = useRouter();
+  const [text, setText] = useState('');
+
+  async function handleSubmit() {
+    const parsed = parseFormattedRecipe(text);
+    if (!parsed.name) return;
+
+    await fetch('/api/recipes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(parsed),
+    });
+
+    router.push('/recipes');
+  }
+
+  return (
+    &lt;main&gt;
+      &lt;h1&gt;レシピ登録&lt;/h1&gt;
+      &lt;textarea
+        value={text}
+        onChange={(e) =&gt; setText(e.target.value)}
+        placeholder={'料理名\n親子丼\n材料\n- 鶏肉|150g\n- 玉ねぎ|1/2個\n手順\n1. 鶏肉を切る\n2. 玉ねぎを煮る'}
+        rows={12}
+      /&gt;
+      &lt;button onClick={handleSubmit}&gt;登録&lt;/button&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>行</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>parseFormattedRecipe(text)</code></td>
+              <td>
+                貼り付けたテキストをクライアント側で構造化データにパースするのは旧コードと同じ。異なるのは、その結果を
+                <code>localStorage</code> の <code>addRecipe()</code> ではなく
+                <code>POST /api/recipes</code> に送る点
+              </td>
+            </tr>
+            <tr>
+              <td><code>router.push('/recipes')</code></td>
+              <td>登録後に一覧ページへ遷移。旧コードの登録完了後の画面遷移に相当</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3><code>app/recipes/[id]/page.tsx</code>（詳細、旧 <code>detail.html</code>）</h3>
+        <p class="filename">next-learning/app/recipes/[id]/page.tsx（抜粋）</p>
+        <pre><code>'use client';
+
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import type { Recipe } from '@prisma/client';
+
+export function RecipeDetail({ recipe }: { recipe: Recipe }) {
+  const router = useRouter();
+  const [isEditing, setIsEditing] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState&lt;Recipe | null&gt;(null);
+
+  async function handleDelete() {
+    const response = await fetch(`/api/recipes/${recipe.id}`, {
+      method: 'DELETE',
+    });
+    const deleted: Recipe = await response.json();
+    setPendingDelete(deleted);
+    router.push('/recipes');
+  }
+
+  async function handleUndo() {
+    if (!pendingDelete) return;
+    await fetch('/api/recipes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pendingDelete),
+    });
+    setPendingDelete(null);
+  }
+
+  // ...編集モードの入力欄・保存ボタンなどはregisterページと同様のフォームを再利用
+  return null;
+}</code></pre>
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>行</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>isEditing</code></td>
+              <td>旧コードの <code>toggleEditMode(show)</code>（インライン編集の表示切り替え）に相当する state</td>
+            </tr>
+            <tr>
+              <td><code>handleDelete</code> / <code>pendingDelete</code></td>
+              <td>
+                旧コードの削除確認モーダル（<code>createConfirmModal()</code>）通過後の削除処理と、削除後に表示される
+                Undoトースト（<code>showToast()</code>）の「元に戻す」ボタンを、削除したレシピをstateに保持しておく形で再現する
+              </td>
+            </tr>
+            <tr>
+              <td><code>handleUndo</code></td>
+              <td>
+                旧コードの undo ボタンが <code>addRecipe(recipeObj)</code>
+                で復元していたのと同じ考え方で、保持しておいた削除済みレシピをそのまま
+                <code>POST /api/recipes</code> に投げて再作成する
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="step7">
+        <h2>9. 手順7: スタイルを移植する</h2>
+        <p>
+          既存の <code>style.css</code> の内容を、そのまま
+          <code>next-learning/app/globals.css</code> に移植します。
+        </p>
+        <p class="filename">next-learning/app/globals.css</p>
+        <pre><code>/* 既存 style.css の内容をそのままコピーする */</code></pre>
+        <p>
+          <code>app/layout.tsx</code> で <code>globals.css</code> を import
+          していることを確認します（<code>create-next-app</code> が自動生成した状態のまま利用可能）。
+        </p>
+      </section>
+
+      <section id="step8">
+        <h2>10. 手順8: 動作確認する</h2>
+        <p>PostgreSQL コンテナが起動していることを確認してから開発サーバーを起動します。</p>
+        <pre><code>docker compose up -d
+bun run dev</code></pre>
+        <p>
+          ブラウザで <code>http://localhost:3000</code> を開き、次を一通り確認します。
+        </p>
+        <ul class="plain">
+          <li>トップページで材料・料理名によるキーワード検索ができる（スペース区切りの複数語）</li>
+          <li>「料理名 / 材料 / 手順 / 参考URL」形式のテキストを貼り付けてレシピを登録できる</li>
+          <li>一覧ページから詳細ページに遷移できる</li>
+          <li>詳細ページで編集・保存ができる</li>
+          <li>詳細ページで削除でき、Undo（元に戻す）が機能する</li>
+        </ul>
+        <div class="callout">
+          <strong>localStorage 版との違いを確認するテスト:</strong>
+          <code>Ctrl-C</code> で <code>bun run dev</code> を止めて再度起動しても、データが残っていることを確認してください。さらに
+          <code>docker compose restart</code> でDBコンテナを再起動しても消えないことも確認できます（named
+          volume に永続化されているため）。ブラウザの localStorage
+          を消してもデータには一切影響しません。
+        </div>
+      </section>
+
+      <section id="mapping">
+        <h2>11. 新旧対応表</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>旧（バニラJS / React版）</th>
+              <th>新（フルスタック）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>localStorage</code> キー <code>recipes</code>（<code>src/data/storage.js</code>）</td>
+              <td>PostgreSQL の <code>Recipe</code> テーブル</td>
+            </tr>
+            <tr>
+              <td>
+                <code>getRecipes()</code> / <code>addRecipe()</code> /
+                <code>updateRecipe()</code> / <code>deleteRecipe()</code>
+                （<code>src/data/recipes.js</code>）
+              </td>
+              <td>
+                <code>prisma.recipe.findMany()</code> /
+                <code>prisma.recipe.create()</code> /
+                <code>prisma.recipe.update()</code> /
+                <code>prisma.recipe.delete()</code> など Route Handlers 内の Prisma 呼び出し
+              </td>
+            </tr>
+            <tr>
+              <td><code>findRecipesByIngredientsOrName()</code>（<code>src/domain/search.js</code>）</td>
+              <td><code>lib/search.ts</code> に移植し、<code>GET /api/recipes?q=...</code> 内で実行</td>
+            </tr>
+            <tr>
+              <td><code>parseFormattedRecipe()</code>（<code>src/domain/parser.js</code>）</td>
+              <td><code>lib/parser.ts</code> にそのまま移植し、登録・編集フォームで利用</td>
+            </tr>
+            <tr>
+              <td><code>createConfirmModal()</code> / <code>showToast()</code>（<code>src/ui/modal.js</code> / <code>src/ui/toast.js</code>）</td>
+              <td>詳細ページの Client Component 内の state（確認ダイアログ表示・Undoトースト表示）</td>
+            </tr>
+            <tr>
+              <td>React版 <code>App.jsx</code> の <code>viewMode</code> state による画面切り替え</td>
+              <td>App Router の実ルーティング（<code>/</code> / <code>/recipes</code> / <code>/register</code> / <code>/recipes/[id]</code>）</td>
+            </tr>
+            <tr>
+              <td>ページ読み込み時の初期描画（<code>initializeApp()</code> 等）</td>
+              <td>各 <code>page.tsx</code>（Server Component）での初期データ取得</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="next">
+        <h2>12. 次のステップ（ECS Fargate / Vercel + Neon）</h2>
+        <p>
+          このハンズオンはローカル動作確認までですが、実際にインターネットへ公開する場合は次のような載せ替えが必要です。
+        </p>
+
+        <h3>ECS on Fargate + RDS/Aurora PostgreSQL へ</h3>
+        <ul class="plain">
+          <li>
+            RDS または Aurora PostgreSQL インスタンスを作成し、その接続文字列を本番用の
+            <code>DATABASE_URL</code> として ECS タスク定義の環境変数（またはSecrets
+            Manager）に設定する
+          </li>
+          <li>
+            マイグレーションはローカル用の <code>prisma migrate dev</code>
+            ではなく、本番向けの <code>bunx prisma migrate deploy</code>
+            をデプロイ時に実行する
+          </li>
+          <li>Next.js アプリを Docker イメージ化して ECS タスクとして動かす</li>
+        </ul>
+
+        <h3>Vercel + Neon へ</h3>
+        <ul class="plain">
+          <li>Neon で PostgreSQL データベースを作成し、接続文字列を取得する</li>
+          <li>
+            Vercel プロジェクトの環境変数に <code>DATABASE_URL</code> を設定する
+          </li>
+          <li>
+            デプロイ前後で <code>bunx prisma migrate deploy</code>
+            を実行してスキーマを反映する（Vercel のビルドコマンドに組み込む方法が一般的）
+          </li>
+          <li>
+            コードの変更はほぼ不要。Prisma は接続先が PostgreSQL である限り、Docker
+            の Postgres でも Neon でも同じスキーマ・クエリで動く
+          </li>
+        </ul>
+        <p>
+          最初から PostgreSQL + Docker Compose で開発しているため、どちらの環境に載せ替える場合も
+          DB の種類自体を変える必要がなく、<code>DATABASE_URL</code>
+          の差し替えとマイグレーション実行だけで済みます。
+        </p>
+      </section>
+
+      <div class="footer-nav">
+        <p>
+          <a href="./Next.js学習ページ.dc.html">← Next.js学習ページに戻る</a>
+        </p>
+      </div>
+    </main>
+
+    <script>
+      const copyIcon =
+        '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+      const checkIcon =
+        '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+      document.querySelectorAll('pre').forEach((pre) => {
+        const codeText = pre.textContent;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'copy-button';
+        button.setAttribute('aria-label', 'コードをコピー');
+        button.title = 'コピー';
+        button.innerHTML = copyIcon;
+
+        button.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(codeText);
+            button.innerHTML = checkIcon;
+            button.classList.add('copied');
+            button.title = 'コピーしました';
+          } catch {
+            button.title = '失敗しました';
+          } finally {
+            setTimeout(() => {
+              button.innerHTML = copyIcon;
+              button.classList.remove('copied');
+              button.title = 'コピー';
+            }, 1500);
+          }
+        });
+
+        pre.appendChild(button);
+      });
+    </script>
+  </body>
+</html>
