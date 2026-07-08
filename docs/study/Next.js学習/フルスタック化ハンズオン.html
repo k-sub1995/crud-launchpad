@@ -193,6 +193,26 @@
         overflow-x: auto;
       }
 
+      table.cli-qa {
+        table-layout: fixed;
+      }
+
+      table.cli-qa td:first-child,
+      table.cli-qa th:first-child {
+        white-space: normal;
+        width: 34%;
+      }
+
+      table.cli-qa td:nth-child(2),
+      table.cli-qa th:nth-child(2) {
+        width: 12%;
+      }
+
+      table.cli-qa td:last-child,
+      table.cli-qa th:last-child {
+        width: 54%;
+      }
+
       th,
       td {
         border: 1px solid var(--border);
@@ -327,7 +347,7 @@
         <ol>
           <li><a href="#about">1. この教材について</a></li>
           <li><a href="#prep">2. 事前準備（リポジトリの取得 / bun / Docker のインストール）</a></li>
-          <li><a href="#step1">3. 手順1: プロジェクトを scaffold し、Biome を導入する</a></li>
+          <li><a href="#step1">3. 手順1: プロジェクトを作成する</a></li>
           <li><a href="#step2">4. 手順2: Docker Compose で PostgreSQL を起動する</a></li>
           <li><a href="#step3">5. 手順3: Prisma を導入し、データモデルを定義する</a></li>
           <li><a href="#step4">6. 手順4: Prisma Client のシングルトンを作る</a></li>
@@ -474,87 +494,167 @@ cd recipe-app</code></pre>
         <p>インストール後、以下がどちらもエラーなく表示されれば準備完了です。</p>
         <pre><code>docker --version
 docker compose version</code></pre>
+
+        <h3>VSCode 拡張機能</h3>
+        <p>
+          このハンズオンで使うライブラリに対応する VSCode
+          拡張機能も入れておくと快適です。
+        </p>
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>拡張機能</th>
+              <th>効果</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Biome</td>
+              <td>
+                保存時に Biome
+                のフォーマット・Lint
+                を自動適用できるようになる。ターミナルで <code>bun run
+                lint</code> / <code>bun run format</code> を毎回叩かなくても、
+                エディタ上でリアルタイムに警告やエラーが表示される
+              </td>
+            </tr>
+            <tr>
+              <td>Tailwind CSS IntelliSense</td>
+              <td>
+                <code>className</code> 内でユーティリティクラス名の補完が効き、
+                クラスにカーソルを合わせると実際の CSS
+                プロパティ値がプレビュー表示される。<code>@theme</code>
+                で定義したトークンの色見本も表示される
+              </td>
+            </tr>
+            <tr>
+              <td>Prisma</td>
+              <td>
+                <code>schema.prisma</code>
+                のシンタックスハイライト・フォーマット・補完が効くようになる
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </section>
 
       <section id="step1">
-        <h2>3. 手順1: プロジェクトを scaffold し、Biome を導入する</h2>
+        <h2>3. 手順1: プロジェクトを作成する</h2>
         <p>
           recipe-app リポジトリのルートで次を実行します（<code>react-learning/</code>
           と並ぶディレクトリとして作られます）。
         </p>
         <pre><code>bunx create-next-app@latest next-learning</code></pre>
-        <p>対話形式でいくつか質問されます。回答は次のとおりです。</p>
-        <table class="code-explain">
+        <div class="callout">
+          <strong>create-next-app のバージョンによって質問形式が異なります:</strong>
+          新しいバージョンでは、最初に「推奨デフォルトを使うか / カスタマイズするか」を聞かれます。
+          <strong>「No, customize settings」を選んでください。</strong>
+          「Yes, recommended defaults」を選ぶと ESLint・Tailwind・React
+          Compiler が固定で入るため、後から構成を変える手間が増えます。
+        </div>
+        <p>カスタマイズを選ぶと、対話形式で次の質問をされます。回答は次のとおりです。</p>
+        <table class="code-explain cli-qa">
           <thead>
             <tr>
-              <th>質問</th>
+              <th>質問（実際の CLI 表示のまま）</th>
               <th>回答</th>
               <th>理由</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>TypeScript を使いますか？</td>
+              <td>Would you like to use the recommended Next.js defaults?</td>
+              <td>No, customize settings</td>
+              <td>
+                「Yes, recommended defaults」を選ぶと ESLint・Tailwind・No React
+                Compiler などが固定で入り、Biome を選べなくなるため
+              </td>
+            </tr>
+            <tr>
+              <td>Would you like to use TypeScript?</td>
               <td>Yes</td>
               <td>厳密な型付けのため</td>
             </tr>
             <tr>
-              <td>ESLint を使いますか？</td>
-              <td>No</td>
-              <td>Lint/Format は ESLint ではなく Biome を使うため</td>
+              <td>Which linter would you like to use?</td>
+              <td>Biome</td>
+              <td>
+                新しい create-next-app では ESLint / Biome / None
+                をこの場で選べる。Biome を選ぶと <code>biome.json</code> の生成・
+                <code>package.json</code> の lint スクリプト追加まで
+                <code>create-next-app</code> の実行中に完了するため、以前の手順にあった「後から Biome を手動導入する」作業（
+                <code>bun add -D @biomejs/biome</code> / <code>bunx biome init</code>）は不要
+              </td>
             </tr>
             <tr>
-              <td>Tailwind CSS を使いますか？</td>
+              <td>Would you like to use React Compiler?</td>
               <td>No</td>
-              <td>既存の <code>style.css</code> をそのまま移植するため</td>
+              <td>実験的機能であり、今回のハンズオンの範囲では不要なため</td>
             </tr>
             <tr>
-              <td><code>src/</code> ディレクトリを使いますか？</td>
+              <td>Would you like to use Tailwind CSS?</td>
+              <td>Yes</td>
+              <td>
+                デファクトスタンダードとして採用する。既存の
+                <code>styles.css</code> は書き換えずに残すのではなく、Tailwind
+                のユーティリティクラスへ実際に移植する（手順7参照）
+              </td>
+            </tr>
+            <tr>
+              <td>Would you like your code inside a `src/` directory?</td>
               <td>No</td>
               <td>ルート直下に <code>app/</code> を置くシンプルな構成にするため</td>
             </tr>
             <tr>
-              <td>App Router を使いますか？</td>
+              <td>Would you like to use App Router? (recommended)</td>
               <td>Yes</td>
               <td>Route Handlers を使うため（Pages Router ではなく App Router が前提）</td>
             </tr>
             <tr>
-              <td>import alias をカスタマイズしますか？</td>
+              <td>Would you like to customize the import alias (`@/*` by default)?</td>
               <td>No（デフォルトの <code>@/*</code> のまま Enter）</td>
               <td>特に変更する理由がないため</td>
+            </tr>
+            <tr>
+              <td>
+                Would you like to include AGENTS.md to guide coding agents to
+                write up-to-date Next.js code?
+              </td>
+              <td>お好みで（Yes 推奨）</td>
+              <td>
+                コーディングエージェント向けに最新の Next.js
+                作法をまとめたファイル。含めても既存ファイルには影響しない
+              </td>
             </tr>
           </tbody>
         </table>
         <p>完了すると <code>next-learning/</code> ディレクトリが作られます。以降のコマンドはこのディレクトリの中で実行します。</p>
         <pre><code>cd next-learning</code></pre>
-        <p>続けて ESLint の代わりに Biome を Lint / Format ツールとして導入します。</p>
-        <pre><code>bun add -D --exact @biomejs/biome
-bunx biome init</code></pre>
-        <p>生成された <code>biome.json</code> を次のように設定します。</p>
-        <p class="filename">next-learning/biome.json</p>
-        <pre><code>{
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "organizeImports": { "enabled": true },
-  "linter": {
-    "enabled": true,
-    "rules": { "recommended": true }
-  },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space",
-    "indentWidth": 2
-  }
-}</code></pre>
-        <p><code>package.json</code> の <code>scripts</code> に lint/format コマンドを追加します。</p>
-        <p class="filename">next-learning/package.json（抜粋）</p>
-        <pre><code>"scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start",
-  "lint": "biome check .",
-  "format": "biome format --write ."
-}</code></pre>
-        <p>動作確認:</p>
+        <p>ディレクトリ構成は次のようになるはずです。</p>
+        <pre><code>next-learning/
+├── app/
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── public/
+├── node_modules/
+├── .next/
+├── .gitignore
+├── AGENTS.md
+├── biome.json
+├── bun.lock
+├── CLAUDE.md
+├── next-env.d.ts
+├── next.config.ts
+├── package.json
+├── postcss.config.mjs
+├── README.md
+└── tsconfig.json</code></pre>
+        <p>
+          Biome が <code>create-next-app</code> の実行時点で正しく組み込まれているか、
+          <code>lint</code> スクリプトを実行して確認します。
+        </p>
         <pre><code>bun run lint</code></pre>
       </section>
 
@@ -1329,13 +1429,302 @@ export function RecipeDetail({ recipe }: { recipe: Recipe }) {
       </section>
 
       <section id="step7">
-        <h2>9. 手順7: スタイルを移植する</h2>
+        <h2>9. 手順7: 既存スタイルを Tailwind に移植する</h2>
         <p>
-          既存の <code>style.css</code> の内容を、そのまま
-          <code>next-learning/app/globals.css</code> に移植します。
+          手順1で Tailwind CSS を Yes
+          で選んだため、プロジェクト作成直後の <code>app/globals.css</code>
+          にはすでに Tailwind の読み込み設定が入っています。
         </p>
-        <p class="filename">next-learning/app/globals.css</p>
-        <pre><code>/* 既存 style.css の内容をそのままコピーする */</code></pre>
+        <p class="filename">next-learning/app/globals.css（プロジェクト作成直後）</p>
+        <pre><code>@import "tailwindcss";</code></pre>
+        <p>
+          ここでの方針は<strong>「既存 CSS をそのまま貼り付けて共存させる」ではなく、
+          <code>styles.css</code> のルールを実際に Tailwind
+          のユーティリティクラスへ置き換える（移植する）</strong
+          >ことです。ただし <code>color-mix()</code>
+          によるホバーブレンドや、位置・サイズ指定付きの背景画像のように
+          ユーティリティだけで綺麗に表現しづらいものは、
+          <code>@theme</code> で CSS 変数として定義した上で
+          Tailwind のアービトラリバリュー構文（<code>[...]</code>）から参照する形で残します。
+        </p>
+
+        <h3>7-1. デザイントークンを <code>@theme</code> に移植する</h3>
+        <p>
+          Tailwind v4 では <code>@theme</code>
+          ディレクティブで CSS 変数を定義すると、それが同時に
+          Tailwind のユーティリティ名前空間に登録されます。例えば
+          <code>--color-primary</code> を定義すると
+          <code>bg-primary</code> / <code>text-primary</code> /
+          <code>border-primary</code> が自動的に使えるようになります。
+          既存の <code>:root</code> の色・影トークンをこの形に移植します。
+        </p>
+        <p class="filename">next-learning/app/globals.css（移植後）</p>
+        <pre><code>@import "tailwindcss";
+
+@theme {
+  --color-bg: #f2f6f7;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f6fafb;
+  --color-surface-strong: #eef5f7;
+  --color-text: #162326;
+  --color-muted: #51666d;
+  --color-border: #c8d6da;
+  --color-primary: #086b76;
+  --color-primary-strong: #064a52;
+  --color-accent: #d64736;
+  --color-accent-strong: #a93126;
+  --color-warning: #f0c44c;
+  --color-tip-bg: #fff2df;
+  --color-field-bg: #ffffff;
+  --shadow-card: 0 18px 42px rgb(22 35 38 / 14%);
+}
+
+:root {
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  @theme {
+    --color-bg: #101a1d;
+    --color-surface: #172428;
+    --color-surface-muted: #1e3035;
+    --color-surface-strong: #263c42;
+    --color-text: #f4fbfc;
+    --color-muted: #b4c6cc;
+    --color-border: #426066;
+    --color-primary: #71d7e3;
+    --color-primary-strong: #a5edf5;
+    --color-accent: #ff765f;
+    --color-accent-strong: #ffab9b;
+    --color-warning: #ffd95f;
+    --color-tip-bg: #2f2825;
+    --color-field-bg: #0f191c;
+    --shadow-card: 0 18px 42px rgb(0 0 0 / 34%);
+  }
+}
+
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+}</code></pre>
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>行 / 概念</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>@theme { ... }</code></td>
+              <td>
+                CSS 変数の定義であると同時に、Tailwind
+                に「このトークンを使ったユーティリティを生成して」と伝える宣言。
+                <code>tailwind.config.js</code> で <code>theme.extend.colors</code>
+                を書く旧来の方法の v4 版にあたる
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>@media (prefers-color-scheme: dark) { @theme { ... } }</code>
+              </td>
+              <td>
+                <strong>知見:</strong> Tailwind v4 の
+                <code>dark:</code> バリアントは既定で
+                <code>prefers-color-scheme</code>
+                ベースで動く。つまり要素側に <code>dark:bg-...</code>
+                を書かなくても、トークンの値をメディアクエリ内で上書きするだけで
+                <code>bg-primary</code> 等を使っている箇所全てが自動的にダークモード対応になる。
+                既存 CSS のダークモード実装方針をそのまま踏襲できる
+              </td>
+            </tr>
+            <tr>
+              <td><code>--shadow-card</code></td>
+              <td>
+                <code>--shadow-*</code> 名前空間で定義すると
+                <code>shadow-card</code> ユーティリティとして使える
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>tailwind.config.js</code> の <code>content</code> 配列
+              </td>
+              <td>
+                v4 では不要。プロジェクト内のクラス使用箇所を自動検出する
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>7-2. 主要コンポーネントのクラス対応表</h3>
+        <p>
+          実際にクラスを貼り替えるのは手順6で作る <code>page.tsx</code>
+          の JSX です。ここでは <code>styles.css</code>
+          の主要ルールが、移植後どのユーティリティクラス列になるかを対応表として整理します。
+        </p>
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>旧セレクタ（役割）</th>
+              <th>移植後の Tailwind ユーティリティクラス</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>.app-shell</code></td>
+              <td>
+                <code>mx-auto w-[min(1120px,calc(100%-32px))] pt-10 pb-14</code>
+              </td>
+            </tr>
+            <tr>
+              <td><code>.page-header</code>（背景画像 + 影 + 枠線）</td>
+              <td>
+                <code
+                  >grid min-h-[300px] items-end rounded-lg border p-[34px]
+                  border-[color-mix(in_srgb,var(--color-primary)_22%,var(--color-border))]
+                  bg-surface bg-[url('/assets/icon.svg')] bg-no-repeat
+                  bg-[position:right_34px_top_34px] bg-[length:150px]
+                  shadow-card</code
+                >
+              </td>
+            </tr>
+            <tr>
+              <td><code>.tips-card</code></td>
+              <td>
+                <code
+                  >inline-grid w-fit max-w-full rounded-lg border border-l-4
+                  border-[color-mix(in_srgb,var(--color-accent)_28%,var(--color-border))]
+                  border-l-accent bg-tip-bg p-4</code
+                >
+              </td>
+            </tr>
+            <tr>
+              <td><code>.workspace</code></td>
+              <td>
+                <code
+                  >mt-6 grid items-start gap-6
+                  md:grid-cols-[minmax(280px,0.9fr)_minmax(360px,1.1fr)]</code
+                >
+              </td>
+            </tr>
+            <tr>
+              <td><code>.editor</code> / <code>.list-panel</code></td>
+              <td>
+                <code
+                  >rounded-lg border border-border bg-surface p-6
+                  shadow-card</code
+                >（<code>.editor</code> はさらに <code>grid gap-3.5</code>）
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>textarea</code> / <code>input[type='search']</code> の
+                focus リング
+              </td>
+              <td>
+                <code
+                  >focus:border-primary
+                  focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-warning)_54%,transparent)]</code
+                >
+              </td>
+            </tr>
+            <tr>
+              <td><code>.button.primary</code></td>
+              <td>
+                <code
+                  >min-h-[42px] rounded-lg border border-transparent px-4
+                  font-bold bg-primary text-white
+                  hover:bg-primary-strong</code
+                >
+              </td>
+            </tr>
+            <tr>
+              <td><code>.button.secondary</code></td>
+              <td>
+                <code
+                  >min-h-[42px] rounded-lg border border-border px-4 font-bold
+                  bg-surface-strong text-text
+                  hover:bg-[color-mix(in_srgb,var(--color-surface-strong)_82%,var(--color-primary))]</code
+                >
+              </td>
+            </tr>
+            <tr>
+              <td><code>.entries</code> / <code>.entry</code></td>
+              <td>
+                <code>grid gap-3</code> /
+                <code
+                  >grid gap-3.5 rounded-lg border border-border bg-surface-muted
+                  p-4</code
+                >
+              </td>
+            </tr>
+            <tr>
+              <td><code>.empty-state</code></td>
+              <td>
+                <code
+                  >mt-4 rounded-lg border border-dashed border-border
+                  bg-surface-muted p-4 text-center text-muted</code
+                >
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code>@media (max-width: 760px)</code> のレスポンシブ調整
+              </td>
+              <td>
+                760px は Tailwind
+                既定のブレークポイントではないため、アービトラリバリュー
+                <code>max-[760px]:flex-col</code> のように
+                <code>max-[...]:</code> 修飾子で個別に書くか、
+                <code>@theme</code> で <code>--breakpoint-*</code>
+                を定義して名前付きブレークポイントにするかを選べる。
+                今回は既存デザインをそのまま踏襲するため
+                <code>max-[760px]:</code> を使う
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>7-3. Tailwind の知見（今回のハンズオンで押さえておきたいポイント）</h3>
+        <ul>
+          <li>
+            <strong>ユーティリティファースト:</strong>
+            独自クラス名（<code>.entry</code> など）でスタイルをまとめる代わりに、
+            JSX の <code>className</code> に小さなユーティリティを並べる。命名を考える必要がなくなる一方、
+            1要素あたりのクラス数は増える
+          </li>
+          <li>
+            <strong><code>@theme</code> は「変数定義 = ユーティリティ生成」:</strong>
+            <code>--color-*</code> / <code>--shadow-*</code> /
+            <code>--breakpoint-*</code> など決まった名前空間で定義すると、対応するユーティリティ（
+            <code>bg-*</code> / <code>shadow-*</code> / レスポンシブ修飾子）が自動で使えるようになる
+          </li>
+          <li>
+            <strong>アービトラリバリュー <code>[...]</code>:</strong>
+            デザインシステムにない値（<code>calc()</code>・特定の背景位置・
+            <code>color-mix()</code> など）は
+            <code>bg-[url('/assets/icon.svg')]</code> や
+            <code>shadow-[0_0_0_3px_...]</code> のように角括弧に生の CSS
+            値を書くことで対応できる
+          </li>
+          <li>
+            <strong>ダークモードは既定で media query ベース:</strong>
+            <code>dark:</code> バリアントを個別に書かなくても、<code>@theme</code>
+            トークンを <code>@media (prefers-color-scheme: dark)</code>
+            内で上書きするだけで全ユーティリティに反映される（v4 の既定動作）
+          </li>
+          <li>
+            <strong>1:1 で綺麗に移植できない CSS もある:</strong>
+            <code>color-mix()</code>
+            を使ったホバーブレンドや複雑な背景合成は無理にユーティリティ化せず、
+            CSS 変数として <code>@theme</code> に残し、必要な箇所だけアービトラリバリューで参照するのが現実的
+          </li>
+        </ul>
+
         <p>
           <code>app/layout.tsx</code> で <code>globals.css</code> を import
           していることを確認します（<code>create-next-app</code> が自動生成した状態のまま利用可能）。
