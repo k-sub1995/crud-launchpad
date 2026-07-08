@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp \"/home/kshimura/Pictures/Screenshots/Screenshot from 2026-07-08 13-00-15.png\" \"/home/kshimura/Developer/admin/crud-launchpad/docs/study/Next.js学習/assets/adminer-login.png\")",
+      "Bash(cp \"/home/kshimura/Pictures/Screenshots/Screenshot from 2026-07-08 13-01-26.png\" \"/home/kshimura/Developer/admin/crud-launchpad/docs/study/Next.js学習/assets/adminer-loggedin.png\")",
+      "Bash(bunx prisma *)",
+      "Bash(cp \"/home/kshimura/Pictures/Screenshots/Screenshot from 2026-07-08 13-32-41.png\" \"/home/kshimura/Developer/admin/crud-launchpad/docs/study/Next.js学習/assets/adminer-recipe-table.png\")",
+      "Bash(git show *)",
+      "Bash(python3 -c ' *)",
+      "Bash(grep -n \"pg1:\\\\|pg2:\\\\|pg\\\\\" + \\\\|pg\\\\${\\\\|for \\(let\\\\|Array.from\\({ length\\\\|pgN\\\\|pg\\\\[\" \"/home/kshimura/Developer/admin/crud-launchpad/docs/study/Next.js学習/Next.js学習ページ.dc.html\")",
+      "Bash(awk 'NR==1543,NR==1543' \"docs/study/Next.js学習/Next.js学習ページ.dc.html\")",
+      "Bash(cat bunfig.toml)",
+      "Bash(grep -n 'trustedDependencies' package.json bun.lock)",
+      "Bash(bun --version)",
+      "Bash(ls prisma/migrations)",
+      "Bash(ls lib *)",
+      "Bash(cat .env)",
+      "Bash(cat compose.yaml)",
+      "Bash(git commit *)",
+      "Bash(git reset *)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "Bash(awk -F: '$1>=1980 && $1<=2300')",
+      "Bash(xargs -I{} echo {})"
+    ],
+    "additionalDirectories": [
+      "/home/kshimura/Pictures/Screenshots"
+    ]
+  }
+}

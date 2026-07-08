@@ -1,0 +1,52 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-bg: #f2f6f7;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f6fafb;
+  --color-surface-strong: #eef5f7;
+  --color-text: #162326;
+  --color-muted: #51666d;
+  --color-border: #c8d6da;
+  --color-primary: #086b76;
+  --color-primary-strong: #064a52;
+  --color-accent: #d64736;
+  --color-accent-strong: #a93126;
+  --color-warning: #f0c44c;
+  --color-tip-bg: #fff2df;
+  --color-field-bg: #ffffff;
+  --shadow-card: 0 18px 42px rgb(22 35 38 / 14%);
+}
+
+:root {
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  @theme {
+    --color-bg: #101a1d;
+    --color-surface: #172428;
+    --color-surface-muted: #1e3035;
+    --color-surface-strong: #263c42;
+    --color-text: #f4fbfc;
+    --color-muted: #b4c6cc;
+    --color-border: #426066;
+    --color-primary: #71d7e3;
+    --color-primary-strong: #a5edf5;
+    --color-accent: #ff765f;
+    --color-accent-strong: #ffab9b;
+    --color-warning: #ffd95f;
+    --color-tip-bg: #2f2825;
+    --color-field-bg: #0f191c;
+    --shadow-card: 0 18px 42px rgb(0 0 0 / 34%);
+  }
+}
+
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+}
