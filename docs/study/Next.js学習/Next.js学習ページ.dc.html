@@ -117,9 +117,9 @@ body { margin: 0; background: #f7fafc; }
     </div>
 
     <!-- Extra2 TOC cards -->
-    <div style="margin-top:28px;font-size:13px;font-weight:700;letter-spacing:0.08em;color:#0e7490">環境構築編 — bun / Docker / Postgres / ECS Fargate（4ページ）</div>
+    <div style="margin-top:28px;font-size:13px;font-weight:700;letter-spacing:0.08em;color:#0e7490">環境構築編 — bun / Docker / Postgres / ECS Fargate（5ページ）</div>
     <div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px">
-      <sc-for list="{{ extraToc2 }}" as="ec2" hint-placeholder-count="4">
+      <sc-for list="{{ extraToc2 }}" as="ec2" hint-placeholder-count="5">
         <button onClick="{{ ec2.go }}" style="text-align:left;border:1px solid #a5f3fc;cursor:pointer;font-family:inherit;background:#ecfeff;border-radius:12px;padding:16px 18px;box-shadow:0 4px 12px rgba(15,23,42,0.04);min-height:44px" style-hover="border-color:#0e7490">
           <div style="display:flex;gap:10px;align-items:baseline">
             <span style="font-family:ui-monospace,Menlo,monospace;font-size:13px;font-weight:700;color:#0e7490">{{ ec2.num }}</span>
@@ -1539,10 +1539,85 @@ docker run hello-world</pre>
     </sc-if>
   </div>
 
-  <!-- ======== EXTRA 6: ENV — POSTGRES PACKAGES ======== -->
-  <div data-screen-label="環境2 Postgresパッケージ" style="display:{{ pg28 }}">
+  <!-- ======== EXTRA 6: ENV — PRISMA CONCEPT ======== -->
+  <div data-screen-label="環境2 Prismaとは" style="display:{{ pg28 }}">
     <div style="display:flex;align-items:baseline;gap:14px">
       <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#0e7490;background:#ecfeff;padding:2px 10px;border-radius:6px">環境2</span>
+      <h2 style="font-size:25px;margin:0">Prismaとは？ — 生SQLとの比較で理解する</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0"><strong>Prisma</strong>は、TypeScript/JavaScriptからDBを操作するための<strong>ORM（Object-Relational Mapper）</strong>です。<br><br><code>schema.prisma</code>というファイル1つにテーブル構造（モデル）を定義すると、そこから型安全なクライアント（Prisma Client）が自動生成され、SQL文を手で書かずにDB操作ができるようになります。</p>
+
+    <div style="margin-top:8px;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:24px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:16px">アプリのコードからDBに届くまで</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <span style="background:#e4eefc;border:1px solid #c9dcf6;color:#1d55b4;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">アプリのコード<br><span style="font-weight:400;font-size:11px">prisma.recipe.findMany()</span></span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#ecfeff;border:1px solid #a5f3fc;color:#0e7490;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">Prisma Client<br><span style="font-weight:400;font-size:11px">schema.prismaから自動生成</span></span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">SQL文<br><span style="font-weight:400;font-size:11px">SELECT * FROM "Recipe"...</span></span>
+        <span style="color:#9ca3af;font-weight:700">→</span>
+        <span style="background:#e6f4ec;border:1px solid #bfe3cd;color:#1a7f4b;padding:9px 13px;border-radius:10px;font-size:13px;font-weight:600">PostgreSQL</span>
+      </div>
+      <p style="margin:18px 0 0 0;font-size:15px;background:#f0faf4;border-radius:10px;padding:12px 16px"><strong style="color:#1a7f4b">Prisma = SQLを手書きする代わりに、TypeScriptの関数呼び出しでDB操作を表現できるようにする層。</strong><br><br>実際に発行されるSQLはPrisma Clientが組み立てて実行するので、開発者が直接SQL文字列を書く必要がなくなります。</p>
+    </div>
+
+    <div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">生SQL（pg などのドライバを直接使う場合）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12px;line-height:1.7;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// 型はついてこない。列名やテーブル名を</span>
+<span style="color:#7c8aa5">// タイポしても実行するまで気づけない</span>
+const result = await pool.query(
+  'SELECT id, name, ingredients, steps, url ' +
+  'FROM "Recipe" ORDER BY "createdAt" DESC'
+);
+const recipes = result.rows;
+<span style="color:#7c8aa5">// recipes の型は any 相当</span></pre>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">Prisma（ORM経由）</div>
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12px;line-height:1.7;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="color:#7c8aa5">// schema.prismaのRecipeモデルから</span>
+<span style="color:#7c8aa5">// 戻り値の型が自動で決まる（補完も効く）</span>
+const recipes = await prisma.recipe.findMany({
+  orderBy: { createdAt: "desc" },
+});
+<span style="color:#7c8aa5">// recipes: Recipe[]（name, ingredients... 全て型付き）</span></pre>
+      </div>
+    </div>
+
+    <!-- Interactive demo -->
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">▶ 操作を選んで、実際に発行されるSQLを見てみよう</div>
+      <p style="margin:0 0 12px 0;font-size:13px;color:#6b7280">ボタンを押すと、Prismaのコードと、それによって実際にPostgreSQLへ送られるSQLが切り替わります。</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+        <sc-for list="{{ prismaOpItems }}" as="po" hint-placeholder-count="4">
+          <button onClick="{{ po.pick }}" style="border:1px solid {{ po.border }};cursor:pointer;font-family:inherit;font-size:13px;padding:8px 16px;border-radius:999px;background:{{ po.bg }};color:{{ po.color }};font-weight:700;min-height:36px">{{ po.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#0e7490;margin-bottom:6px">Prismaのコード</div>
+          <pre style="margin:0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:14px 16px;font-size:12px;line-height:1.7;overflow-x:auto;white-space:pre-wrap;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">{{ prismaOpCode }}</pre>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#334155;margin-bottom:6px">実際にPostgreSQLへ送られるSQL</div>
+          <pre style="margin:0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:14px 16px;font-size:12px;line-height:1.7;overflow-x:auto;white-space:pre-wrap;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">{{ prismaOpSql }}</pre>
+        </div>
+      </div>
+      <p style="margin:14px 0 0 0;font-size:13px;color:#4b5563">{{ prismaOpNote }}</p>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#ecfeff;border-radius:12px;padding:14px 18px;font-size:14px">
+      <strong style="color:#0e7490">Q. SQLを覚えなくてもPrismaだけ使えればいい？</strong><br>
+      <span style="color:#4b5563">A. 基本のCRUD（findMany/create/update/delete）はPrismaの書き方だけで十分こなせます。<br><br>ただし複雑な集計や既存DBのトラブルシュートではSQLの知識が役立つ場面があるため、「SQLを完全に代替する」というより「日常的なDB操作を型安全に楽にする」道具と捉えるのが実態に近いです。</span>
+    </div>
+    </sc-if>
+  </div>
+
+  <!-- ======== EXTRA 7: ENV — POSTGRES PACKAGES ======== -->
+  <div data-screen-label="環境3 Postgresパッケージ" style="display:{{ pg29 }}">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#0e7490;background:#ecfeff;padding:2px 10px;border-radius:6px">環境3</span>
       <h2 style="font-size:25px;margin:0">追加パッケージ — Postgresに接続する</h2>
     </div>
     <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">02章の <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">create-next-app</span> の既定構成にはDB接続用のライブラリは含まれません。<br><br>Postgresへの接続には<strong>ORMのPrisma</strong>を追加します（スキーマファイル1つから型安全なクライアントを自動生成でき、Server Components / Server Actions / Route Handlersのどこからでも同じ書き方で使えます）。</p>
@@ -1605,15 +1680,15 @@ if (process.env.NODE_ENV !== "production") {
     </sc-if>
   </div>
 
-  <!-- ======== EXTRA 7: ENV — DOCKER COMPOSE ======== -->
-  <div data-screen-label="環境3 Docker Compose" style="display:{{ pg29 }}">
+  <!-- ======== EXTRA 8: ENV — DOCKER COMPOSE ======== -->
+  <div data-screen-label="環境4 Docker Compose" style="display:{{ pg30 }}">
     <div style="display:flex;align-items:baseline;gap:14px">
-      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#0e7490;background:#ecfeff;padding:2px 10px;border-radius:6px">環境3</span>
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#0e7490;background:#ecfeff;padding:2px 10px;border-radius:6px">環境4</span>
       <h2 style="font-size:25px;margin:0">Docker Compose — ローカルにPostgresを起動する</h2>
     </div>
     <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">Next.jsアプリ自体は<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">bun dev</span>でホスト上で動かし（Turbopackのホットリロードが速いため）、<strong>Postgresだけ</strong>をDocker Composeでコンテナ起動するのがローカル開発の基本形です。</p>
 
-    <div style="display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">① docker-compose.yml（プロジェクト直下に作成）</div>
+    <div style="display:inline-flex;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">① compose.yaml（プロジェクト直下に作成）</div>
     <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.8;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">services:
   db:
     image: postgres:16-alpine
@@ -1651,16 +1726,16 @@ docker compose down -v</pre>
 
     <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
     <div style="margin-top:16px;background:#ecfeff;border-radius:12px;padding:14px 18px;font-size:14px">
-      <strong style="color:#0e7490">Q. Next.jsアプリ自体もdocker-compose.ymlに入れなくていいの？</strong><br>
+      <strong style="color:#0e7490">Q. Next.jsアプリ自体もcompose.yamlに入れなくていいの？</strong><br>
       <span style="color:#4b5563">A. ローカル開発中は入れないほうが快適です。Turbopackのファイル監視がコンテナ越しだと遅くなりがちなので、アプリはホストでbun devが基本形です。<br><br>アプリをコンテナ化するのは、次のページで扱う「本番＝ECS Fargate」に向けたビルド確認のときです。</span>
     </div>
     </sc-if>
   </div>
 
-  <!-- ======== EXTRA 8: ENV — ECS FARGATE DOCKERFILE ======== -->
-  <div data-screen-label="環境4 ECS Fargate向けDockerfile" style="display:{{ pg30 }}">
+  <!-- ======== EXTRA 9: ENV — ECS FARGATE DOCKERFILE ======== -->
+  <div data-screen-label="環境5 ECS Fargate向けDockerfile" style="display:{{ pg31 }}">
     <div style="display:flex;align-items:baseline;gap:14px">
-      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#0e7490;background:#ecfeff;padding:2px 10px;border-radius:6px">環境4</span>
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#0e7490;background:#ecfeff;padding:2px 10px;border-radius:6px">環境5</span>
       <h2 style="font-size:25px;margin:0">本番デプロイ想定 — ECS on Fargate向けにビルドする</h2>
     </div>
     <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">ECS Fargateはコンテナ実行基盤なので、本番用には<strong>Next.jsをDockerイメージ化</strong>する必要があります。<br><br><span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">next.config.ts</span> に <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">output: "standalone"</span> を指定すると、イメージサイズを抑えた実行専用の出力が作れます。</p>
@@ -1731,8 +1806,8 @@ docker push <ACCOUNT_ID>.dkr.ecr.ap-northeast-1.amazonaws.com/recipe-next:latest
 
     <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
     <div style="margin-top:16px;background:#ecfeff;border-radius:12px;padding:14px 18px;font-size:14px">
-      <strong style="color:#0e7490">Q. ローカルのdocker-compose.ymlに、本番用のDockerfileをそのまま組み込める？</strong><br>
-      <span style="color:#4b5563">A. 組み込めます。docker-compose.ymlのdbサービスに加えて、appサービスとして<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">build: .</span>を追加すれば「アプリもDB も丸ごとdocker compose up」構成にできます。<br><br>ただし開発中はホットリロードの速さを優先し、本ページの構成（アプリはホスト・DBだけコンテナ）から始めるのがおすすめです。</span>
+      <strong style="color:#0e7490">Q. ローカルのcompose.yamlに、本番用のDockerfileをそのまま組み込める？</strong><br>
+      <span style="color:#4b5563">A. 組み込めます。compose.yamlのdbサービスに加えて、appサービスとして<span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em">build: .</span>を追加すれば「アプリもDB も丸ごとdocker compose up」構成にできます。<br><br>ただし開発中はホットリロードの速さを優先し、本ページの構成（アプリはホスト・DBだけコンテナ）から始めるのがおすすめです。</span>
     </div>
     </sc-if>
   </div>
@@ -1803,6 +1878,7 @@ class Component extends DCLogic {
 
   EXTRA2 = [
     { label: "事前準備 — bun/Docker確認", desc: "bun・Dockerのバージョン確認とインストール手順" },
+    { label: "Prismaとは", desc: "ORMの役割を生SQLとの比較で理解する" },
     { label: "Postgresパッケージ", desc: "Prismaの追加installとschema.prisma、db.ts" },
     { label: "Docker Compose", desc: "ローカルPostgresの起動・停止コマンド" },
     { label: "ECS Fargate向けDockerfile", desc: "standalone出力とマルチステージビルド、ECR push" }
@@ -1823,6 +1899,33 @@ class Component extends DCLogic {
     { label: "RegisterRecipeForm（登録フォーム）", server: false, reason: "recipeText/recipeUrlを自分のuseStateで持つ制御コンポーネント。入力部分はクライアントに残し、送信先のonRegister（parseRecipeText＋追加）はServer Actionへ分けるのが基本形です。" },
     { label: "defaultRecipes.js（初期データ）", server: true, reason: "ただのデータ（純JS）です。サーバー側に置けば、初期レシピをHTMLに焼き込んだ状態で届けられます（DBのseedデータにするのが基本形）。" },
     { label: "app-header（h1とview-switcher）", server: true, reason: "今はonClick＋setViewModeのボタンですが、Next.jsでは<Link>に変わるので実はサーバーでOK。「現在ページのハイライト」にusePathname()を使う場合だけ、その部分をクライアントに切り出します。" }
+  ];
+
+  PRISMA_OPS = [
+    {
+      label: "一覧取得（findMany）",
+      code: 'await prisma.recipe.findMany({\n  orderBy: { createdAt: "desc" },\n});',
+      sql: 'SELECT "id","name","ingredients","steps","url",\n       "createdAt","updatedAt"\nFROM "Recipe"\nORDER BY "createdAt" DESC;',
+      note: "配列で複数件返ってきます。orderByの指定がそのままSQLのORDER BY句になります。"
+    },
+    {
+      label: "1件作成（create）",
+      code: 'await prisma.recipe.create({\n  data: { name: "肉じゃが", ingredients, steps },\n});',
+      sql: 'INSERT INTO "Recipe"\n  ("name","ingredients","steps","createdAt","updatedAt")\nVALUES ($1,$2,$3,now(),now())\nRETURNING *;',
+      note: "createdAt/updatedAtはschema.prismaの@default(now())と@updatedAtから自動で埋まるので、渡す必要がありません。"
+    },
+    {
+      label: "更新（update）",
+      code: 'await prisma.recipe.update({\n  where: { id: 3 },\n  data: { name: "肉じゃが（改）" },\n});',
+      sql: 'UPDATE "Recipe"\nSET "name" = $1, "updatedAt" = now()\nWHERE "id" = $2\nRETURNING *;',
+      note: "whereで指定した行だけがUPDATEされます。updatedAtは@updatedAtにより自動更新。"
+    },
+    {
+      label: "削除（delete）",
+      code: 'await prisma.recipe.delete({\n  where: { id: 3 },\n});',
+      sql: 'DELETE FROM "Recipe"\nWHERE "id" = $1\nRETURNING *;',
+      note: "削除前の行の内容がRETURNING *で返ってくるので、削除結果をそのまま画面に使えます。"
+    }
   ];
 
   TIMELINES = {
@@ -1900,7 +2003,7 @@ class Component extends DCLogic {
     const s = this.state;
     const page = s.page;
     const pg = {};
-    for (let i = 0; i <= 30; i++) pg["pg" + i] = (page === i) ? "block" : "none";
+    for (let i = 0; i <= 31; i++) pg["pg" + i] = (page === i) ? "block" : "none";
 
     const labelOf = (n) => {
       if (n === 0) return "目次・全体像";
@@ -1912,7 +2015,7 @@ class Component extends DCLogic {
       if (n === 9) return "09 全体まとめ";
       if (n >= 10 && n <= 12) return "1" + (n - 10) + " " + this.GLOSSARY[n - 6].label;
       if (n >= 23 && n <= 26) return "発展" + (n - 22) + " " + this.EXTRA[n - 23].label;
-      if (n >= 27 && n <= 30) return "環境" + (n - 26) + " " + this.EXTRA2[n - 27].label;
+      if (n >= 27 && n <= 31) return "環境" + (n - 26) + " " + this.EXTRA2[n - 27].label;
       const c = n - 12;
       return String(c).padStart(2, "0") + " " + this.CHAPTERS[c].label;
     };
@@ -1984,13 +2087,13 @@ class Component extends DCLogic {
         desc: e.desc,
         go: () => this.goPage(i + 27)
       })),
-      pageIndicator: page === 0 ? "全10章 + 用語01–12" : (page <= 12 ? "用語ディープダイブ / 01–12" : page <= 22 ? "第" + (page - 12) + "章 / 全10章" : page <= 26 ? "発展編 " + (page - 22) + "/4" : "環境構築編 " + (page - 26) + "/4"),
+      pageIndicator: page === 0 ? "全10章 + 用語01–12" : (page <= 12 ? "用語ディープダイブ / 01–12" : page <= 22 ? "第" + (page - 12) + "章 / 全10章" : page <= 26 ? "発展編 " + (page - 22) + "/4" : "環境構築編 " + (page - 26) + "/5"),
       pagerDisplay: page === 0 ? "none" : "block",
       goPrev: () => this.goPage(Math.max(0, page - 1)),
-      goNext: () => this.goPage(Math.min(30, page + 1)),
+      goNext: () => this.goPage(Math.min(31, page + 1)),
       prevLabel: labelOf(Math.max(0, page - 1)),
-      hasNext: page < 30,
-      nextLabel: page < 30 ? labelOf(page + 1) : "",
+      hasNext: page < 31,
+      nextLabel: page < 31 ? labelOf(page + 1) : "",
 
       // ch2 routing demo
       routeItems: this.ROUTES.map((r, i) => ({
@@ -2022,6 +2125,18 @@ class Component extends DCLogic {
         : "",
       quizResultBg: quiz && s.quizAnswer !== null ? (s.quizAnswer === quiz.server ? "#f0faf4" : "#fdf4f4") : "#f1f5f9",
       quizReason: quiz ? quiz.reason : "",
+
+      // env2 prisma op picker
+      prismaOpItems: this.PRISMA_OPS.map((op, i) => ({
+        label: op.label,
+        pick: () => this.setState({ prismaOpSel: i }),
+        bg: (s.prismaOpSel ?? 0) === i ? "#0e7490" : "#ffffff",
+        color: (s.prismaOpSel ?? 0) === i ? "#ffffff" : "#334155",
+        border: (s.prismaOpSel ?? 0) === i ? "#0e7490" : "#a5f3fc"
+      })),
+      prismaOpCode: this.PRISMA_OPS[s.prismaOpSel ?? 0].code,
+      prismaOpSql: this.PRISMA_OPS[s.prismaOpSel ?? 0].sql,
+      prismaOpNote: this.PRISMA_OPS[s.prismaOpSel ?? 0].note,
 
       // ch5 rendering timeline
       renderModes: ["CSR", "SSR", "SSG", "ISR"].map(m => ({

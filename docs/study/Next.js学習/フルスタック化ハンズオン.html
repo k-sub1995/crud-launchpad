@@ -333,6 +333,7 @@
   <body>
     <main>
       <header class="doc-header">
+        <p><a href="./Next.js学習ページ.dc.html">← Next.js学習ページに戻る</a></p>
         <h1>フルスタック化ハンズオン</h1>
         <p>
           献立検索アプリ「recipe-app」（<code>react-learning</code>
@@ -661,10 +662,14 @@ docker compose version</code></pre>
       <section id="step2">
         <h2>4. 手順2: Docker Compose で PostgreSQL を起動する</h2>
         <p>
-          <code>next-learning/</code> 直下に <code>docker-compose.yml</code> を作成します。
+          <code>next-learning/</code> 直下に <code>compose.yaml</code> を作成します。
+          あわせて、DBの中身をブラウザで確認できる軽量GUIツール
+          <a href="https://github.com/vrana/adminer" target="_blank" rel="noreferrer">Adminer</a>
+          も一緒に起動しておきます。
         </p>
-        <p class="filename">next-learning/docker-compose.yml</p>
-        <pre><code>services:
+        <p class="filename">next-learning/compose.yaml</p>
+        <pre><code># DB本体（PostgreSQL）
+services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -673,9 +678,18 @@ docker compose version</code></pre>
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: recipe_app
     ports:
-      - "5432:5432"
+      - "5454:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+
+  # DBの中身をブラウザで確認できるGUIツール
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "8088:8080"
+    depends_on:
+      - db
 
 volumes:
   db-data:</code></pre>
@@ -697,12 +711,18 @@ volumes:
             </tr>
             <tr>
               <td><code>ports</code></td>
-              <td>ホストの 5432 番をコンテナの 5432 番（PostgreSQLの既定ポート）に接続</td>
+              <td>ホストの 5454 番をコンテナの 5432 番（PostgreSQLの既定ポート）に接続。ホスト側は他アプリと衝突しやすいためポートをずらしている</td>
             </tr>
             <tr>
               <td><code>volumes</code></td>
               <td>
                 named volume <code>db-data</code> にデータを永続化する。これが無いとコンテナを消したときにデータも消える
+              </td>
+            </tr>
+            <tr>
+              <td><code>adminer</code></td>
+              <td>
+                DBの中身をブラウザで確認できる軽量GUI。<code>psql</code>を都度打たなくても、テーブルやデータをその場で見られるので開発中の確認が捗る
               </td>
             </tr>
           </tbody>
@@ -711,19 +731,91 @@ volumes:
         <pre><code>docker compose up -d</code></pre>
         <p>起動確認:</p>
         <pre><code>docker compose ps</code></pre>
+        <p>
+          Adminer は <code>http://localhost:8088</code>
+          で開けます。ログイン画面では以下を入力します。
+        </p>
+        <img src="assets/adminer-login.png" alt="Adminer ログイン画面" style="max-width:100%;border:1px solid #ccc;border-radius:8px;" />
+        <table class="code-explain">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>値</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>System</td>
+              <td>PostgreSQL</td>
+            </tr>
+            <tr>
+              <td>Server</td>
+              <td>db</td>
+            </tr>
+            <tr>
+              <td>Username</td>
+              <td>postgres</td>
+            </tr>
+            <tr>
+              <td>Password</td>
+              <td>postgres</td>
+            </tr>
+            <tr>
+              <td>Database</td>
+              <td>recipe_app</td>
+            </tr>
+          </tbody>
+        </table>
+        <img src="assets/adminer-loggedin.png" alt="Adminer ログイン後のテーブル一覧画面" style="max-width:100%;border:1px solid #ccc;border-radius:8px;" />
+        <p>
+          Server 欄には <code>localhost</code> ではなく
+          <code>db</code>（compose.yaml のサービス名）を指定します。Adminer
+          コンテナから見ると、同じ Docker ネットワーク上の
+          <code>db</code> という名前で PostgreSQL コンテナに到達できるためです。
+        </p>
       </section>
 
       <section id="step3">
         <h2>5. 手順3: Prisma を導入し、データモデルを定義する</h2>
+        <p>
+          「そもそもPrismaとは何か」を生SQLとの比較で先に押さえたい場合は、
+          <a href="./Next.js学習ページ.dc.html">Next.js学習ページ</a>
+          の「環境構築編 — 環境2 Prismaとは」を先に見ておくと理解しやすくなります。
+        </p>
         <pre><code>bun add prisma @prisma/client
 bunx prisma init --datasource-provider postgresql</code></pre>
         <p>
-          <code>prisma init</code> により <code>prisma/schema.prisma</code> と
-          <code>.env</code> が生成されます。<code>.env</code> を Docker
-          Compose の PostgreSQL に向けます。
+          <code>prisma init</code> により <code>prisma/schema.prisma</code> ・
+          <code>.env</code> ・<code>prisma.config.ts</code> の3つが生成されます。
+          <code>.env</code> を Docker Compose の PostgreSQL に向けます。
         </p>
         <p class="filename">next-learning/.env</p>
-        <pre><code>DATABASE_URL="postgresql://postgres:postgres@localhost:5432/recipe_app"</code></pre>
+        <pre><code>DATABASE_URL="postgresql://postgres:postgres@localhost:5454/recipe_app"</code></pre>
+        <p>
+          接続文字列は <code>schema.prisma</code> 側ではなく、
+          <code>prisma init</code> が生成する <code>prisma.config.ts</code>
+          が持ちます。<code>bunx prisma migrate</code> や
+          <code>bunx prisma studio</code>
+          などCLIコマンドはこのファイル経由で接続先を知ります。
+        </p>
+        <p class="filename">next-learning/prisma.config.ts</p>
+        <pre><code>import "dotenv/config";
+import { defineConfig } from "prisma/config";
+
+export default defineConfig({
+  schema: "prisma/schema.prisma",
+  migrations: {
+    path: "prisma/migrations",
+  },
+  datasource: {
+    url: process.env["DATABASE_URL"],
+  },
+});</code></pre>
+        <p>
+          <code>import "dotenv/config"</code> で <code>.env</code> を読み込み、
+          <code>process.env["DATABASE_URL"]</code> をCLI用の接続文字列として
+          <code>defineConfig</code> に渡しています。生成されたままの内容で変更不要です。
+        </p>
         <p>
           旧コードの <code>src/data/recipes.js</code> にある
           <code>normalizeRecipe()</code> は、レシピを常に
@@ -740,7 +832,6 @@ bunx prisma init --datasource-provider postgresql</code></pre>
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Recipe {
@@ -766,7 +857,10 @@ model Recipe {
             </tr>
             <tr>
               <td><code>datasource db</code></td>
-              <td>接続先DBの種類（postgresql）と接続文字列（環境変数から取得）</td>
+              <td>
+                接続先DBの種類（postgresql）。接続文字列はここには書かず、
+                <code>prisma.config.ts</code> 側で管理する
+              </td>
             </tr>
             <tr>
               <td><code>id Int @id @default(autoincrement())</code></td>
@@ -806,6 +900,16 @@ model Recipe {
           これで PostgreSQL 内に <code>Recipe</code> テーブルが作られ、
           Prisma Client の型も生成されます。
         </p>
+        <p>
+          Adminer（<code>http://localhost:8088</code>）にログインし直して、
+          <code>Recipe</code> テーブルと <code>_prisma_migrations</code>
+          テーブルが実際に作成されているか確認してみましょう。
+        </p>
+        <img src="assets/adminer-recipe-table.png" alt="Adminerでrecipe_appスキーマにRecipeテーブルが作成されたことを確認" style="max-width:100%;border:1px solid #ccc;border-radius:8px;" />
+        <p>
+          <code>_prisma_migrations</code> はPrismaがマイグレーション履歴を管理するための内部テーブルで、
+          自分でデータを触る必要はありません。
+        </p>
       </section>
 
       <section id="step4">
@@ -814,14 +918,25 @@ model Recipe {
           Next.js の開発サーバーはホットリロードのたびにモジュールを再評価するため、
           毎回 <code>new PrismaClient()</code> すると接続数が増え続けてしまいます。定石のシングルトンパターンで防ぎます。
         </p>
+        <p>
+          <code>schema.prisma</code> の <code>datasource</code>
+          には接続文字列を書かないため、
+          <code>PrismaClient</code> に渡す driver adapter（<code>@prisma/adapter-pg</code>）
+          側で接続文字列を指定します。
+        </p>
+        <pre><code>bun add @prisma/adapter-pg</code></pre>
         <p class="filename">next-learning/lib/prisma.ts</p>
         <pre><code>import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+
+// ここで PostgreSQL の接続URLを取得している
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
@@ -835,6 +950,14 @@ if (process.env.NODE_ENV !== 'production') {
           </thead>
           <tbody>
             <tr>
+              <td><code>new PrismaPg({'{'} connectionString: ... {'}'})</code></td>
+              <td>
+                Next.js が自動で読み込んだ <code>.env</code> の
+                <code>DATABASE_URL</code> を使って PostgreSQL への driver adapter を作る。
+                <code>PrismaClient</code> にはこの adapter 経由でしか接続文字列を渡せない
+              </td>
+            </tr>
+            <tr>
               <td><code>globalThis as unknown as {'{'} prisma?: ... {'}'}</code></td>
               <td>
                 <code>globalThis</code>（プロセス全体で共有される領域）に
@@ -842,8 +965,8 @@ if (process.env.NODE_ENV !== 'production') {
               </td>
             </tr>
             <tr>
-              <td><code>globalForPrisma.prisma ?? new PrismaClient()</code></td>
-              <td>すでに保管された instance があればそれを再利用し、無ければ新規作成</td>
+              <td><code>globalForPrisma.prisma ?? new PrismaClient({'{'} adapter {'}'})</code></td>
+              <td>すでに保管された instance があればそれを再利用し、無ければ adapter 付きで新規作成</td>
             </tr>
             <tr>
               <td><code>if (NODE_ENV !== 'production')</code></td>
