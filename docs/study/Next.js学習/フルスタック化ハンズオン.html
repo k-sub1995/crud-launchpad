@@ -787,7 +787,7 @@ docker compose version</code></pre>
         <pre><code># DB本体（PostgreSQL）
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
@@ -796,7 +796,7 @@ services:
     ports:
       - "5454:5432"
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql
 
   # DBの中身をブラウザで確認できるGUIツール
   adminer:
@@ -818,8 +818,8 @@ volumes:
           </thead>
           <tbody>
             <tr>
-              <td><code>image: postgres:16-alpine</code></td>
-              <td>軽量な Alpine ベースの PostgreSQL 16 公式イメージを使う</td>
+              <td><code>image: postgres:18-alpine</code></td>
+              <td>軽量な Alpine ベースの PostgreSQL 18 公式イメージを使う</td>
             </tr>
             <tr>
               <td><code>environment</code></td>
