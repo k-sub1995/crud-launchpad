@@ -942,9 +942,11 @@
                   style="font-size: 13.5px; line-height: 1.7; color: #e6a7a7"
                 >
                   <strong style="color: #f0807f">課金の目安</strong> —
-                  この構成を丸1日動かすと NAT Gateway 約$1.1/日 +
-                  RDS(db.t4g.micro) 約$0.4/日 + ALB 約$0.6/日 + Fargate
-                  約$0.9/日 ≒ <strong>1日あたり$3前後</strong>。<br />
+                  この構成を丸1日動かすと<br />
+                  NAT Gateway 約$1.1/日 + RDS(db.t4g.micro) 約$0.4/日 + ALB
+                  約$0.6/日 + Fargate 約$0.9/日 <br />
+                  ≒ <strong>1日あたり$3前後</strong>。<br />
+                  ※free-tierで新規登録6ヶ月以内であれば$200のクレジットで実質無料です。<br />
                   学習が終わったら11章の手順で必ず削除してください。
                 </div>
               </div>
@@ -1501,6 +1503,21 @@
                   style="width: 100%; height: auto; display: block"
                 />
               </div>
+              VPCを作成、数分待って「成功」と表示されたら構築完了
+              <div
+                style="
+                  margin: 24px 0;
+                  padding: 18px;
+                  background: #ffffff;
+                  border: 1px solid #1c2836;
+                  border-radius: 13px;
+                "
+              >
+                <img
+                  src="../../images/aws/deploy/貼り付けられた画像%20(13).png"
+                  style="width: 100%; height: auto; display: block"
+                />
+              </div>
               <div
                 style="
                   display: flex;
@@ -1918,12 +1935,124 @@
                           border-radius: 5px;
                           color: #e6b877;
                         "
-                        >0.0.0.0/0</code
-                      >
-                      を追加して作成。
+                        >Anywhere-IPv4</code
+                      >(0.0.0.0/0) を追加して作成。
                     </div>
                   </div>
                 </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(16).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(17).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(18).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(19).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(20).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(25).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(21).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(22).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+
                 <div
                   style="
                     display: flex;
@@ -2364,7 +2493,7 @@
                         "
                         >マスターユーザー</span
                       ><span style="color: #e6edf3"
-                        >appuser／パスワードは「自己管理」で強いものを生成し控える</span
+                        >appuser／パスワードは「セルフマネージド」＋「パスワードを自動生成」</span
                       >
                       <span
                         style="
@@ -2452,6 +2581,62 @@
                         >エンドポイント</strong
                       >（xxx.rds.amazonaws.com）をコピーして控える。
                     </div>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 14px; padding: 16px 0 0">
+                  <div
+                    style="
+                      width: 26px;
+                      height: 26px;
+                      border-radius: 7px;
+                      background: rgba(255, 153, 0, 0.14);
+                      color: var(--accent, #ff9900);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 12px;
+                      font-weight: 600;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    4
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                      "
+                    >
+                      作成完了直後、DB詳細ページ上部のバナーにある「<strong
+                        style="color: #e6edf3"
+                        >認証情報の詳細を表示</strong
+                      >」をクリックしてパスワードを確認する。<br />
+                      セルフマネージドのパスワードはRDSが保管してくれるものではなく、<strong
+                        style="color: #e6edf3"
+                        >この画面で確認できるのは今だけ</strong
+                      >（再表示不可。忘れるとパスワードリセット＝再起動が必要になる）。<br />
+                      控えたら、その場でParameter Storeに登録する。
+                    </div>
+                    <pre
+                      style="
+                        margin: 10px 0 0 0;
+                        background: #0f172a;
+                        color: #e2e8f0;
+                        border-radius: 10px;
+                        padding: 12px 14px;
+                        font-size: 12.5px;
+                        line-height: 1.7;
+                        overflow-x: auto;
+                        font-family:
+                          'IBM Plex Mono', 'SF Mono', Menlo, Consolas, monospace;
+                      "
+                    ><code>aws ssm put-parameter \
+  --name "/handson/db/password" \
+  --value "&lt;控えたパスワード&gt;" \
+  --type SecureString</code></pre>
                   </div>
                 </div>
               </div>
@@ -2634,7 +2819,7 @@
                   margin: 30px 0 4px;
                 "
               >
-                手順 — 接続情報を4つ保存
+                手順 — 残り3つの接続情報を保存（passwordは4章でCLIから登録済み）
               </h3>
               <div
                 style="
@@ -2721,7 +2906,8 @@
                         color: #c3cdd7;
                       "
                     >
-                      次の4つを1つずつ作成します（名前は階層で整理するのが定石）。
+                      次の3つを1つずつ作成します（名前は階層で整理するのが定石）。<br />
+                      passwordは4章の作成直後にCLIで<code>/handson/db/password</code>として登録済みなので、ここでは作成不要です。
                     </div>
                     <div
                       style="
@@ -2761,18 +2947,6 @@
                         >/handson/db/user</span
                       ><span style="color: #8b98a5">String</span
                       ><span style="color: #e6edf3">appuser</span>
-                      <span
-                        style="
-                          color: #7c8b99;
-                          font-family: 'IBM Plex Mono', monospace;
-                          font-size: 11px;
-                        "
-                        >/handson/db/password</span
-                      ><span style="color: var(--accent, #ff9900)"
-                        >SecureString</span
-                      ><span style="color: #e6edf3"
-                        >DBパスワード（暗号化して保存）</span
-                      >
                     </div>
                   </div>
                 </div>
@@ -2803,10 +2977,10 @@
                         color: #c3cdd7;
                       "
                     >
-                      パスワードだけはタイプで「<strong style="color: #e6edf3"
-                        >SecureString</strong
-                      >」を選ぶこと（KMSで暗号化される）。<br />
-                      他はStringでOK。
+                      この3つはタイプ「<strong style="color: #e6edf3"
+                        >String</strong
+                      >」でOK（暗号化不要な非機密情報のため）。<br />
+                      passwordだけ4章でタイプ「SecureString」（KMSで暗号化）として登録済みのはず。一覧画面で確認しておく。
                     </div>
                   </div>
                 </div>
@@ -2837,7 +3011,7 @@
                   style="font-size: 13.5px; line-height: 1.75; color: #a8dab8"
                 >
                   <strong style="color: #5fd685">実行するとこうなる</strong> —
-                  一覧に4つのパラメータが並び、passwordのタイプ欄だけ「SecureString」と表示されます。<br />
+                  一覧に4つのパラメータ（4章のpassword＋今回の3つ）が並び、passwordのタイプ欄だけ「SecureString」と表示されます。<br />
                   値は画面上でマスクされます。
                 </div>
               </div>
@@ -3343,7 +3517,7 @@ CMD ["node", "server.js"]</code></pre>
                   style="margin: 0; padding: 15px 16px; overflow-x: auto"
                 ><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">services:
   db:
-    image: postgres:16
+    image: postgres:18
     environment:
       POSTGRES_USER: appuser
       POSTGRES_PASSWORD: localpass
