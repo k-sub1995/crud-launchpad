@@ -376,11 +376,12 @@ ReactDOM.createRoot(
     <div style="margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
       <div>
         <div style="display:inline-flex;background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe3cd;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">具体例: Next.jsでの書き方</div>
-        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">export default async function Page({ params }) {
+        <pre style="margin:12px 0 0 0;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;font-size:12.5px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace">export default async function Page({ params }: { params: Promise&lt;{ id: string }&gt; }) {
   <span style="color:#7c8aa5">// force-cache = ビルド時に1回だけ取得</span>
   <span style="color:#7c8aa5">// してキャッシュを使い回す → SSG</span>
+  const { id } = await params;
   const res = await fetch(
-    `https://api/recipes/${params.id}`,
+    `https://api/recipes/${id}`,
     { cache: "force-cache" }
   );
   const recipe = await res.json();
@@ -1383,8 +1384,9 @@ import { parseRecipeText } from "@/lib/parseRecipeText";
 <span style="color:#7c8aa5">// PATCH /api/recipes/1 → 編集保存（saveEdit相当）</span>
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise&lt;{ id: string }&gt; }
 ) {
+  const { id } = await params;
   const { editRecipeText } = await request.json();
   const parsed = parseRecipeText(editRecipeText?.trim() ?? "", "");
   if (!parsed) {
@@ -1393,16 +1395,17 @@ export async function PATCH(
       { status: 400 }
     );
   }
-  const updated = await updateRecipe(params.id, parsed);
+  const updated = await updateRecipe(id, parsed);
   return NextResponse.json(updated);
 }
 
 <span style="color:#7c8aa5">// DELETE /api/recipes/1 → 削除（deleteRecipe相当）</span>
 export async function DELETE(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise&lt;{ id: string }&gt; }
 ) {
-  await deleteRecipe(params.id);
+  const { id } = await params;
+  await deleteRecipe(id);
   return NextResponse.json({ ok: true });
 }</pre>
       </div>
