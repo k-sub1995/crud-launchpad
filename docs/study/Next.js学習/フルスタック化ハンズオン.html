@@ -1520,10 +1520,10 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
         <p>
           <code>id</code> は <code>schema.prisma</code> の
           <code>@default(autoincrement())</code>
-          により、登録するたびに 1, 2, 3...
-          と連番で発行されます。<br />
+          により、登録するたびに 1, 2, 3... と連番で発行されます。<br />
           そのため <code>:id</code> の部分は、登録レスポンスに含まれる実際の値に
-          毎回置き換える必要があります （例: <code>:id</code> → <code>1</code>）。
+          毎回置き換える必要があります （例: <code>:id</code> →
+          <code>1</code>）。
         </p>
         <p>
           CRUD操作の前後で一覧・検索を挟み、データが期待通りに変化しているかを
@@ -1541,7 +1541,9 @@ curl -X POST http://localhost:3000/api/recipes \
 curl http://localhost:3000/api/recipes
 
 # 4. 検索（登録した名前でヒットすることを確認）
-curl "http://localhost:3000/api/recipes?q=親子丼"
+# 日本語をエンコードせずそのままクエリに渡すと 400 Bad Request になるため、
+# --data-urlencode でクエリ文字列をエンコードする
+curl -G "http://localhost:3000/api/recipes" --data-urlencode "q=親子丼"
 
 # 5. 更新（:id は手順2のレスポンスに含まれるidに置き換える。コピペ厳禁）
 curl -X PATCH http://localhost:3000/api/recipes/:id \
@@ -1549,7 +1551,7 @@ curl -X PATCH http://localhost:3000/api/recipes/:id \
   -d '{"name":"他人丼"}'
 
 # 6. 更新後の検索（新しい名前でヒットすることを確認）
-curl "http://localhost:3000/api/recipes?q=他人丼"
+curl -G "http://localhost:3000/api/recipes" --data-urlencode "q=他人丼"
 
 # 7. 削除（:id は同様に置き換える）
 curl -X DELETE http://localhost:3000/api/recipes/:id
