@@ -316,6 +316,29 @@
                   スクショは自分で貼って完成
                 </div>
               </div>
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 18px 0 0;
+                  padding: 15px 17px;
+                  background: rgba(255, 153, 0, 0.05);
+                  border: 1px solid rgba(255, 153, 0, 0.18);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">💡</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #d8cbb5"
+                >
+                  各手順では<strong style="color: #e6edf3"
+                    >変更が必要な設定項目だけ</strong
+                  >を書いています。<br />
+                  記載のない項目は<strong style="color: #e6edf3"
+                    >AWSコンソールのデフォルトのまま</strong
+                  >でOKです。
+                </div>
+              </div>
             </header>
 
             <!-- CHAPTERS -->
@@ -2101,7 +2124,7 @@
                       を作成。<br />
                       インバウンドは カスタムTCP
                       <strong style="color: #e6edf3">3000</strong>
-                      の1行、ソースは「カスタム」で検索欄に
+                      、ソースは「カスタム」で検索欄に
                       <code
                         style="
                           font-family: 'IBM Plex Mono', monospace;
@@ -2112,7 +2135,21 @@
                         "
                         >alb-sg</code
                       >
-                      と入れてSGを選択。
+                      と入れてSGを選択して作成。
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(23).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
                     </div>
                   </div>
                 </div>
@@ -2154,7 +2191,7 @@
                         >db-sg</code
                       >
                       を作成。<br />
-                      インバウンドは PostgreSQL(5432) 1行、ソースに
+                      インバウンドは PostgreSQL(5432) 、ソースに
                       <code
                         style="
                           font-family: 'IBM Plex Mono', monospace;
@@ -2165,20 +2202,24 @@
                         "
                         >app-sg</code
                       >
-                      を指定。
+                      と入れてSGを選択して作成。
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(24).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
                     </div>
                   </div>
                 </div>
-              </div>
-              <div style="margin: 14px 0">
-                <x-import
-                  component-from-global-scope="image-slot"
-                  from="./image-slot.js"
-                  id="ss-ch3-sg-list"
-                  placeholder="📷 スクショ: セキュリティグループ一覧（alb-sg / app-sg / db-sg の3つが並んだ状態）"
-                  hint-size="100%,200px"
-                  style="width: 100%; height: 200px"
-                ></x-import>
               </div>
               <div
                 style="
@@ -2197,10 +2238,41 @@
                 >
                   <strong style="color: #5fd685">実行するとこうなる</strong> —
                   3つのSGが一覧に並びます。<br />
-                  db-sg のインバウンドを開くと、ソース欄に app-sg
-                  のID(sg-xxxx)が入っているはず。<br />
-                  これが「SG参照」です。
+                  例としてdb-sg を選択しインバウンドルールを開くと、ソース欄に
+                  app-sg のID(sg-xxxx)が入っています。<br />
+                  これが「SG参照」——ソースをIPアドレスではなく別のSGで指定する仕組みで、<strong
+                    style="color: #7fd99e"
+                    >app-sgが付いたリソース（ECSタスク）からの通信だけ</strong
+                  >を通します。ALBやECSのIPが変わっても設定を直す必要がありません。
                 </div>
+              </div>
+              <div
+                style="
+                  margin: 24px 0;
+                  padding: 18px;
+                  background: #ffffff;
+                  border: 1px solid #1c2836;
+                  border-radius: 13px;
+                "
+              >
+                <img
+                  src="../../images/aws/deploy/貼り付けられた画像%20(26).png"
+                  style="width: 100%; height: auto; display: block"
+                />
+              </div>
+              <div
+                style="
+                  margin: 24px 0;
+                  padding: 18px;
+                  background: #ffffff;
+                  border: 1px solid #1c2836;
+                  border-radius: 13px;
+                "
+              >
+                <img
+                  src="../../images/aws/deploy/貼り付けられた画像%20(27).png"
+                  style="width: 100%; height: auto; display: block"
+                />
               </div>
 
               <sc-if
@@ -2426,9 +2498,52 @@
                       "
                     >
                       「標準作成」→ エンジン「PostgreSQL」を選択。<br />
+                      データベース作成方法は「フル設定」を選択。<br />
                       テンプレートは「<strong style="color: #e6edf3"
                         >無料利用枠</strong
-                      >」（なければ「開発/テスト」）。
+                      >」
+                      <div
+                        style="
+                          margin: 24px 0;
+                          padding: 18px;
+                          background: #ffffff;
+                          border: 1px solid #1c2836;
+                          border-radius: 13px;
+                        "
+                      >
+                        <img
+                          src="../../images/aws/deploy/貼り付けられた画像%20(8).png"
+                          style="width: 100%; height: auto; display: block"
+                        />
+                      </div>
+                      <div
+                        style="
+                          margin: 24px 0;
+                          padding: 18px;
+                          background: #ffffff;
+                          border: 1px solid #1c2836;
+                          border-radius: 13px;
+                        "
+                      >
+                        <img
+                          src="../../images/aws/deploy/貼り付けられた画像%20(9).png"
+                          style="width: 100%; height: auto; display: block"
+                        />
+                      </div>
+                      <div
+                        style="
+                          margin: 24px 0;
+                          padding: 18px;
+                          background: #ffffff;
+                          border: 1px solid #1c2836;
+                          border-radius: 13px;
+                        "
+                      >
+                        <img
+                          src="../../images/aws/deploy/貼り付けられた画像%20(10).png"
+                          style="width: 100%; height: auto; display: block"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2483,7 +2598,17 @@
                           font-family: 'IBM Plex Mono', monospace;
                           font-size: 11.5px;
                         "
-                        >DB識別子</span
+                        >エンジンバージョン</span
+                      ><span style="color: #e6edf3"
+                        >PostgreSQL 18x（デフォルトが18xならそのままで）</span
+                      >
+                      <span
+                        style="
+                          color: #7c8b99;
+                          font-family: 'IBM Plex Mono', monospace;
+                          font-size: 11.5px;
+                        "
+                        >DBインスタンス識別子</span
                       ><span style="color: #e6edf3">handson-db</span>
                       <span
                         style="
@@ -2491,10 +2616,29 @@
                           font-family: 'IBM Plex Mono', monospace;
                           font-size: 11.5px;
                         "
-                        >マスターユーザー</span
-                      ><span style="color: #e6edf3"
-                        >appuser／パスワードは「セルフマネージド」＋「パスワードを自動生成」</span
+                        >マスターユーザー名</span
                       >
+                      <span style="color: #e6edf3">postgres</span>
+                      <span
+                        style="
+                          color: #7c8b99;
+                          font-family: 'IBM Plex Mono', monospace;
+                          font-size: 11.5px;
+                        "
+                        >認証情報管理</span
+                      >
+                      <span style="color: #e6edf3"
+                        >セルフマネージド / パスワードを自動生成に☑</span
+                      >
+                      <span
+                        style="
+                          color: #7c8b99;
+                          font-family: 'IBM Plex Mono', monospace;
+                          font-size: 11.5px;
+                        "
+                        >その他の認証情報の設定</span
+                      >
+                      <span style="color: #e6edf3">パスワード認証</span>
                       <span
                         style="
                           color: #7c8b99;
@@ -2538,10 +2682,127 @@
                           font-family: 'IBM Plex Mono', monospace;
                           font-size: 11.5px;
                         "
+                        >モニタリング</span
+                      ><span style="color: #e6edf3"
+                        >Performance Insights を有効にする チェックを外す</span
+                      >
+                      <span
+                        style="
+                          color: #7c8b99;
+                          font-family: 'IBM Plex Mono', monospace;
+                          font-size: 11.5px;
+                        "
                         >最初のDB名</span
                       ><span style="color: #e6edf3"
                         >「追加設定」を開いて appdb と入力</span
                       >
+                    </div>
+                    <br />
+                    識別子はhandson-db
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(11).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    認証情報管理はセルフマネージド / パスワードを自動生成
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(12).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    インスタンスはデフォルトのt4g.micro<br />
+                    （micro以外の表示なら、テンプレートが「無料利用枠」になっていない可能性）
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(28).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    VPCは作成したhandson-vpc
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(29).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    セキュリティグループは作成したdb-sgでアプリのみ通す
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(30).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    モニタリングでPerformance Insightsを外す
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(31).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    追加設定を開いて、最初のデータベース名は「appdb」と命名
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(32).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
                     </div>
                   </div>
                 </div>
@@ -2576,10 +2837,54 @@
                       ステータスが「作成中」→「<strong style="color: #e6edf3"
                         >利用可能</strong
                       >」になるまで5〜10分待つ。<br />
-                      完了したらDB詳細画面の「接続とセキュリティ」から<strong
+                      完了したら「接続の詳細の表示」から<br /><strong
                         style="color: #e6edf3"
-                        >エンドポイント</strong
-                      >（xxx.rds.amazonaws.com）をコピーして控える。
+                        >マスターユーザー、パスワード、エンドポイント</strong
+                      >をコピーして控える。
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(33).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    作成メッセージから「接続の詳細の表示」
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(34).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    マスターユーザー、パスワード、エンドポイントをコピーして控えておく
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(35).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
                     </div>
                   </div>
                 </div>
@@ -2616,9 +2921,65 @@
                       >」をクリックしてパスワードを確認する。<br />
                       セルフマネージドのパスワードはRDSが保管してくれるものではなく、<strong
                         style="color: #e6edf3"
-                        >この画面で確認できるのは今だけ</strong
+                        >この画面で確認できるのは今だけ<br /> </strong
                       >（再表示不可。忘れるとパスワードリセット＝再起動が必要になる）。<br />
                       控えたら、その場でParameter Storeに登録する。
+                    </div>
+                    <div
+                      style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 6px;
+                        margin: 12px 0 7px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11.5px;
+                      "
+                    >
+                      <span
+                        style="
+                          padding: 3px 9px;
+                          background: #0a1119;
+                          border: 1px solid #24323f;
+                          border-radius: 6px;
+                          color: #cdd9e5;
+                        "
+                        >画面右上のターミナルアイコン</span
+                      ><span style="color: #5f6f7e">›</span
+                      ><span
+                        style="
+                          padding: 3px 9px;
+                          background: rgba(255, 153, 0, 0.14);
+                          border: 1px solid rgba(255, 153, 0, 0.3);
+                          border-radius: 6px;
+                          color: var(--accent, #ff9900);
+                        "
+                        >CloudShellを開く</span
+                      >
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(36).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                        margin-bottom: 7px;
+                      "
+                    >
+                      数十秒待ち、起動したら次のコマンドを打つ
                     </div>
                     <pre
                       style="
@@ -2635,20 +2996,54 @@
                       "
                     ><code>aws ssm put-parameter \
   --name "/handson/db/password" \
-  --value "&lt;控えたパスワード&gt;" \
+  --value "&lt;控えたマスターパスワード&gt;" \
   --type SecureString</code></pre>
+
+                    <div
+                      style="
+                        display: flex;
+                        gap: 11px;
+                        margin: 12px 0 0;
+                        padding: 12px 15px;
+                        background: rgba(34, 197, 94, 0.06);
+                        border: 1px solid rgba(34, 197, 94, 0.22);
+                        border-radius: 10px;
+                      "
+                    >
+                      <span style="font-size: 15px; flex: 0 0 auto">✅</span>
+                      <div
+                        style="
+                          font-size: 13px;
+                          line-height: 1.7;
+                          color: #a8dab8;
+                        "
+                      >
+                        <strong style="color: #5fd685"
+                          >実行するとこうなる</strong
+                        >
+                        — <code>{"Version": 1, "Tier": "Standard"}</code>
+                        のようなJSONが返り、
+                        <code>/handson/db/password</code>
+                        という名前でSecureString（暗号化済み）のパラメータが登録される。<br />
+                        中身はパラメータストアの画面（5章）で確認可能（値は「表示」を押すまでマスクされる）。
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(37).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div style="margin: 14px 0">
-                <x-import
-                  component-from-global-scope="image-slot"
-                  from="./image-slot.js"
-                  id="ss-ch4-rds"
-                  placeholder="📷 スクショ: DB詳細画面（ステータス「利用可能」とエンドポイントが見える状態）"
-                  hint-size="100%,240px"
-                  style="width: 100%; height: 240px"
-                ></x-import>
               </div>
               <div
                 style="
@@ -2666,7 +3061,9 @@
                   style="font-size: 13.5px; line-height: 1.75; color: #a8dab8"
                 >
                   <strong style="color: #5fd685">実行するとこうなる</strong> —
-                  DBは起動しますが、パブリックアクセスなし＋db-sgの制限により、現時点ではどこからも接続できません。<br />
+                  DBが起動します。<br />
+                  現状ではパブリックアクセスなし +
+                  db-sgの制限により、どこからも接続できません。<br />
                   8章でECSタスク(app-sg)が動き始めて、初めて接続できるようになります。
                 </div>
               </div>
