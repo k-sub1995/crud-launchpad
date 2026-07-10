@@ -2950,7 +2950,8 @@
                         style="color: #e6edf3"
                         >この画面で確認できるのは今だけ<br /> </strong
                       >（再表示不可。忘れるとパスワードリセット＝再起動が必要になる）。<br />
-                      控えたら、その場でParameter Storeに登録する。
+                      控えたら、その場でアプリが使う接続URL（パスワードとエンドポイントを埋め込んだもの）をParameter
+                      Storeに登録する。
                     </div>
                     <div
                       style="
@@ -3022,8 +3023,8 @@
                           'IBM Plex Mono', 'SF Mono', Menlo, Consolas, monospace;
                       "
                     ><code>aws ssm put-parameter \
-  --name "/handson/db/password" \
-  --value "&lt;控えたマスターパスワード&gt;" \
+  --name "/handson/db/url" \
+  --value "postgresql://appuser:&lt;控えたマスターパスワード&gt;@&lt;控えたエンドポイント&gt;:5432/appdb" \
   --type SecureString</code></pre>
 
                     <div
@@ -3050,7 +3051,7 @@
                         >
                         — <code>{"Version": 1, "Tier": "Standard"}</code>
                         のようなJSONが返り、
-                        <code>/handson/db/password</code>
+                        <code>/handson/db/url</code>
                         という名前でSecureString（暗号化済み）のパラメータが登録される。<br />
                         中身はパラメータストアの画面（5章）で確認可能（値は「表示」を押すまでマスクされる）。
                       </div>
@@ -3065,7 +3066,35 @@
                       "
                     >
                       <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(41).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
                         src="../../images/aws/deploy/貼り付けられた画像%20(37).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(42).png"
                         style="width: 100%; height: auto; display: block"
                       />
                     </div>
@@ -3205,8 +3234,9 @@
                 DBのパスワードを<strong style="color: #e6edf3"
                   >コードや設定ファイルに直書きしない</strong
                 >のが実務の鉄則。<br />
-                Systems Manager
-                の「パラメータストア」に保存し、7章でECSタスクに環境変数として注入します。
+                接続URLは4章でCloudShellからSystems
+                Managerの「パラメータストア」に登録済み。<br />
+                この章では登録内容をコンソールで確認し、SecureStringの仕組みを理解します。値は7章でECSタスクに環境変数として注入します。
               </p>
 
               <div
@@ -3243,7 +3273,7 @@
                   margin: 30px 0 4px;
                 "
               >
-                手順 — 接続URLを保存（passwordは4章でCloudShellから登録済み）
+                手順 — 4章で登録した接続URLを確認する
               </h3>
               <div
                 style="
@@ -3305,22 +3335,12 @@
                       ><span
                         style="
                           padding: 3px 9px;
-                          background: #0a1119;
-                          border: 1px solid #24323f;
-                          border-radius: 6px;
-                          color: #cdd9e5;
-                        "
-                        >パラメータストア</span
-                      ><span style="color: #5f6f7e">›</span
-                      ><span
-                        style="
-                          padding: 3px 9px;
                           background: rgba(255, 153, 0, 0.14);
                           border: 1px solid rgba(255, 153, 0, 0.3);
                           border-radius: 6px;
                           color: var(--accent, #ff9900);
                         "
-                        >パラメータの作成</span
+                        >パラメータストア</span
                       >
                     </div>
                     <div
@@ -3358,7 +3378,7 @@
                         color: #c3cdd7;
                       "
                     >
-                      CloudShellで登録したDBパスワードの登録（/handson/db/password）を確認する。
+                      4章でCloudShellから登録した接続URL（/handson/db/url）が一覧にあることを確認する。
                       <br />
                       <div
                         style="
@@ -3374,23 +3394,6 @@
                           style="width: 100%; height: auto; display: block"
                         />
                       </div>
-                      次に、アプリがDB接続に使う<strong
-                        style="color: #e6edf3"
-                        >接続URLを1本</strong
-                      >だけ作成します。<br />
-                      アプリ（Prisma）は
-                      <code
-                        style="
-                          font-family: 'IBM Plex Mono', monospace;
-                          background: #0a1119;
-                          padding: 1px 6px;
-                          border-radius: 5px;
-                          color: #e6b877;
-                        "
-                        >DATABASE_URL</code
-                      >
-                      1本で接続する作りなので、host / name / user
-                      を個別に分けず、接続URLごと保存する。<br />
                       7章でECSタスクにこの値を注入する。<br />
                     </div>
                     <div
@@ -3449,11 +3452,11 @@
                         color: #c3cdd7;
                       "
                     >
-                      タイプは「<strong style="color: #e6edf3"
+                      タイプが「<strong style="color: #e6edf3"
                         >SecureString</strong
-                      >」（KMSで暗号化）。値にパスワードが含まれるため、Stringにはしない。<br /><br />
+                      >」（KMSで暗号化）になっていることを確認する。値にパスワードが含まれるため、Stringにはしない。<br />
+                      値は「表示」を押すまでマスクされる。表示して、パスワードとエンドポイントを正しく埋め込めているか確認する。
                     </div>
-                    /handson/db/urlを作成。値は「postgresql://appuser:（4章のパスワード）@（4章で控えたRDSエンドポイント）:5432/appdb」。<br />
                     <div
                       style="
                         margin: 24px 0;
@@ -3464,7 +3467,7 @@
                       "
                     >
                       <img
-                        src="../../images/aws/deploy/貼り付けられた画像%20(44).png"
+                        src="../../images/aws/deploy/貼り付けられた画像%20(43).png"
                         style="width: 100%; height: auto; display: block"
                       />
                     </div>
@@ -3486,10 +3489,9 @@
                 <div
                   style="font-size: 13.5px; line-height: 1.75; color: #a8dab8"
                 >
-                  <strong style="color: #5fd685">実行するとこうなる</strong> —
-                  一覧に2つのパラメータ（4章のpassword +
-                  今回のurl）が並びます。<br />
-                  どちらもタイプは「SecureString」で、値は暗号化されて隠されます。<br />
+                  <strong style="color: #5fd685">確認できればOK</strong> —
+                  一覧に4章で登録した1つのパラメータが並びます。<br />
+                  タイプは「SecureString」で、値は暗号化されて隠されます。<br />
                   <div
                     style="
                       display: grid;
@@ -3499,15 +3501,6 @@
                       margin-top: 10px;
                     "
                   >
-                    <span
-                      style="
-                        color: #7c8b99;
-                        font-family: 'IBM Plex Mono', monospace;
-                        font-size: 11px;
-                      "
-                      >/handson/db/password</span
-                    ><span style="color: #8b98a5">SecureString</span
-                    ><span style="color: #e6edf3">4章で作成したパスワード</span>
                     <span
                       style="
                         color: #7c8b99;
@@ -3855,8 +3848,7 @@ REGISTRY=$ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com
 aws ecr get-login-password --region ap-northeast-1 | \
   docker login --username AWS --password-stdin $REGISTRY
 
-# Fargate(x86_64)向けにビルドする点に注意（Apple Silicon の人は必須）
-docker build --platform linux/amd64 -t $REGISTRY/handson-app:v1 .
+docker build -t $REGISTRY/handson-app:v1 .
 docker push $REGISTRY/handson-app:v1</code></pre>
               </div>
               <div style="margin: 14px 0">
@@ -6276,10 +6268,17 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
             ch4: [
               { id: 'c4a', label: 'RDS(PostgreSQL)を起動した' },
               { id: 'c4b', label: 'エンドポイントを控えた' },
+              {
+                id: 'c4d',
+                label: 'CloudShellで /handson/db/url を登録した',
+              },
               { id: 'c4c', label: '「パブリックアクセスなし」の意味を理解した' },
             ],
             ch5: [
-              { id: 'c5a', label: 'パラメータストアに /handson/db/url を保存した' },
+              {
+                id: 'c5a',
+                label: 'パラメータストアで /handson/db/url を確認した',
+              },
               { id: 'c5b', label: 'パスワードを含む値を SecureString にする理由を理解した' },
             ],
             ch6: [
