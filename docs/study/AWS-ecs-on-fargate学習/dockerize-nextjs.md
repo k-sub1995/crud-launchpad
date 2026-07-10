@@ -96,3 +96,17 @@ docker run -p 3000:3000 \
 ```
 
 ブラウザで `localhost:3000` が開いてデータが表示され、`curl localhost:3000/api/health` が `{"status":"ok"}` を返せばECSに載せる準備は完了。RDSとの接続確認はECSデプロイ後にALB経由で行う。
+
+## 次の準備: AWS CLI v2 のセットアップ
+
+ハンズオン6章（ECRへのpush）でAWS CLIを使う。未セットアップなら `aws configure` まで済ませておく。
+
+アクセスキー発行〜configure をスクショ付きで追える記事:
+<https://qiita.com/pekosyu/items/743670e8afcc365969ca>
+
+参考（公式）:
+
+- インストール（OS別）: <https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/getting-started-install.html>
+- 初期設定 `aws configure`（クイックスタート）: <https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/getting-started-quickstart.html>
+
+`aws sts get-caller-identity` が自分のアカウントIDを返せば設定完了。
