@@ -1,13 +1,17 @@
 'use client';
 
 import type { Entry } from '@prisma/client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-export function EntryPage({ initialEntries }: { initialEntries: Entry[] }) {
-  const [entries, setEntries] = useState(initialEntries);
+export function EntryPage() {
+  const [entries, setEntries] = useState<Entry[]>([]);
   const [query, setQuery] = useState('');
   const [text, setText] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
+
+  useEffect(() => {
+    refresh('');
+  }, []);
 
   async function refresh(q: string) {
     const response = await fetch(`/api/entries?q=${encodeURIComponent(q)}`, {
