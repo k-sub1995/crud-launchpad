@@ -3216,7 +3216,7 @@
                   margin: 30px 0 4px;
                 "
               >
-                手順 — 残り3つの接続情報を保存（passwordは4章でCLIから登録済み）
+                手順 — 接続情報を保存（passwordは4章でCloudShellから登録済み）
               </h3>
               <div
                 style="
@@ -3298,13 +3298,57 @@
                     </div>
                     <div
                       style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(38).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(39).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
                         font-size: 13.5px;
                         line-height: 1.75;
                         color: #c3cdd7;
                       "
                     >
-                      次の3つを1つずつ作成します（名前は階層で整理するのが定石）。<br />
-                      passwordは4章の作成直後にCLIで<code>/handson/db/password</code>として登録済みなので、ここでは作成不要です。
+                      CloudShellで登録したDBパスワードの登録（/handson/db/password）を確認する。
+                      <br />
+                      <div
+                        style="
+                          margin: 24px 0;
+                          padding: 18px;
+                          background: #ffffff;
+                          border: 1px solid #1c2836;
+                          border-radius: 13px;
+                        "
+                      >
+                        <img
+                          src="../../images/aws/deploy/貼り付けられた画像%20(40).png"
+                          style="width: 100%; height: auto; display: block"
+                        />
+                      </div>
+                      以下3つを1つずつ作成します。<br />
+                      8章でECSタスクに注入する接続情報一式をここで一括管理する。<br />
                     </div>
                     <div
                       style="
@@ -3377,20 +3421,181 @@
                       この3つはタイプ「<strong style="color: #e6edf3"
                         >String</strong
                       >」でOK（暗号化不要な非機密情報のため）。<br />
-                      passwordだけ4章でタイプ「SecureString」（KMSで暗号化）として登録済みのはず。一覧画面で確認しておく。
+                      passwordだけ4章でタイプ「SecureString」（KMSで暗号化）として登録済みのはず。一覧画面で確認しておく。<br /><br />
+                    </div>
+                    /handson/db/hostを作成。<br />
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(44).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(41).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(42).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(43).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    /handson/db/nameを作成。<br />
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(44).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(45).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(46).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(43).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    /handson/db/userを作成。<br />
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(44).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(47).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(48).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(43).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
                     </div>
                   </div>
                 </div>
-              </div>
-              <div style="margin: 14px 0">
-                <x-import
-                  component-from-global-scope="image-slot"
-                  from="./image-slot.js"
-                  id="ss-ch5-params"
-                  placeholder="📷 スクショ: パラメータ一覧（/handson/db/ 配下の4つが並んだ状態）"
-                  hint-size="100%,200px"
-                  style="width: 100%; height: 200px"
-                ></x-import>
               </div>
               <div
                 style="
@@ -3408,8 +3613,71 @@
                   style="font-size: 13.5px; line-height: 1.75; color: #a8dab8"
                 >
                   <strong style="color: #5fd685">実行するとこうなる</strong> —
-                  一覧に4つのパラメータ（4章のpassword＋今回の3つ）が並び、passwordのタイプ欄だけ「SecureString」と表示されます。<br />
-                  値は画面上でマスクされます。
+                  一覧に4つのパラメータ（4章のpassword +
+                  今回の3つ）が並びます。<br />
+                  passwordのタイプ欄だけ「SecureString」と表示されます。<br />
+                  <div
+                    style="
+                      display: grid;
+                      grid-template-columns: auto auto 1fr;
+                      gap: 6px 14px;
+                      font-size: 12.5px;
+                      margin-top: 10px;
+                    "
+                  >
+                    <span
+                      style="
+                        color: #7c8b99;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11px;
+                      "
+                      >/handson/db/host</span
+                    ><span style="color: #8b98a5">String</span
+                    ><span style="color: #e6edf3"
+                      >4章で控えたRDSエンドポイント</span
+                    >
+                    <span
+                      style="
+                        color: #7c8b99;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11px;
+                      "
+                      >/handson/db/name</span
+                    ><span style="color: #8b98a5">String</span
+                    ><span style="color: #e6edf3">appdb</span>
+                    <span
+                      style="
+                        color: #7c8b99;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11px;
+                      "
+                      >/handson/db/password</span
+                    ><span style="color: #8b98a5">SecureString</span
+                    ><span style="color: #e6edf3">4章で作成したパスワード</span>
+                    <span
+                      style="
+                        color: #7c8b99;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11px;
+                      "
+                      >/handson/db/user</span
+                    ><span style="color: #8b98a5">String</span
+                    ><span style="color: #e6edf3">appuser</span>
+                  </div>
+                  <div
+                    style="
+                      margin: 24px 0;
+                      padding: 18px;
+                      background: #ffffff;
+                      border: 1px solid #1c2836;
+                      border-radius: 13px;
+                    "
+                  >
+                    <img
+                      src="../../images/aws/deploy/貼り付けられた画像%20(49).png"
+                      style="width: 100%; height: auto; display: block"
+                    />
+                  </div>
                 </div>
               </div>
 
