@@ -339,6 +339,33 @@
                   >でOKです。
                 </div>
               </div>
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 14px 0 0;
+                  padding: 15px 17px;
+                  background: rgba(88, 166, 255, 0.06);
+                  border: 1px solid rgba(88, 166, 255, 0.22);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">✅</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #b8cbe0"
+                >
+                  <strong style="color: #e6edf3">事前準備（必須）:</strong>
+                  <a
+                    href="./dockerize-nextjs.md"
+                    style="color: #58a6ff; text-decoration: underline"
+                    >dockerize-nextjs.md</a
+                  >
+                  に沿って、デプロイするアプリの<strong style="color: #e6edf3"
+                    >4ファイル修正（standalone / Dockerfile / .dockerignore /
+                    /api/health）とローカルでの動作確認</strong
+                  >まで済ませておいてください。
+                </div>
+              </div>
             </header>
 
             <!-- CHAPTERS -->
@@ -875,7 +902,7 @@
                   <div
                     style="font-size: 12.5px; color: #8b98a5; line-height: 1.6"
                   >
-                    クレジットカード登録が必要。学習後は11章の手順で必ず削除する。
+                    クレジットカード登録が必要。学習後は10章の手順で必ず削除する。
                   </div>
                 </div>
                 <div
@@ -921,7 +948,7 @@
                   <div
                     style="font-size: 12.5px; color: #8b98a5; line-height: 1.6"
                   >
-                    6章で使用。ローカルでコンテナをビルドするために必要。
+                    事前準備（dockerize-nextjs.md）で使用。ローカルでコンテナをビルドするために必要。
                   </div>
                 </div>
                 <div
@@ -944,7 +971,7 @@
                   <div
                     style="font-size: 12.5px; color: #8b98a5; line-height: 1.6"
                   >
-                    7章のECRプッシュで使用。aws configure まで済ませる。
+                    6章のECRプッシュで使用。aws configure まで済ませる。
                   </div>
                 </div>
               </div>
@@ -970,7 +997,7 @@
                   約$0.6/日 + Fargate 約$0.9/日 <br />
                   ≒ <strong>1日あたり$3前後</strong>。<br />
                   ※free-tierで新規登録6ヶ月以内であれば$200のクレジットで実質無料です。<br />
-                  学習が終わったら11章の手順で必ず削除してください。
+                  学習が終わったら10章の手順で必ず削除してください。
                 </div>
               </div>
 
@@ -1583,7 +1610,7 @@
                 >
                   <strong style="color: #f0807f">課金注意</strong> — NAT Gateway
                   はこの瞬間から時間課金（約$0.045/時+通信量）が始まります。<br />
-                  数日空ける場合は11章を参考に一旦削除を。
+                  数日空ける場合は10章を参考に一旦削除を。
                 </div>
               </div>
 
@@ -3064,7 +3091,7 @@
                   DBが起動します。<br />
                   現状ではパブリックアクセスなし +
                   db-sgの制限により、どこからも接続できません。<br />
-                  8章でECSタスク(app-sg)が動き始めて、初めて接続できるようになります。
+                  7章でECSタスク(app-sg)が動き始めて、初めて接続できるようになります。
                 </div>
               </div>
 
@@ -3179,7 +3206,7 @@
                   >コードや設定ファイルに直書きしない</strong
                 >のが実務の鉄則。<br />
                 Systems Manager
-                の「パラメータストア」に保存し、8章でECSタスクに環境変数として注入します。
+                の「パラメータストア」に保存し、7章でECSタスクに環境変数として注入します。
               </p>
 
               <div
@@ -3216,7 +3243,7 @@
                   margin: 30px 0 4px;
                 "
               >
-                手順 — 接続情報を保存（passwordは4章でCloudShellから登録済み）
+                手順 — 接続URLを保存（passwordは4章でCloudShellから登録済み）
               </h3>
               <div
                 style="
@@ -3347,8 +3374,24 @@
                           style="width: 100%; height: auto; display: block"
                         />
                       </div>
-                      以下3つを1つずつ作成します。<br />
-                      8章でECSタスクに注入する接続情報一式をここで一括管理する。<br />
+                      次に、アプリがDB接続に使う<strong
+                        style="color: #e6edf3"
+                        >接続URLを1本</strong
+                      >だけ作成します。<br />
+                      アプリ（Prisma）は
+                      <code
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          background: #0a1119;
+                          padding: 1px 6px;
+                          border-radius: 5px;
+                          color: #e6b877;
+                        "
+                        >DATABASE_URL</code
+                      >
+                      1本で接続する作りなので、host / name / user
+                      を個別に分けず、接続URLごと保存する。<br />
+                      7章でECSタスクにこの値を注入する。<br />
                     </div>
                     <div
                       style="
@@ -3365,29 +3408,17 @@
                           font-family: 'IBM Plex Mono', monospace;
                           font-size: 11px;
                         "
-                        >/handson/db/host</span
-                      ><span style="color: #8b98a5">String</span
-                      ><span style="color: #e6edf3"
-                        >4章で控えたRDSエンドポイント</span
+                        >/handson/db/url</span
+                      ><span style="color: #8b98a5">SecureString</span
+                      ><span
+                        style="
+                          color: #e6edf3;
+                          font-family: 'IBM Plex Mono', monospace;
+                          font-size: 11px;
+                          word-break: break-all;
+                        "
+                        >postgresql://appuser:（4章のパスワード）@（4章で控えたRDSエンドポイント）:5432/appdb</span
                       >
-                      <span
-                        style="
-                          color: #7c8b99;
-                          font-family: 'IBM Plex Mono', monospace;
-                          font-size: 11px;
-                        "
-                        >/handson/db/name</span
-                      ><span style="color: #8b98a5">String</span
-                      ><span style="color: #e6edf3">appdb</span>
-                      <span
-                        style="
-                          color: #7c8b99;
-                          font-family: 'IBM Plex Mono', monospace;
-                          font-size: 11px;
-                        "
-                        >/handson/db/user</span
-                      ><span style="color: #8b98a5">String</span
-                      ><span style="color: #e6edf3">appuser</span>
                     </div>
                   </div>
                 </div>
@@ -3418,12 +3449,11 @@
                         color: #c3cdd7;
                       "
                     >
-                      この3つはタイプ「<strong style="color: #e6edf3"
-                        >String</strong
-                      >」でOK（暗号化不要な非機密情報のため）。<br />
-                      passwordだけ4章でタイプ「SecureString」（KMSで暗号化）として登録済みのはず。一覧画面で確認しておく。<br /><br />
+                      タイプは「<strong style="color: #e6edf3"
+                        >SecureString</strong
+                      >」（KMSで暗号化）。値にパスワードが含まれるため、Stringにはしない。<br /><br />
                     </div>
-                    /handson/db/hostを作成。<br />
+                    /handson/db/urlを作成。値は「postgresql://appuser:（4章のパスワード）@（4章で控えたRDSエンドポイント）:5432/appdb」。<br />
                     <div
                       style="
                         margin: 24px 0;
@@ -3435,162 +3465,6 @@
                     >
                       <img
                         src="../../images/aws/deploy/貼り付けられた画像%20(44).png"
-                        style="width: 100%; height: auto; display: block"
-                      />
-                    </div>
-                    <div
-                      style="
-                        margin: 24px 0;
-                        padding: 18px;
-                        background: #ffffff;
-                        border: 1px solid #1c2836;
-                        border-radius: 13px;
-                      "
-                    >
-                      <img
-                        src="../../images/aws/deploy/貼り付けられた画像%20(41).png"
-                        style="width: 100%; height: auto; display: block"
-                      />
-                    </div>
-                    <div
-                      style="
-                        margin: 24px 0;
-                        padding: 18px;
-                        background: #ffffff;
-                        border: 1px solid #1c2836;
-                        border-radius: 13px;
-                      "
-                    >
-                      <img
-                        src="../../images/aws/deploy/貼り付けられた画像%20(42).png"
-                        style="width: 100%; height: auto; display: block"
-                      />
-                    </div>
-                    <div
-                      style="
-                        margin: 24px 0;
-                        padding: 18px;
-                        background: #ffffff;
-                        border: 1px solid #1c2836;
-                        border-radius: 13px;
-                      "
-                    >
-                      <img
-                        src="../../images/aws/deploy/貼り付けられた画像%20(43).png"
-                        style="width: 100%; height: auto; display: block"
-                      />
-                    </div>
-                    /handson/db/nameを作成。<br />
-                    <div
-                      style="
-                        margin: 24px 0;
-                        padding: 18px;
-                        background: #ffffff;
-                        border: 1px solid #1c2836;
-                        border-radius: 13px;
-                      "
-                    >
-                      <img
-                        src="../../images/aws/deploy/貼り付けられた画像%20(44).png"
-                        style="width: 100%; height: auto; display: block"
-                      />
-                    </div>
-                    <div
-                      style="
-                        margin: 24px 0;
-                        padding: 18px;
-                        background: #ffffff;
-                        border: 1px solid #1c2836;
-                        border-radius: 13px;
-                      "
-                    >
-                      <img
-                        src="../../images/aws/deploy/貼り付けられた画像%20(45).png"
-                        style="width: 100%; height: auto; display: block"
-                      />
-                    </div>
-                    <div
-                      style="
-                        margin: 24px 0;
-                        padding: 18px;
-                        background: #ffffff;
-                        border: 1px solid #1c2836;
-                        border-radius: 13px;
-                      "
-                    >
-                      <img
-                        src="../../images/aws/deploy/貼り付けられた画像%20(46).png"
-                        style="width: 100%; height: auto; display: block"
-                      />
-                    </div>
-                    <div
-                      style="
-                        margin: 24px 0;
-                        padding: 18px;
-                        background: #ffffff;
-                        border: 1px solid #1c2836;
-                        border-radius: 13px;
-                      "
-                    >
-                      <img
-                        src="../../images/aws/deploy/貼り付けられた画像%20(43).png"
-                        style="width: 100%; height: auto; display: block"
-                      />
-                    </div>
-                    /handson/db/userを作成。<br />
-                    <div
-                      style="
-                        margin: 24px 0;
-                        padding: 18px;
-                        background: #ffffff;
-                        border: 1px solid #1c2836;
-                        border-radius: 13px;
-                      "
-                    >
-                      <img
-                        src="../../images/aws/deploy/貼り付けられた画像%20(44).png"
-                        style="width: 100%; height: auto; display: block"
-                      />
-                    </div>
-                    <div
-                      style="
-                        margin: 24px 0;
-                        padding: 18px;
-                        background: #ffffff;
-                        border: 1px solid #1c2836;
-                        border-radius: 13px;
-                      "
-                    >
-                      <img
-                        src="../../images/aws/deploy/貼り付けられた画像%20(47).png"
-                        style="width: 100%; height: auto; display: block"
-                      />
-                    </div>
-                    <div
-                      style="
-                        margin: 24px 0;
-                        padding: 18px;
-                        background: #ffffff;
-                        border: 1px solid #1c2836;
-                        border-radius: 13px;
-                      "
-                    >
-                      <img
-                        src="../../images/aws/deploy/貼り付けられた画像%20(48).png"
-                        style="width: 100%; height: auto; display: block"
-                      />
-                    </div>
-                    <div
-                      style="
-                        margin: 24px 0;
-                        padding: 18px;
-                        background: #ffffff;
-                        border: 1px solid #1c2836;
-                        border-radius: 13px;
-                      "
-                    >
-                      <img
-                        src="../../images/aws/deploy/貼り付けられた画像%20(43).png"
                         style="width: 100%; height: auto; display: block"
                       />
                     </div>
@@ -3613,9 +3487,9 @@
                   style="font-size: 13.5px; line-height: 1.75; color: #a8dab8"
                 >
                   <strong style="color: #5fd685">実行するとこうなる</strong> —
-                  一覧に4つのパラメータ（4章のpassword +
-                  今回の3つ）が並びます。<br />
-                  passwordのタイプ欄だけ「SecureString」と表示されます。<br />
+                  一覧に2つのパラメータ（4章のpassword +
+                  今回のurl）が並びます。<br />
+                  どちらもタイプは「SecureString」で、値は暗号化されて隠されます。<br />
                   <div
                     style="
                       display: grid;
@@ -3631,26 +3505,6 @@
                         font-family: 'IBM Plex Mono', monospace;
                         font-size: 11px;
                       "
-                      >/handson/db/host</span
-                    ><span style="color: #8b98a5">String</span
-                    ><span style="color: #e6edf3"
-                      >4章で控えたRDSエンドポイント</span
-                    >
-                    <span
-                      style="
-                        color: #7c8b99;
-                        font-family: 'IBM Plex Mono', monospace;
-                        font-size: 11px;
-                      "
-                      >/handson/db/name</span
-                    ><span style="color: #8b98a5">String</span
-                    ><span style="color: #e6edf3">appdb</span>
-                    <span
-                      style="
-                        color: #7c8b99;
-                        font-family: 'IBM Plex Mono', monospace;
-                        font-size: 11px;
-                      "
                       >/handson/db/password</span
                     ><span style="color: #8b98a5">SecureString</span
                     ><span style="color: #e6edf3">4章で作成したパスワード</span>
@@ -3660,23 +3514,17 @@
                         font-family: 'IBM Plex Mono', monospace;
                         font-size: 11px;
                       "
-                      >/handson/db/user</span
-                    ><span style="color: #8b98a5">String</span
-                    ><span style="color: #e6edf3">appuser</span>
-                  </div>
-                  <div
-                    style="
-                      margin: 24px 0;
-                      padding: 18px;
-                      background: #ffffff;
-                      border: 1px solid #1c2836;
-                      border-radius: 13px;
-                    "
-                  >
-                    <img
-                      src="../../images/aws/deploy/貼り付けられた画像%20(49).png"
-                      style="width: 100%; height: auto; display: block"
-                    />
+                      >/handson/db/url</span
+                    ><span style="color: #8b98a5">SecureString</span
+                    ><span
+                      style="
+                        color: #e6edf3;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11px;
+                        word-break: break-all;
+                      "
+                      >postgresql://appuser:（パスワード）@（RDSエンドポイント）:5432/appdb</span
+                    >
                   </div>
                 </div>
               </div>
@@ -3742,7 +3590,7 @@
 
             <section
               id="ch6"
-              data-screen-label="06 Docker化"
+              data-screen-label="06 ECR"
               style="
                 padding: 56px 0;
                 border-bottom: 1px solid #1c2836;
@@ -3766,602 +3614,6 @@
                     letter-spacing: 0.08em;
                   "
                   >CHAPTER 06</span
-                >
-                <span style="flex: 1; height: 1px; background: #1c2836"></span>
-              </div>
-              <h2
-                style="
-                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
-                  font-size: 31px;
-                  font-weight: 700;
-                  margin: 0 0 16px;
-                  letter-spacing: -0.01em;
-                "
-              >
-                アプリを Docker 化する
-              </h2>
-              <p
-                style="
-                  font-size: 16px;
-                  line-height: 1.8;
-                  color: #aab6c2;
-                  margin: 0 0 24px;
-                "
-              >
-                ECSで動かせる形＝<strong style="color: #e6edf3"
-                  >コンテナイメージ</strong
-                >にします。<br />
-                この章だけはAWSでなく手元のPCでの作業。<br />
-                Next.js（画面）にAPIも<strong style="color: #e6edf3"
-                  >Route Handlers</strong
-                >として同居させ、1つの Dockerfile
-                を書き、ローカルで動くことを確認してから次へ進みます。
-              </p>
-
-              <h3
-                style="
-                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
-                  font-size: 19px;
-                  font-weight: 600;
-                  margin: 26px 0 12px;
-                "
-              >
-                API 部分 — Route Handlers（最小構成）
-              </h3>
-              <p
-                style="
-                  font-size: 14.5px;
-                  line-height: 1.85;
-                  color: #c3cdd7;
-                  margin: 0 0 16px;
-                "
-              >
-                Next.js の App Router では
-                <code
-                  style="
-                    font-family: 'IBM Plex Mono', monospace;
-                    background: #0a1119;
-                    padding: 1px 6px;
-                    border-radius: 5px;
-                    color: #e6b877;
-                  "
-                  >app/api/.../route.ts</code
-                >
-                を置くだけで、同じコンテナがAPIエンドポイントになります。<br />
-                別のAPIサーバーは不要。
-              </p>
-              <div
-                data-code
-                style="
-                  margin: 16px 0;
-                  border: 1px solid #23303f;
-                  border-radius: 11px;
-                  overflow: hidden;
-                  background: #0a1119;
-                "
-              >
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 9px 14px;
-                    background: #111a24;
-                    border-bottom: 1px solid #1c2836;
-                  "
-                >
-                  <span
-                    style="
-                      font-family: 'IBM Plex Mono', monospace;
-                      font-size: 11.5px;
-                      color: #7c8b99;
-                      letter-spacing: 0.05em;
-                    "
-                    >app/api/health/route.ts</span
-                  ><button
-                    onClick="{{ copyCode }}"
-                    style="
-                      display: flex;
-                      align-items: center;
-                      gap: 6px;
-                      background: transparent;
-                      border: 1px solid #2a3746;
-                      color: #8b98a5;
-                      font-size: 11.5px;
-                      padding: 4px 11px;
-                      border-radius: 7px;
-                      cursor: pointer;
-                      font-family: 'IBM Plex Mono', monospace;
-                      transition: all 0.15s;
-                    "
-                    style-hover="border-color:var(--accent,#ff9900);color:var(--accent,#ff9900)"
-                  >
-                    <span style="font-size: 12px">⧉</span
-                    ><span data-lbl>コピー</span>
-                  </button>
-                </div>
-                <pre
-                  style="margin: 0; padding: 15px 16px; overflow-x: auto"
-                ><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">export function GET() {
-  return Response.json({ status: "ok" });
-}</code></pre>
-              </div>
-              <div
-                data-code
-                style="
-                  margin: 16px 0;
-                  border: 1px solid #23303f;
-                  border-radius: 11px;
-                  overflow: hidden;
-                  background: #0a1119;
-                "
-              >
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 9px 14px;
-                    background: #111a24;
-                    border-bottom: 1px solid #1c2836;
-                  "
-                >
-                  <span
-                    style="
-                      font-family: 'IBM Plex Mono', monospace;
-                      font-size: 11.5px;
-                      color: #7c8b99;
-                      letter-spacing: 0.05em;
-                    "
-                    >app/api/messages/route.ts</span
-                  ><button
-                    onClick="{{ copyCode }}"
-                    style="
-                      display: flex;
-                      align-items: center;
-                      gap: 6px;
-                      background: transparent;
-                      border: 1px solid #2a3746;
-                      color: #8b98a5;
-                      font-size: 11.5px;
-                      padding: 4px 11px;
-                      border-radius: 7px;
-                      cursor: pointer;
-                      font-family: 'IBM Plex Mono', monospace;
-                      transition: all 0.15s;
-                    "
-                    style-hover="border-color:var(--accent,#ff9900);color:var(--accent,#ff9900)"
-                  >
-                    <span style="font-size: 12px">⧉</span
-                    ><span data-lbl>コピー</span>
-                  </button>
-                </div>
-                <pre
-                  style="margin: 0; padding: 15px 16px; overflow-x: auto"
-                ><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">import { Pool } from "pg";
-
-// 毎リクエスト実行（ビルド時の静的化を防ぐ）
-export const dynamic = "force-dynamic";
-
-// 環境変数から接続情報を組み立てる（8章でECSが注入する）
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: 5432,
-});
-
-export async function GET() {
-  await pool.query(
-    "CREATE TABLE IF NOT EXISTS messages (id serial, body text)");
-  const { rows } = await pool.query(
-    "SELECT id, body FROM messages ORDER BY id");
-  return Response.json(rows);
-}</code></pre>
-              </div>
-              <p
-                style="
-                  font-size: 13.5px;
-                  line-height: 1.8;
-                  color: #8b98a5;
-                  margin: 8px 0 0;
-                "
-              >
-                依存は
-                <code
-                  style="
-                    font-family: 'IBM Plex Mono', monospace;
-                    background: #0a1119;
-                    padding: 1px 6px;
-                    border-radius: 5px;
-                    color: #e6b877;
-                  "
-                  >npm install pg</code
-                >（TypeScriptなら
-                <code
-                  style="
-                    font-family: 'IBM Plex Mono', monospace;
-                    background: #0a1119;
-                    padding: 1px 6px;
-                    border-radius: 5px;
-                    color: #e6b877;
-                  "
-                  >npm install -D @types/pg</code
-                >
-                も）の追加だけ。
-              </p>
-
-              <h3
-                style="
-                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
-                  font-size: 19px;
-                  font-weight: 600;
-                  margin: 30px 0 12px;
-                "
-              >
-                Dockerfile
-              </h3>
-              <p
-                style="
-                  font-size: 14.5px;
-                  line-height: 1.85;
-                  color: #c3cdd7;
-                  margin: 0 0 16px;
-                "
-              >
-                ポイントは2つ。①
-                <code
-                  style="
-                    font-family: 'IBM Plex Mono', monospace;
-                    background: #0a1119;
-                    padding: 1px 6px;
-                    border-radius: 5px;
-                    color: #e6b877;
-                  "
-                  >next.config.js</code
-                >
-                に
-                <code
-                  style="
-                    font-family: 'IBM Plex Mono', monospace;
-                    background: #0a1119;
-                    padding: 1px 6px;
-                    border-radius: 5px;
-                    color: #e6b877;
-                  "
-                  >output: "standalone"</code
-                >
-                を指定してイメージを軽くする。<br />
-                ② ページ内のAPI呼び出しは
-                <code
-                  style="
-                    font-family: 'IBM Plex Mono', monospace;
-                    background: #0a1119;
-                    padding: 1px 6px;
-                    border-radius: 5px;
-                    color: #e6b877;
-                  "
-                  >fetch("/api/messages")</code
-                >
-                のように<strong style="color: #e6edf3"
-                  >同一ドメインの相対パス</strong
-                >で書く（同じコンテナのRoute
-                Handlerが応えるので、APIのURLを埋め込む必要がない）。
-              </p>
-              <div
-                data-code
-                style="
-                  margin: 16px 0;
-                  border: 1px solid #23303f;
-                  border-radius: 11px;
-                  overflow: hidden;
-                  background: #0a1119;
-                "
-              >
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 9px 14px;
-                    background: #111a24;
-                    border-bottom: 1px solid #1c2836;
-                  "
-                >
-                  <span
-                    style="
-                      font-family: 'IBM Plex Mono', monospace;
-                      font-size: 11.5px;
-                      color: #7c8b99;
-                      letter-spacing: 0.05em;
-                    "
-                    >Dockerfile（マルチステージ）</span
-                  ><button
-                    onClick="{{ copyCode }}"
-                    style="
-                      display: flex;
-                      align-items: center;
-                      gap: 6px;
-                      background: transparent;
-                      border: 1px solid #2a3746;
-                      color: #8b98a5;
-                      font-size: 11.5px;
-                      padding: 4px 11px;
-                      border-radius: 7px;
-                      cursor: pointer;
-                      font-family: 'IBM Plex Mono', monospace;
-                      transition: all 0.15s;
-                    "
-                    style-hover="border-color:var(--accent,#ff9900);color:var(--accent,#ff9900)"
-                  >
-                    <span style="font-size: 12px">⧉</span
-                    ><span data-lbl>コピー</span>
-                  </button>
-                </div>
-                <pre
-                  style="margin: 0; padding: 15px 16px; overflow-x: auto"
-                ><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">FROM node:22-slim AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-FROM node:22-slim
-WORKDIR /app
-ENV NODE_ENV=production
-COPY --from=build /app/.next/standalone ./
-COPY --from=build /app/.next/static ./.next/static
-COPY --from=build /app/public ./public
-EXPOSE 3000
-CMD ["node", "server.js"]</code></pre>
-              </div>
-
-              <h3
-                style="
-                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
-                  font-size: 19px;
-                  font-weight: 600;
-                  margin: 30px 0 12px;
-                "
-              >
-                ローカルで通し確認（docker compose）
-              </h3>
-              <div
-                data-code
-                style="
-                  margin: 16px 0;
-                  border: 1px solid #23303f;
-                  border-radius: 11px;
-                  overflow: hidden;
-                  background: #0a1119;
-                "
-              >
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 9px 14px;
-                    background: #111a24;
-                    border-bottom: 1px solid #1c2836;
-                  "
-                >
-                  <span
-                    style="
-                      font-family: 'IBM Plex Mono', monospace;
-                      font-size: 11.5px;
-                      color: #7c8b99;
-                      letter-spacing: 0.05em;
-                    "
-                    >compose.yaml</span
-                  ><button
-                    onClick="{{ copyCode }}"
-                    style="
-                      display: flex;
-                      align-items: center;
-                      gap: 6px;
-                      background: transparent;
-                      border: 1px solid #2a3746;
-                      color: #8b98a5;
-                      font-size: 11.5px;
-                      padding: 4px 11px;
-                      border-radius: 7px;
-                      cursor: pointer;
-                      font-family: 'IBM Plex Mono', monospace;
-                      transition: all 0.15s;
-                    "
-                    style-hover="border-color:var(--accent,#ff9900);color:var(--accent,#ff9900)"
-                  >
-                    <span style="font-size: 12px">⧉</span
-                    ><span data-lbl>コピー</span>
-                  </button>
-                </div>
-                <pre
-                  style="margin: 0; padding: 15px 16px; overflow-x: auto"
-                ><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">services:
-  db:
-    image: postgres:18
-    environment:
-      POSTGRES_USER: appuser
-      POSTGRES_PASSWORD: localpass
-      POSTGRES_DB: appdb
-  app:
-    build: .
-    environment:
-      DB_HOST: db
-      DB_USER: appuser
-      DB_PASSWORD: localpass
-      DB_NAME: appdb
-    ports: ["3000:3000"]</code></pre>
-              </div>
-              <div
-                data-code
-                style="
-                  margin: 16px 0;
-                  border: 1px solid #23303f;
-                  border-radius: 11px;
-                  overflow: hidden;
-                  background: #0a1119;
-                "
-              >
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 9px 14px;
-                    background: #111a24;
-                    border-bottom: 1px solid #1c2836;
-                  "
-                >
-                  <span
-                    style="
-                      font-family: 'IBM Plex Mono', monospace;
-                      font-size: 11.5px;
-                      color: #7c8b99;
-                      letter-spacing: 0.05em;
-                    "
-                    >bash — 動作確認</span
-                  ><button
-                    onClick="{{ copyCode }}"
-                    style="
-                      display: flex;
-                      align-items: center;
-                      gap: 6px;
-                      background: transparent;
-                      border: 1px solid #2a3746;
-                      color: #8b98a5;
-                      font-size: 11.5px;
-                      padding: 4px 11px;
-                      border-radius: 7px;
-                      cursor: pointer;
-                      font-family: 'IBM Plex Mono', monospace;
-                      transition: all 0.15s;
-                    "
-                    style-hover="border-color:var(--accent,#ff9900);color:var(--accent,#ff9900)"
-                  >
-                    <span style="font-size: 12px">⧉</span
-                    ><span data-lbl>コピー</span>
-                  </button>
-                </div>
-                <pre
-                  style="margin: 0; padding: 15px 16px; overflow-x: auto"
-                ><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">docker compose up --build
-
-# 別ターミナルで
-curl http://localhost:3000/api/health
-# =&gt; {"status":"ok"}
-# ブラウザで http://localhost:3000 を開きページ表示を確認</code></pre>
-              </div>
-              <div
-                style="
-                  display: flex;
-                  gap: 13px;
-                  margin: 18px 0;
-                  padding: 15px 17px;
-                  background: rgba(34, 197, 94, 0.06);
-                  border: 1px solid rgba(34, 197, 94, 0.22);
-                  border-radius: 11px;
-                "
-              >
-                <span style="font-size: 16px; flex: 0 0 auto">✅</span>
-                <div
-                  style="font-size: 13.5px; line-height: 1.75; color: #a8dab8"
-                >
-                  <strong style="color: #5fd685">実行するとこうなる</strong> —
-                  ローカルの2コンテナ（app /
-                  db）が起動し、ブラウザでページが表示されます。<br />
-                  この「動く状態」を、7章以降でそのままAWSに持っていきます。
-                </div>
-              </div>
-
-              <sc-if
-                value="{{ showChecklist }}"
-                hint-placeholder-val="{{ true }}"
-              >
-                <div
-                  style="
-                    margin: 30px 0 4px;
-                    padding: 16px 18px 10px;
-                    background: #0e1620;
-                    border: 1px solid #1c2836;
-                    border-radius: 13px;
-                  "
-                >
-                  <div
-                    style="
-                      display: flex;
-                      align-items: center;
-                      gap: 9px;
-                      margin-bottom: 6px;
-                      padding: 0 4px;
-                    "
-                  >
-                    <span style="font-size: 13px">✅</span
-                    ><span
-                      style="
-                        font-size: 12.5px;
-                        font-weight: 600;
-                        color: #8b98a5;
-                        letter-spacing: 0.04em;
-                      "
-                      >この章のチェック</span
-                    >
-                  </div>
-                  <sc-for
-                    list="{{ checks_ch6 }}"
-                    as="item"
-                    hint-placeholder-count="3"
-                  >
-                    <div
-                      data-id="{{ item.id }}"
-                      onClick="{{ toggleItem }}"
-                      style="
-                        display: flex;
-                        gap: 12px;
-                        align-items: flex-start;
-                        cursor: pointer;
-                        padding: 9px 8px;
-                        border-radius: 8px;
-                      "
-                      style-hover="background:#131b26"
-                    >
-                      <span style="{{ item.boxStyle }}">✓</span
-                      ><span style="{{ item.txtStyle }}">{{ item.label }}</span>
-                    </div>
-                  </sc-for>
-                </div>
-              </sc-if>
-            </section>
-
-            <section
-              id="ch7"
-              data-screen-label="07 ECR"
-              style="
-                padding: 56px 0;
-                border-bottom: 1px solid #1c2836;
-                animation: fadeUp 0.5s ease both;
-              "
-            >
-              <div
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: 14px;
-                  margin-bottom: 10px;
-                "
-              >
-                <span
-                  style="
-                    font-family: 'IBM Plex Mono', monospace;
-                    font-size: 12.5px;
-                    font-weight: 600;
-                    color: var(--accent, #ff9900);
-                    letter-spacing: 0.08em;
-                  "
-                  >CHAPTER 07</span
                 >
                 <span style="flex: 1; height: 1px; background: #1c2836"></span>
               </div>
@@ -4611,7 +3863,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                 <x-import
                   component-from-global-scope="image-slot"
                   from="./image-slot.js"
-                  id="ss-ch7-ecr"
+                  id="ss-ch6-ecr"
                   placeholder="📷 スクショ: ECRリポジトリ内にイメージ(v1タグ)が表示された状態"
                   hint-size="100%,200px"
                   style="width: 100%; height: 200px"
@@ -4654,7 +3906,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                       color: #e6b877;
                     "
                     >...amazonaws.com/handson-app:v1</code
-                  >）を8章で使うので控えておく。
+                  >）を7章で使うので控えておく。
                 </div>
               </div>
               <div
@@ -4724,7 +3976,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                     >
                   </div>
                   <sc-for
-                    list="{{ checks_ch7 }}"
+                    list="{{ checks_ch6 }}"
                     as="item"
                     hint-placeholder-count="2"
                   >
@@ -4750,8 +4002,8 @@ docker push $REGISTRY/handson-app:v1</code></pre>
             </section>
 
             <section
-              id="ch8"
-              data-screen-label="08 ECS"
+              id="ch7"
+              data-screen-label="07 ECS"
               style="
                 padding: 56px 0;
                 border-bottom: 1px solid #1c2836;
@@ -4774,7 +4026,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                     color: var(--accent, #ff9900);
                     letter-spacing: 0.08em;
                   "
-                  >CHAPTER 08</span
+                  >CHAPTER 07</span
                 >
                 <span style="flex: 1; height: 1px; background: #1c2836"></span>
               </div>
@@ -4802,7 +4054,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                 >（入れ物）、<strong style="color: #e6edf3">タスク定義</strong
                 >（コンテナの設計図）、<strong style="color: #e6edf3"
                   >サービス</strong
-                >（設計図どおりに常時N個動かし続ける仕組み・9章で作成）。<br />
+                >（設計図どおりに常時N個動かし続ける仕組み・8章で作成）。<br />
                 Fargateを選ぶと、下で動くサーバーの管理が不要になります。
               </p>
 
@@ -5094,7 +4346,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                           color: #e6b877;
                         "
                         >app</code
-                      >、イメージURIは7章で控えた
+                      >、イメージURIは6章で控えた
                       <code
                         style="
                           font-family: 'IBM Plex Mono', monospace;
@@ -5156,7 +4408,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                           font-family: 'IBM Plex Mono', monospace;
                           font-size: 11px;
                         "
-                        >DB_HOST</span
+                        >DATABASE_URL</span
                       ><span style="color: #8b98a5">ValueFrom</span
                       ><span
                         style="
@@ -5164,55 +4416,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                           font-family: 'IBM Plex Mono', monospace;
                           font-size: 11px;
                         "
-                        >/handson/db/host</span
-                      >
-                      <span
-                        style="
-                          color: #7c8b99;
-                          font-family: 'IBM Plex Mono', monospace;
-                          font-size: 11px;
-                        "
-                        >DB_NAME</span
-                      ><span style="color: #8b98a5">ValueFrom</span
-                      ><span
-                        style="
-                          color: #e6edf3;
-                          font-family: 'IBM Plex Mono', monospace;
-                          font-size: 11px;
-                        "
-                        >/handson/db/name</span
-                      >
-                      <span
-                        style="
-                          color: #7c8b99;
-                          font-family: 'IBM Plex Mono', monospace;
-                          font-size: 11px;
-                        "
-                        >DB_USER</span
-                      ><span style="color: #8b98a5">ValueFrom</span
-                      ><span
-                        style="
-                          color: #e6edf3;
-                          font-family: 'IBM Plex Mono', monospace;
-                          font-size: 11px;
-                        "
-                        >/handson/db/user</span
-                      >
-                      <span
-                        style="
-                          color: #7c8b99;
-                          font-family: 'IBM Plex Mono', monospace;
-                          font-size: 11px;
-                        "
-                        >DB_PASSWORD</span
-                      ><span style="color: #8b98a5">ValueFrom</span
-                      ><span
-                        style="
-                          color: #e6edf3;
-                          font-family: 'IBM Plex Mono', monospace;
-                          font-size: 11px;
-                        "
-                        >/handson/db/password</span
+                        >/handson/db/url</span
                       >
                     </div>
                     <div
@@ -5223,7 +4427,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                         margin-top: 8px;
                       "
                     >
-                      これで6章のコードの
+                      これでアプリのコードの
                       <code
                         style="
                           font-family: 'IBM Plex Mono', monospace;
@@ -5232,7 +4436,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                           border-radius: 5px;
                           color: #e6b877;
                         "
-                        >process.env.DB_*</code
+                        >process.env.DATABASE_URL</code
                       >
                       に、起動時に値が入ります。<br />
                       コードに秘密が書かれない仕組みの完成。
@@ -5286,7 +4490,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                 <x-import
                   component-from-global-scope="image-slot"
                   from="./image-slot.js"
-                  id="ss-ch8-taskdef"
+                  id="ss-ch7-taskdef"
                   placeholder="📷 スクショ: タスク定義一覧（handson-app が登録された状態）"
                   hint-size="100%,200px"
                   style="width: 100%; height: 200px"
@@ -5310,7 +4514,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                   <strong style="color: #5fd685">実行するとこうなる</strong> —
                   タスク定義が1つ登録されます。<br />
                   まだコンテナは動いていません（設計図を書いただけ）。<br />
-                  動かすのは9章の「サービス」です。
+                  動かすのは8章の「サービス」です。
                 </div>
               </div>
 
@@ -5348,7 +4552,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                     >
                   </div>
                   <sc-for
-                    list="{{ checks_ch8 }}"
+                    list="{{ checks_ch7 }}"
                     as="item"
                     hint-placeholder-count="4"
                   >
@@ -5374,8 +4578,8 @@ docker push $REGISTRY/handson-app:v1</code></pre>
             </section>
 
             <section
-              id="ch9"
-              data-screen-label="09 ALB&サービス"
+              id="ch8"
+              data-screen-label="08 ALB&サービス"
               style="
                 padding: 56px 0;
                 border-bottom: 1px solid #1c2836;
@@ -5398,7 +4602,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                     color: var(--accent, #ff9900);
                     letter-spacing: 0.08em;
                   "
-                  >CHAPTER 09</span
+                  >CHAPTER 08</span
                 >
                 <span style="flex: 1; height: 1px; background: #1c2836"></span>
               </div>
@@ -5851,7 +5055,7 @@ docker push $REGISTRY/handson-app:v1</code></pre>
                 <x-import
                   component-from-global-scope="image-slot"
                   from="./image-slot.js"
-                  id="ss-ch9-services"
+                  id="ss-ch8-services"
                   placeholder="📷 スクショ: クラスター画面でサービスが「アクティブ」、タスクが「実行中」の状態"
                   hint-size="100%,240px"
                   style="width: 100%; height: 240px"
@@ -5945,7 +5149,7 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
                   ここが本ハンズオン最大の山場です。<br />
                   ブラウザにページが出れば、①〜④の流れ（ALB→Next.js(Route
                   Handlers)→RDS）がすべて貫通しています。<br />
-                  エラーの場合はサービスの「イベント」タブとタスクの「ログ」タブを見るのが定石（11章）。
+                  エラーの場合はサービスの「イベント」タブとタスクの「ログ」タブを見るのが定石（10章）。
                 </div>
               </div>
 
@@ -5983,7 +5187,7 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
                     >
                   </div>
                   <sc-for
-                    list="{{ checks_ch9 }}"
+                    list="{{ checks_ch8 }}"
                     as="item"
                     hint-placeholder-count="4"
                   >
@@ -6009,8 +5213,8 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
             </section>
 
             <section
-              id="ch10"
-              data-screen-label="10 Route53&HTTPS"
+              id="ch9"
+              data-screen-label="09 Route53&HTTPS"
               style="
                 padding: 56px 0;
                 border-bottom: 1px solid #1c2836;
@@ -6033,7 +5237,7 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
                     color: var(--accent, #ff9900);
                     letter-spacing: 0.08em;
                   "
-                  >CHAPTER 10</span
+                  >CHAPTER 09</span
                 >
                 <span style="flex: 1; height: 1px; background: #1c2836"></span>
               </div>
@@ -6595,7 +5799,7 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
                 <x-import
                   component-from-global-scope="image-slot"
                   from="./image-slot.js"
-                  id="ss-ch10-https"
+                  id="ss-ch9-https"
                   placeholder="📷 スクショ: ブラウザで https://自分のドメイン が鍵マーク付きで表示された状態"
                   hint-size="100%,240px"
                   style="width: 100%; height: 240px"
@@ -6667,7 +5871,7 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
                     >
                   </div>
                   <sc-for
-                    list="{{ checks_ch10 }}"
+                    list="{{ checks_ch9 }}"
                     as="item"
                     hint-placeholder-count="4"
                   >
@@ -6693,8 +5897,8 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
             </section>
 
             <section
-              id="ch11"
-              data-screen-label="11 運用と片付け"
+              id="ch10"
+              data-screen-label="10 運用と片付け"
               style="padding: 56px 0 20px; animation: fadeUp 0.5s ease both"
             >
               <div
@@ -6713,7 +5917,7 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
                     color: var(--accent, #ff9900);
                     letter-spacing: 0.08em;
                   "
-                  >CHAPTER 11</span
+                  >CHAPTER 10</span
                 >
                 <span style="flex: 1; height: 1px; background: #1c2836"></span>
               </div>
@@ -6803,7 +6007,7 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
                   <div
                     style="font-size: 12.5px; color: #8b98a5; line-height: 1.65"
                   >
-                    7章の手順で
+                    6章の手順で
                     <code
                       style="
                         font-family: 'IBM Plex Mono', monospace;
@@ -6850,7 +6054,7 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
                 <x-import
                   component-from-global-scope="image-slot"
                   from="./image-slot.js"
-                  id="ss-ch11-logs"
+                  id="ss-ch10-logs"
                   placeholder="📷 スクショ: タスクの「ログ」タブでアプリのログが流れている状態"
                   hint-size="100%,200px"
                   style="width: 100%; height: 200px"
@@ -6966,7 +6170,7 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
                     >
                   </div>
                   <sc-for
-                    list="{{ checks_ch11 }}"
+                    list="{{ checks_ch10 }}"
                     as="item"
                     hint-placeholder-count="3"
                   >
@@ -7005,7 +6209,7 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
             >
               <div style="font-size: 12.5px; color: #5f6f7e; line-height: 1.6">
                 ECS on Fargate 実務ハンズオン資料 — 2026年7月版<br />NAT
-                Gateway・RDS・ALBは置いておくだけで課金されます。終わったら必ず11章の削除手順を。
+                Gateway・RDS・ALBは置いておくだけで課金されます。終わったら必ず10章の削除手順を。
               </div>
               <a
                 href="#top"
@@ -7042,12 +6246,11 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
             { id: 'ch3', num: '03', title: 'セキュリティグループ設計' },
             { id: 'ch4', num: '04', title: 'RDS — PostgreSQL を立てる' },
             { id: 'ch5', num: '05', title: 'パラメータストアで秘密情報管理' },
-            { id: 'ch6', num: '06', title: 'アプリを Docker 化する' },
-            { id: 'ch7', num: '07', title: 'ECR — イメージ置き場' },
-            { id: 'ch8', num: '08', title: 'ECS — クラスターとタスク定義' },
-            { id: 'ch9', num: '09', title: 'ALB & サービス起動' },
-            { id: 'ch10', num: '10', title: 'Route 53 & HTTPS 化' },
-            { id: 'ch11', num: '11', title: '運用の基本と片付け' },
+            { id: 'ch6', num: '06', title: 'ECR — イメージ置き場' },
+            { id: 'ch7', num: '07', title: 'ECS — クラスターとタスク定義' },
+            { id: 'ch8', num: '08', title: 'ALB & サービス起動' },
+            { id: 'ch9', num: '09', title: 'Route 53 & HTTPS 化' },
+            { id: 'ch10', num: '10', title: '運用の基本と片付け' },
           ];
           this.checkData = {
             ch0: [
@@ -7076,37 +6279,32 @@ curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
               { id: 'c4c', label: '「パブリックアクセスなし」の意味を理解した' },
             ],
             ch5: [
-              { id: 'c5a', label: 'パラメータストアにDB接続情報を保存した' },
-              { id: 'c5b', label: 'SecureString と String の使い分けを理解した' },
+              { id: 'c5a', label: 'パラメータストアに /handson/db/url を保存した' },
+              { id: 'c5b', label: 'パスワードを含む値を SecureString にする理由を理解した' },
             ],
             ch6: [
-              { id: 'c6a', label: 'Route Handlers で /api/health と /api/messages を実装した' },
-              { id: 'c6b', label: 'Next.js を Docker 化しローカルで動かした' },
-              { id: 'c6c', label: 'docker compose でDB込みの動作確認をした' },
-            ],
-            ch7: [
               { id: 'c7a', label: 'ECRリポジトリを作成した' },
               { id: 'c7b', label: 'イメージを push した' },
             ],
-            ch8: [
+            ch7: [
               { id: 'c8a', label: 'クラスターを作成した' },
               { id: 'c8b', label: 'タスク定義(handson-app)を作成した' },
               { id: 'c8c', label: 'タスクロールと実行ロールの違いを理解した' },
               { id: 'c8d', label: 'パラメータストアからの secrets 注入を設定した' },
             ],
-            ch9: [
+            ch8: [
               { id: 'c9a', label: 'ALBとターゲットグループを作成した' },
               { id: 'c9b', label: 'リスナーの転送先に app-tg を設定した' },
               { id: 'c9c', label: 'ECSサービスを起動した' },
               { id: 'c9d', label: 'ALBのDNS名でページが表示された' },
             ],
-            ch10: [
+            ch9: [
               { id: 'c10a', label: 'ドメインを取得しホストゾーンを確認した' },
               { id: 'c10b', label: 'ACMで証明書を発行した' },
               { id: 'c10c', label: 'HTTPSリスナーとリダイレクトを設定した' },
               { id: 'c10d', label: '独自ドメインのHTTPSで表示された' },
             ],
-            ch11: [
+            ch10: [
               { id: 'c11a', label: 'ログとメトリクスの見方がわかった' },
               { id: 'c11b', label: '新バージョンのデプロイ手順を理解した' },
               { id: 'c11c', label: 'リソースを全て削除した(続けない場合)' },
