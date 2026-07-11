@@ -3963,16 +3963,6 @@
                     >v1</code
                   >
                   タグのイメージが表示されます。<br />
-                  このURI（<code
-                    style="
-                      font-family: 'IBM Plex Mono', monospace;
-                      background: #0a1119;
-                      padding: 1px 6px;
-                      border-radius: 5px;
-                      color: #e6b877;
-                    "
-                    >...amazonaws.com/handson-app:v1</code
-                  >）を7章で使うので控えておく。
                 </div>
               </div>
               <sc-if
@@ -4082,14 +4072,214 @@
                   margin: 0 0 24px;
                 "
               >
-                ECSの登場人物は3つ。<strong style="color: #e6edf3"
-                  >クラスター</strong
-                >（入れ物）、<strong style="color: #e6edf3">タスク定義</strong
-                >（コンテナの設計図）、<strong style="color: #e6edf3"
-                  >サービス</strong
-                >（設計図どおりに常時N個動かし続ける仕組み・8章で作成）。<br />
+                ECSの登場人物は3つ。<br />
+                <strong style="color: #e6edf3">・クラスター</strong
+                >（入れ物）<br /><strong style="color: #e6edf3"
+                  >・タスク定義</strong
+                >（コンテナの設計図）<br /><strong style="color: #e6edf3"
+                  >・サービス</strong
+                >（設計図どおりに常時N個動かし続ける仕組み・8章で作成）<br />
                 Fargateを選ぶと、下で動くサーバーの管理が不要になります。
               </p>
+
+              <!-- TIPS: ECS on EC2 と on Fargate の違い -->
+              <div
+                style="
+                  margin: 18px 0 28px;
+                  padding: 18px;
+                  background: rgba(255, 153, 0, 0.05);
+                  border: 1px solid rgba(255, 153, 0, 0.18);
+                  border-radius: 11px;
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-bottom: 14px;
+                  "
+                >
+                  <span style="font-size: 16px">💡</span>
+                  <strong
+                    style="
+                      font-size: 14px;
+                      color: #e6edf3;
+                      letter-spacing: 0.02em;
+                    "
+                    >TIPS — ECS on EC2 と on Fargate、何が違う？</strong
+                  >
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 14px">
+                  <!-- ECS on EC2 -->
+                  <div
+                    style="
+                      flex: 1 1 240px;
+                      background: #0e1620;
+                      border: 1px solid #1c2836;
+                      border-radius: 10px;
+                      padding: 14px;
+                    "
+                  >
+                    <div
+                      style="
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: #aab6c2;
+                        margin-bottom: 10px;
+                        text-align: center;
+                      "
+                    >
+                      ECS on EC2
+                    </div>
+                    <div
+                      style="
+                        padding: 8px 10px;
+                        margin-bottom: 4px;
+                        background: rgba(255, 153, 0, 0.14);
+                        border: 1px solid rgba(255, 153, 0, 0.35);
+                        border-radius: 7px;
+                        font-size: 12.5px;
+                        color: #ffc266;
+                        text-align: center;
+                      "
+                    >
+                      📦 コンテナ（アプリ）
+                    </div>
+                    <div
+                      style="
+                        padding: 8px 10px;
+                        margin-bottom: 4px;
+                        background: rgba(255, 153, 0, 0.14);
+                        border: 1px solid rgba(255, 153, 0, 0.35);
+                        border-radius: 7px;
+                        font-size: 12.5px;
+                        color: #ffc266;
+                        text-align: center;
+                      "
+                    >
+                      🖥 OS・ミドルウェア（パッチ適用）
+                    </div>
+                    <div
+                      style="
+                        padding: 8px 10px;
+                        background: rgba(255, 153, 0, 0.14);
+                        border: 1px solid rgba(255, 153, 0, 0.35);
+                        border-radius: 7px;
+                        font-size: 12.5px;
+                        color: #ffc266;
+                        text-align: center;
+                      "
+                    >
+                      🏗 EC2インスタンス（台数・スケール）
+                    </div>
+                    <div
+                      style="
+                        margin-top: 10px;
+                        font-size: 12px;
+                        color: #ffc266;
+                        text-align: center;
+                      "
+                    >
+                      🟧 = あなたが管理（3層ぜんぶ）
+                    </div>
+                  </div>
+                  <!-- ECS on Fargate -->
+                  <div
+                    style="
+                      flex: 1 1 240px;
+                      background: #0e1620;
+                      border: 1px solid #1c2836;
+                      border-radius: 10px;
+                      padding: 14px;
+                    "
+                  >
+                    <div
+                      style="
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: var(--accent, #ff9900);
+                        margin-bottom: 10px;
+                        text-align: center;
+                      "
+                    >
+                      ECS on Fargate ← 今回はこっち
+                    </div>
+                    <div
+                      style="
+                        padding: 8px 10px;
+                        margin-bottom: 4px;
+                        background: rgba(255, 153, 0, 0.14);
+                        border: 1px solid rgba(255, 153, 0, 0.35);
+                        border-radius: 7px;
+                        font-size: 12.5px;
+                        color: #ffc266;
+                        text-align: center;
+                      "
+                    >
+                      📦 コンテナ（アプリ）
+                    </div>
+                    <div
+                      style="
+                        padding: 8px 10px;
+                        margin-bottom: 4px;
+                        background: rgba(88, 166, 255, 0.08);
+                        border: 1px dashed rgba(88, 166, 255, 0.35);
+                        border-radius: 7px;
+                        font-size: 12.5px;
+                        color: #7fa8d0;
+                        text-align: center;
+                      "
+                    >
+                      🖥 OS・ミドルウェア
+                    </div>
+                    <div
+                      style="
+                        padding: 8px 10px;
+                        background: rgba(88, 166, 255, 0.08);
+                        border: 1px dashed rgba(88, 166, 255, 0.35);
+                        border-radius: 7px;
+                        font-size: 12.5px;
+                        color: #7fa8d0;
+                        text-align: center;
+                      "
+                    >
+                      🏗 サーバー（見えない・意識しない）
+                    </div>
+                    <div
+                      style="
+                        margin-top: 10px;
+                        font-size: 12px;
+                        color: #7fa8d0;
+                        text-align: center;
+                      "
+                    >
+                      🟦 = AWSにおまかせ（管理はコンテナだけ）
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="
+                    margin-top: 14px;
+                    font-size: 13px;
+                    line-height: 1.75;
+                    color: #d8cbb5;
+                  "
+                >
+                  <strong style="color: var(--accent, #ff9900)"
+                    >結論: デファクトは Fargate<br
+                  /></strong>
+                  <strong style="color: #e6edf3">サーバー管理ゼロ</strong
+                  >・課金はタスクが使った
+                  vCPU・メモリ分だけでスケールも自動。<br />
+                  EC2を選ぶのは「GPUが必要」「特殊なインスタンスタイプを使いたい」など<strong
+                    style="color: #e6edf3"
+                    >明確な理由があるときだけ</strong
+                  >。
+                </div>
+              </div>
 
               <h3
                 style="
@@ -4193,6 +4383,91 @@
                         >AWS Fargate</strong
                       >」のみチェックで作成。
                     </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(52).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(53).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(54).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    クラスター名だけ変更して作成
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(55).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(56).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(57).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -4207,31 +4482,251 @@
               >
                 手順 2 — タスク定義
               </h3>
+
+              <!-- TIPS: タスク定義とは？ -->
               <div
                 style="
-                  display: flex;
-                  gap: 13px;
-                  margin: 14px 0;
-                  padding: 15px 17px;
+                  margin: 18px 0;
+                  padding: 18px;
                   background: rgba(255, 153, 0, 0.05);
                   border: 1px solid rgba(255, 153, 0, 0.18);
                   border-radius: 11px;
                 "
               >
-                <span style="font-size: 16px; flex: 0 0 auto">🎯</span>
                 <div
-                  style="font-size: 13.5px; line-height: 1.75; color: #d8cbb5"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-bottom: 14px;
+                  "
                 >
-                  <strong style="color: var(--accent, #ff9900)"
-                    >2つのロールの違い</strong
+                  <span style="font-size: 16px">💡</span>
+                  <strong
+                    style="
+                      font-size: 14px;
+                      color: #e6edf3;
+                      letter-spacing: 0.02em;
+                    "
+                    >TIPS — タスク定義 is 何？ →
+                    コンテナの「設計図」です</strong
                   >
-                  —
-                  <strong style="color: #e6edf3">タスク実行ロール</strong
-                  >＝ECS自身がタスクを起動するための権限（ECRからのpull、パラメータストアの読み取り、ログ書き込み）。<br /><strong
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: stretch;
+                    gap: 14px;
+                  "
+                >
+                  <!-- 設計図 -->
+                  <div
+                    style="
+                      flex: 1 1 260px;
+                      background: #0e1620;
+                      border: 1px solid #1c2836;
+                      border-radius: 10px;
+                      padding: 14px;
+                    "
+                  >
+                    <div
+                      style="
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: var(--accent, #ff9900);
+                        margin-bottom: 10px;
+                        text-align: center;
+                      "
+                    >
+                      📋 タスク定義（設計図）
+                    </div>
+                    <div
+                      style="
+                        display: grid;
+                        gap: 4px;
+                        font-size: 12.5px;
+                        color: #cdd9e5;
+                      "
+                    >
+                      <div
+                        style="
+                          padding: 7px 10px;
+                          background: #0a1119;
+                          border: 1px solid #24323f;
+                          border-radius: 7px;
+                        "
+                      >
+                        🐳
+                        <strong style="color: #e6edf3">どのイメージ？</strong> —
+                        ECRの
+                        <code
+                          style="
+                            font-family: 'IBM Plex Mono', monospace;
+                            font-size: 11.5px;
+                            color: #ffc266;
+                          "
+                          >handson-app:v1</code
+                        >
+                      </div>
+                      <div
+                        style="
+                          padding: 7px 10px;
+                          background: #0a1119;
+                          border: 1px solid #24323f;
+                          border-radius: 7px;
+                        "
+                      >
+                        ⚙️
+                        <strong style="color: #e6edf3">どのスペック？</strong>
+                        — 0.25 vCPU / 0.5 GB
+                      </div>
+                      <div
+                        style="
+                          padding: 7px 10px;
+                          background: #0a1119;
+                          border: 1px solid #24323f;
+                          border-radius: 7px;
+                        "
+                      >
+                        🔌 <strong style="color: #e6edf3">どのポート？</strong>
+                        — 3000
+                      </div>
+                      <div
+                        style="
+                          padding: 7px 10px;
+                          background: #0a1119;
+                          border: 1px solid #24323f;
+                          border-radius: 7px;
+                        "
+                      >
+                        🔑
+                        <strong style="color: #e6edf3">どの環境変数？</strong>
+                        — DATABASE_URL（パラメータストアから）
+                      </div>
+                      <div
+                        style="
+                          padding: 7px 10px;
+                          background: #0a1119;
+                          border: 1px solid #24323f;
+                          border-radius: 7px;
+                        "
+                      >
+                        🛡 <strong style="color: #e6edf3">どの権限？</strong>
+                        — タスク実行ロール
+                      </div>
+                    </div>
+                  </div>
+                  <!-- 矢印 -->
+                  <div
+                    style="
+                      flex: 0 0 auto;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 20px;
+                      color: var(--accent, #ff9900);
+                    "
+                  >
+                    ➡
+                  </div>
+                  <!-- タスク -->
+                  <div
+                    style="
+                      flex: 1 1 200px;
+                      background: #0e1620;
+                      border: 1px solid #1c2836;
+                      border-radius: 10px;
+                      padding: 14px;
+                    "
+                  >
+                    <div
+                      style="
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: #aab6c2;
+                        margin-bottom: 10px;
+                        text-align: center;
+                      "
+                    >
+                      🏃 タスク（動いている実体）
+                    </div>
+                    <div style="display: grid; gap: 4px">
+                      <div
+                        style="
+                          padding: 8px 10px;
+                          background: rgba(255, 153, 0, 0.14);
+                          border: 1px solid rgba(255, 153, 0, 0.35);
+                          border-radius: 7px;
+                          font-size: 12.5px;
+                          color: #ffc266;
+                          text-align: center;
+                        "
+                      >
+                        📦 タスク #1
+                      </div>
+                      <div
+                        style="
+                          padding: 8px 10px;
+                          background: rgba(255, 153, 0, 0.14);
+                          border: 1px solid rgba(255, 153, 0, 0.35);
+                          border-radius: 7px;
+                          font-size: 12.5px;
+                          color: #ffc266;
+                          text-align: center;
+                        "
+                      >
+                        📦 タスク #2
+                      </div>
+                      <div
+                        style="
+                          padding: 8px 10px;
+                          border: 1px dashed #24323f;
+                          border-radius: 7px;
+                          font-size: 12.5px;
+                          color: #6b7a89;
+                          text-align: center;
+                        "
+                      >
+                        📦 …何個でも
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        margin-top: 10px;
+                        font-size: 12px;
+                        color: #aab6c2;
+                        text-align: center;
+                      "
+                    >
+                      1つの設計図から複製して起動
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="
+                    margin-top: 14px;
+                    font-size: 13px;
+                    line-height: 1.75;
+                    color: #d8cbb5;
+                  "
+                >
+                  Dockerで言う
+                  <code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 12px;
+                      color: #ffc266;
+                    "
+                    >docker run</code
+                  >
+                  のオプション一式を、あらかじめ名前を付けて登録しておくイメージ。<br />
+                  一度作ったら変更はできず、修正すると<strong
                     style="color: #e6edf3"
-                    >タスクロール</strong
-                  >＝アプリのコードがAWSを呼ぶ時の権限（今回は不要）。<br />
-                  混同しやすいので注意。
+                    >リビジョン（:1, :2, …）として新しい版が積み上がる</strong
+                  >のが特徴です。デプロイのやり直し・切り戻しはリビジョンを切り替えるだけ。
                 </div>
               </div>
               <div
@@ -4319,7 +4814,7 @@
                         color: #c3cdd7;
                       "
                     >
-                      ファミリー名
+                      タスク定義ファミリー名
                       <code
                         style="
                           font-family: 'IBM Plex Mono', monospace;
@@ -4328,10 +4823,211 @@
                           border-radius: 5px;
                           color: #e6b877;
                         "
-                        >handson-app</code
-                      >、起動タイプ Fargate、CPU 0.25 vCPU / メモリ 0.5
-                      GB。タスク実行ロールは「新しいロールの作成」。
+                        >handson-app<br /></code
+                      >起動タイプ Fargate<br />
+                      CPU 0.25 vCPU<br />
+                      メモリ 0.5GB<br />
+                      タスク実行ロールは「新しいロールの作成」。
                     </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(58).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    新しいタスク定義の作成 > 新しいタスク定義の作成
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(59).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(60).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    CPU .25 vCPU<br />
+                    メモリ .5GB<br />
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(61).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    新しいタスク実行ロールを作成する
+                    <div
+                      style="
+                        display: flex;
+                        gap: 13px;
+                        margin: 14px 0;
+                        padding: 15px 17px;
+                        background: rgba(255, 153, 0, 0.05);
+                        border: 1px solid rgba(255, 153, 0, 0.18);
+                        border-radius: 11px;
+                      "
+                    >
+                      <span style="font-size: 16px; flex: 0 0 auto">🎯</span>
+                      <div
+                        style="
+                          font-size: 13.5px;
+                          line-height: 1.75;
+                          color: #d8cbb5;
+                        "
+                      >
+                        <strong style="color: var(--accent, #ff9900)"
+                          >2つのロールの違い</strong
+                        >
+                        — ECSには2種類のロール（権限）設定がある。<br />
+                        <strong style="color: #e6edf3">タスク実行ロール</strong>
+                        =
+                        ECS自身がタスクを起動するための権限（ECRからのpull、パラメータストアの読み取りなど）。<br /><strong
+                          style="color: #e6edf3"
+                          >タスクロール</strong
+                        >
+                        = アプリのコードからAWSを呼ぶ時の権限（今回は不要）。<br />
+                        混同しやすいので注意。
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(62).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    ロールを作成 >
+                    ロール名を「handson-ecsTaskExecutionRole」とする
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(68).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    ステートメントを編集 > サービスを選択 > Systems
+                    Managerを選択
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(63).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    GetParametersを選択して☑し、リソースを追加
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(64).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    リソースのタイプを「All Resources」にし、リソースを追加
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(67).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    画面左の追加ポリシーに「"ssm:GetParameters"」「"*"」が入っていることを確認して、ロールを作成する。
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(65).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(66).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    作成したロール名がセットされ、ECSのタスク定義に戻る。
                   </div>
                 </div>
                 <div
@@ -4369,7 +5065,7 @@
                         margin-bottom: 8px;
                       "
                     >
-                      コンテナ設定：名前
+                      コンテナ - 1 名前
                       <code
                         style="
                           font-family: 'IBM Plex Mono', monospace;
@@ -4379,7 +5075,8 @@
                           color: #e6b877;
                         "
                         >app</code
-                      >、イメージURIは6章で控えた
+                      ><br />
+                      イメージURI
                       <code
                         style="
                           font-family: 'IBM Plex Mono', monospace;
@@ -4388,9 +5085,24 @@
                           border-radius: 5px;
                           color: #e6b877;
                         "
-                        >.../handson-app:v1</code
-                      >、コンテナポート
-                      <strong style="color: #e6edf3">3000</strong>。
+                        >ECRイメージを閲覧</code
+                      >からイメージを選択<br />
+                      コンテナポート
+                      <strong style="color: #e6edf3">3000</strong>
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(69).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
                     </div>
                   </div>
                 </div>
@@ -4422,7 +5134,7 @@
                         margin-bottom: 8px;
                       "
                     >
-                      「環境変数」セクションで、5章のパラメータを<strong
+                      「環境変数」で、5章のパラメータを<strong
                         style="color: #e6edf3"
                         >「ValueFrom」</strong
                       >として注入：
@@ -4472,62 +5184,44 @@
                         >process.env.DATABASE_URL</code
                       >
                       に、起動時に値が入ります。<br />
-                      コードに秘密が書かれない仕組みの完成。
+                      コードに秘密が書かれないセキュアな仕組みの完成。
+                    </div>
+                    <br />
+                    環境変数を追加。<br />
+                    ・キー：DATABASE_URL<br />
+                    ・値のタイプ：VALUEFrom<br />
+                    ・値：/handson/db/url
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(70).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    他はデフォルトで作成。
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(71).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
                     </div>
                   </div>
                 </div>
-              </div>
-              <div
-                style="
-                  display: flex;
-                  gap: 13px;
-                  margin: 18px 0;
-                  padding: 15px 17px;
-                  background: rgba(77, 157, 255, 0.06);
-                  border: 1px solid rgba(77, 157, 255, 0.24);
-                  border-radius: 11px;
-                "
-              >
-                <span style="font-size: 16px; flex: 0 0 auto">📌</span>
-                <div
-                  style="font-size: 13.5px; line-height: 1.7; color: #a9c7ea"
-                >
-                  初回は「実行ロールにSSM読み取り権限がない」エラーでタスクが落ちることがあります。<br />
-                  その場合はIAMコンソールで
-                  <code
-                    style="
-                      font-family: 'IBM Plex Mono', monospace;
-                      background: #0a1119;
-                      padding: 1px 6px;
-                      border-radius: 5px;
-                      color: #e6b877;
-                    "
-                    >ecsTaskExecutionRole</code
-                  >
-                  にインラインポリシーで
-                  <code
-                    style="
-                      font-family: 'IBM Plex Mono', monospace;
-                      background: #0a1119;
-                      padding: 1px 6px;
-                      border-radius: 5px;
-                      color: #e6b877;
-                    "
-                    >ssm:GetParameters</code
-                  >（対象 /handson/*
-                  ）を追加してください（2章のLambda資料・実行ロール追加と同じ手順です）。
-                </div>
-              </div>
-
-              <div style="margin: 14px 0">
-                <x-import
-                  component-from-global-scope="image-slot"
-                  from="./image-slot.js"
-                  id="ss-ch7-taskdef"
-                  placeholder="📷 スクショ: タスク定義一覧（handson-app が登録された状態）"
-                  hint-size="100%,200px"
-                  style="width: 100%; height: 200px"
-                ></x-import>
               </div>
               <div
                 style="
@@ -4548,6 +5242,20 @@
                   タスク定義が1つ登録されます。<br />
                   まだコンテナは動いていません（設計図を書いただけ）。<br />
                   動かすのは8章の「サービス」です。
+                  <div
+                    style="
+                      margin: 24px 0;
+                      padding: 18px;
+                      background: #ffffff;
+                      border: 1px solid #1c2836;
+                      border-radius: 13px;
+                    "
+                  >
+                    <img
+                      src="../../images/aws/deploy/貼り付けられた画像%20(72).png"
+                      style="width: 100%; height: auto; display: block"
+                    />
+                  </div>
                 </div>
               </div>
 
