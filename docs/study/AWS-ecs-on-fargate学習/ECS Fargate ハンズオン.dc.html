@@ -259,12 +259,13 @@
                   margin: 0 0 32px;
                 "
               >
-                AWSアカウントを作った直後の状態から、<strong
+                本記事ではAWSアカウントを作った直後から、<strong
                   style="color: #e6edf3"
-                  >独自ドメインのHTTPSで動くWebアプリ</strong
+                  >Webアプリ</strong
                 >（フロント &amp; API: Next.js (Route Handlers) / DB:
-                PostgreSQL）を公開するまでを、1つずつ画面を確認しながら進めます。VPC・セキュリティグループ・Route
-                53・証明書まで、登場するものはすべてこの資料の中で作ります。
+                PostgreSQL）を公開するまでを、1つずつ画面を確認しながら進めます。<br/>
+                ※本編の構築ゴールはHTTP公開（8章）までです。<br/>
+                任意の付録章にRoute 53 +ACMによるHTTPS化がありますが、ドメイン代の実費がかかります。
               </p>
               <div style="display: flex; flex-wrap: wrap; gap: 10px">
                 <div
@@ -281,7 +282,7 @@
                   "
                 >
                   <span style="color: var(--accent, #ff9900)">▪</span>所要
-                  6〜8時間（分割推奨）
+                  10〜12時間（分割推奨）
                 </div>
                 <div
                   style="
@@ -298,22 +299,6 @@
                 >
                   <span style="color: var(--accent, #ff9900)">▪</span
                   >前提知識ゼロでOK
-                </div>
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    padding: 9px 14px;
-                    background: #121b25;
-                    border: 1px solid #1c2836;
-                    border-radius: 9px;
-                    font-size: 13px;
-                    color: #cdd9e5;
-                  "
-                >
-                  <span style="color: var(--accent, #ff9900)">▪</span>📷
-                  スクショは自分で貼って完成
                 </div>
               </div>
               <div
@@ -360,10 +345,11 @@
                     style="color: #58a6ff; text-decoration: underline"
                     >dockerize-nextjs.md</a
                   >
-                  に沿って、デプロイするアプリの<strong style="color: #e6edf3"
+                  に沿って、<br/>
+                  デプロイするアプリの<strong style="color: #e6edf3"
                     >4ファイル修正（standalone / Dockerfile / .dockerignore /
                     /api/health）とローカルでの動作確認</strong
-                  >まで済ませておいてください。
+                  >まで済ませてください。
                 </div>
               </div>
             </header>
@@ -902,7 +888,7 @@
                   <div
                     style="font-size: 12.5px; color: #8b98a5; line-height: 1.6"
                   >
-                    クレジットカード登録が必要。学習後は10章の手順で必ず削除する。
+                    クレジットカード登録が必要。学習後は9章の手順で必ず削除する。
                   </div>
                 </div>
                 <div
@@ -997,7 +983,7 @@
                   約$0.6/日 + Fargate 約$0.9/日 <br />
                   ≒ <strong>1日あたり$3前後</strong>。<br />
                   ※free-tierで新規登録6ヶ月以内であれば$200のクレジットで実質無料です。<br />
-                  学習が終わったら10章の手順で必ず削除してください。
+                  学習が終わったら9章の手順で必ず削除してください。
                 </div>
               </div>
 
@@ -1610,7 +1596,7 @@
                 >
                   <strong style="color: #f0807f">課金注意</strong> — NAT Gateway
                   はこの瞬間から時間課金（約$0.045/時+通信量）が始まります。<br />
-                  数日空ける場合は10章を参考に一旦削除を。
+                  数日空ける場合は9章を参考に一旦削除を。
                 </div>
               </div>
 
@@ -3031,8 +3017,39 @@
                       "
                     ><code>aws ssm put-parameter \
   --name "/handson/db/url" \
-  --value "postgresql://postgres:&lt;控えたマスターパスワード&gt;@&lt;控えたエンドポイント&gt;:5432/appdb" \
+  --value "postgresql://postgres:&lt;控えたマスターパスワード&gt;@&lt;控えたエンドポイント&gt;:5432/appdb?sslmode=no-verify" \
   --type SecureString</code></pre>
+
+                    <div
+                      style="
+                        display: flex;
+                        gap: 11px;
+                        margin: 12px 0 0;
+                        padding: 12px 15px;
+                        background: rgba(255, 153, 0, 0.05);
+                        border: 1px solid rgba(255, 153, 0, 0.18);
+                        border-radius: 10px;
+                      "
+                    >
+                      <span style="font-size: 15px; flex: 0 0 auto">💡</span>
+                      <div
+                        style="
+                          font-size: 13px;
+                          line-height: 1.7;
+                          color: #b8c4d0;
+                        "
+                      >
+                        <strong style="color: #e6edf3"
+                          >?sslmode=no-verify を忘れずに</strong
+                        >
+                        — RDSのPostgreSQLはデフォルトでSSL接続を必須にしている（<code>rds.force_ssl=1</code>）。<br />
+                        一方、アプリが使うpgドライバ（node-postgres）はデフォルトでSSLを使わないため、そのままだと接続を拒否されてPrismaが
+                        <code>P1010</code>（アクセス拒否）エラーになる。<br />
+                        <code>?sslmode=no-verify</code>
+                        を付けると「SSLで接続するが、サーバー証明書の検証は省略する」という意味になる。<br />
+                        本番では証明書検証まで行うのが正道だが、このハンズオンでは割り切って省略する。
+                      </div>
+                    </div>
 
                     <div
                       style="
@@ -3689,7 +3706,7 @@ psql "postgresql://postgres:&lt;控えたマスターパスワード&gt;@&lt;控
                           font-size: 11px;
                           word-break: break-all;
                         "
-                        >postgresql://postgres:（4章のパスワード）@（4章で控えたRDSエンドポイント）:5432/appdb</span
+                        >postgresql://postgres:（4章のパスワード）@（4章で控えたRDSエンドポイント）:5432/appdb?sslmode=no-verify</span
                       >
                     </div>
                   </div>
@@ -3785,7 +3802,7 @@ psql "postgresql://postgres:&lt;控えたマスターパスワード&gt;@&lt;控
                         font-size: 11px;
                         word-break: break-all;
                       "
-                      >postgresql://postgres:（パスワード）@（RDSエンドポイント）:5432/appdb</span
+                      >postgresql://postgres:（パスワード）@（RDSエンドポイント）:5432/appdb?sslmode=no-verify</span
                     >
                   </div>
                 </div>
@@ -6977,7 +6994,7 @@ http://<"ALBのDNS名">
                   ここが本ハンズオン最大の山場です。<br />
                   ブラウザにページが出れば、①〜④の流れ（ALB→Next.js(Route
                   Handlers)→RDS）がすべて貫通しています。<br />
-                  エラーの場合はサービスの「イベント」タブとタスクの「ログ」タブを見るのが定石（10章）。
+                  エラーの場合はサービスの「イベント」タブとタスクの「ログ」タブを見るのが定石（9章）。
                 </div>
               </div>
 
@@ -7041,13 +7058,9 @@ http://<"ALBのDNS名">
             </section>
 
             <section
-              id="ch9"
-              data-screen-label="09 Route53&HTTPS"
-              style="
-                padding: 56px 0;
-                border-bottom: 1px solid #1c2836;
-                animation: fadeUp 0.5s ease both;
-              "
+              id="ch10"
+              data-screen-label="09 片付け"
+              style="padding: 56px 0 20px; animation: fadeUp 0.5s ease both"
             >
               <div
                 style="
@@ -7078,7 +7091,7 @@ http://<"ALBのDNS名">
                   letter-spacing: -0.01em;
                 "
               >
-                Route 53 &amp; HTTPS 化
+                片付け
               </h2>
               <p
                 style="
@@ -7088,13 +7101,878 @@ http://<"ALBのDNS名">
                   margin: 0 0 24px;
                 "
               >
-                仕上げです。<br />
-                ALBの長いDNS名を<strong style="color: #e6edf3"
+                課金を止める削除手順です。
+              </p>
+
+              <h3
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 19px;
+                  font-weight: 600;
+                  margin: 30px 0 12px;
+                "
+              >
+                片付け（課金を止める順番）
+              </h3>
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 14px 0;
+                  padding: 15px 17px;
+                  background: rgba(239, 68, 68, 0.06);
+                  border: 1px solid rgba(239, 68, 68, 0.24);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">⚠️</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.7; color: #e6a7a7"
+                >
+                  <strong style="color: #f0807f">削除は依存の逆順で</strong> —
+                  使っている物が残っていると削除に失敗します。<br />
+                  上から順に消してください。
+                </div>
+              </div>
+              <ol
+                style="
+                  margin: 12px 0 20px;
+                  padding-left: 20px;
+                  font-size: 14px;
+                  line-height: 2.1;
+                  color: #c3cdd7;
+                "
+              >
+                <li>ECSサービス（タスク数を0に更新 → 削除）→ クラスター削除</li>
+                ECS > クラスター > サービス > タスクの停止
+                <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(119).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                stop all tasksですべてを停止
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(120).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                サービスの更新から必要なタスクを0にして更新削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(121).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(122).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(123).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                再読込してタスクが0個を確認
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(124).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                > サービスまで戻り、サービスを☑して削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(125).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(126).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                削除確認
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(127).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                同じページのアクション > クラスターの削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(128).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                  delete handson-cluster
+                  <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(129).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                削除確認
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(130).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                クラスターも0になっている
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(131).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <li>ALB削除 → ターゲットグループ削除</li>
+                EC2 > ロードバランサーで、ロードバランサーをチェック
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(134).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                アクション > ロードバランサーの削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(132).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                確認 > 削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(133).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                ALB削除完了
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(135).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                同じくEC2 > ターゲットグループで、ターゲットグループをチェック
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(136).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                アクション > 削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(137).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(138).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                ターゲットグループ削除完了
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(139).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <li>
+                  RDSインスタンス削除（最終スナップショット不要にチェック）
+                </li>
+                RDS > データベースを選択
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(140).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                アクション > 削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(141).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                スナップショットとバックアップのチェックをすべて外す<br/>
+                了承のチェックを入れて「delete me」で削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(142).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                5分ほどで一覧から消えたら削除完了
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(147).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <li>NAT Gateway削除</li>
+                VPC > NATゲートウェイからNATゲートウェイを選択
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(143).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                アクション > NATゲートウェイを削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(144).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(145).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                数分待って状態がDeleting→Deletedになったら削除完了
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(146).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <li>VPC削除（サブネット等も一括で消える）</li>
+                VPC > お使いのVPCからhandson-vpcを☑
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(148).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                アクション > VPCの削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(149).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                一括で削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(150).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                削除完了
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(151).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <li>ECRリポジトリ削除（イメージごと）</li>
+                ECR > プライベートレジストリ > リポジトリ > handson-appを選択
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(152).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(153).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(154).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                削除完了
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(155).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <li>パラメータストア、CloudWatchロググループを削除</li>
+                Systems Manager > パラメータストアで/handson/db/urlを☑
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(156).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(157).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(158).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                削除完了
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(159).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                CloudWatch > ログ > ログ管理からロググループで/ecs/handson-appを☑
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(161).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(160).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                アクション > ロググループの削除
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(162).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(163).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+                削除完了
+                <div
+                  style="
+                    margin: 24px 0;
+                    padding: 18px;
+                    background: #ffffff;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <img
+                    src="../../images/aws/deploy/貼り付けられた画像%20(164).png"
+                    style="width: 100%; height: auto; display: block"
+                  />
+                </div>
+              </ol>
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 18px 0;
+                  padding: 15px 17px;
+                  background: rgba(34, 197, 94, 0.06);
+                  border: 1px solid rgba(34, 197, 94, 0.22);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">✅</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #a8dab8"
+                >
+                  <strong style="color: #5fd685">最後の確認</strong> —
+                  翌日以降に Billing
+                  コンソールの「コスト詳細」を開き、課金が止まっていることを確認したら完了です。<br />
+                  おつかれさまでした。
+                </div>
+              </div>
+
+              <sc-if
+                value="{{ showChecklist }}"
+                hint-placeholder-val="{{ true }}"
+              >
+                <div
+                  style="
+                    margin: 30px 0 4px;
+                    padding: 16px 18px 10px;
+                    background: #0e1620;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 9px;
+                      margin-bottom: 6px;
+                      padding: 0 4px;
+                    "
+                  >
+                    <span style="font-size: 13px">✅</span
+                    ><span
+                      style="
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        color: #8b98a5;
+                        letter-spacing: 0.04em;
+                      "
+                      >この章のチェック</span
+                    >
+                  </div>
+                  <sc-for
+                    list="{{ checks_ch10 }}"
+                    as="item"
+                    hint-placeholder-count="3"
+                  >
+                    <div
+                      data-id="{{ item.id }}"
+                      onClick="{{ toggleItem }}"
+                      style="
+                        display: flex;
+                        gap: 12px;
+                        align-items: flex-start;
+                        cursor: pointer;
+                        padding: 9px 8px;
+                        border-radius: 8px;
+                      "
+                      style-hover="background:#131b26"
+                    >
+                      <span style="{{ item.boxStyle }}">✓</span
+                      ><span style="{{ item.txtStyle }}">{{ item.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </section>
+
+            <section
+              id="ch9"
+              data-screen-label="付録 Route53&HTTPS"
+              style="
+                padding: 56px 0;
+                border-bottom: 1px solid #1c2836;
+                animation: fadeUp 0.5s ease both;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 14px;
+                  margin-bottom: 10px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: var(--accent, #ff9900);
+                    letter-spacing: 0.08em;
+                  "
+                  >APPENDIX</span
+                >
+                <span style="flex: 1; height: 1px; background: #1c2836"></span>
+              </div>
+              <h2
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 31px;
+                  font-weight: 700;
+                  margin: 0 0 16px;
+                  letter-spacing: -0.01em;
+                "
+              >
+                付録 — Route 53 &amp; HTTPS 化
+              </h2>
+              <p
+                style="
+                  font-size: 16px;
+                  line-height: 1.8;
+                  color: #aab6c2;
+                  margin: 0 0 24px;
+                "
+              >
+                この章は<strong style="color: #e6edf3">任意の付録</strong>です。<br />
+                ハンズオンの学習目的は8章のHTTP公開までで達成しているので、やらずに終えて構いません。<br />
+                参考までにALBの長いDNS名を<strong style="color: #e6edf3"
                   >自分のドメイン</strong
                 >に置き換え、ACMの証明書で<strong style="color: #e6edf3"
                   >HTTPS</strong
                 >にします。<br />
-                ドメイン代（.comで年約$14〜）だけは実費がかかります。
+                ドメイン代（.comで年約$14〜程度）は必ず実費がかかります。<br />
               </p>
 
               <h3
@@ -7623,16 +8501,6 @@ http://<"ALBのDNS名">
                   </div>
                 </div>
               </div>
-              <div style="margin: 14px 0">
-                <x-import
-                  component-from-global-scope="image-slot"
-                  from="./image-slot.js"
-                  id="ss-ch9-https"
-                  placeholder="📷 スクショ: ブラウザで https://自分のドメイン が鍵マーク付きで表示された状態"
-                  hint-size="100%,240px"
-                  style="width: 100%; height: 240px"
-                ></x-import>
-              </div>
               <div
                 style="
                   display: flex;
@@ -7724,305 +8592,6 @@ http://<"ALBのDNS名">
               </sc-if>
             </section>
 
-            <section
-              id="ch10"
-              data-screen-label="10 運用と片付け"
-              style="padding: 56px 0 20px; animation: fadeUp 0.5s ease both"
-            >
-              <div
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: 14px;
-                  margin-bottom: 10px;
-                "
-              >
-                <span
-                  style="
-                    font-family: 'IBM Plex Mono', monospace;
-                    font-size: 12.5px;
-                    font-weight: 600;
-                    color: var(--accent, #ff9900);
-                    letter-spacing: 0.08em;
-                  "
-                  >CHAPTER 10</span
-                >
-                <span style="flex: 1; height: 1px; background: #1c2836"></span>
-              </div>
-              <h2
-                style="
-                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
-                  font-size: 31px;
-                  font-weight: 700;
-                  margin: 0 0 16px;
-                  letter-spacing: -0.01em;
-                "
-              >
-                運用の基本と片付け
-              </h2>
-              <p
-                style="
-                  font-size: 16px;
-                  line-height: 1.8;
-                  color: #aab6c2;
-                  margin: 0 0 24px;
-                "
-              >
-                「動いた後」に毎日使う3つの操作と、課金を止める削除手順です。
-              </p>
-
-              <h3
-                style="
-                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
-                  font-size: 19px;
-                  font-weight: 600;
-                  margin: 26px 0 12px;
-                "
-              >
-                日常の3操作
-              </h3>
-              <div
-                style="
-                  display: grid;
-                  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-                  gap: 12px;
-                  margin: 8px 0 20px;
-                "
-              >
-                <div
-                  style="
-                    padding: 16px;
-                    background: #111a24;
-                    border: 1px solid #1c2836;
-                    border-radius: 11px;
-                  "
-                >
-                  <div
-                    style="
-                      font-size: 13.5px;
-                      font-weight: 600;
-                      margin-bottom: 6px;
-                    "
-                  >
-                    ログを見る
-                  </div>
-                  <div
-                    style="font-size: 12.5px; color: #8b98a5; line-height: 1.65"
-                  >
-                    クラスター › サービス › タスク › 「ログ」タブ。<br />
-                    コンテナの標準出力がそのままCloudWatch
-                    Logsに流れています。<br />
-                    エラー調査はまずここ。
-                  </div>
-                </div>
-                <div
-                  style="
-                    padding: 16px;
-                    background: #111a24;
-                    border: 1px solid #1c2836;
-                    border-radius: 11px;
-                  "
-                >
-                  <div
-                    style="
-                      font-size: 13.5px;
-                      font-weight: 600;
-                      margin-bottom: 6px;
-                    "
-                  >
-                    新バージョンを出す
-                  </div>
-                  <div
-                    style="font-size: 12.5px; color: #8b98a5; line-height: 1.65"
-                  >
-                    6章の手順で
-                    <code
-                      style="
-                        font-family: 'IBM Plex Mono', monospace;
-                        background: #0a1119;
-                        padding: 1px 5px;
-                        border-radius: 5px;
-                        color: #e6b877;
-                      "
-                      >:v2</code
-                    >
-                    をpush →
-                    タスク定義の「新しいリビジョンの作成」でタグを差し替え →
-                    サービスの「更新」で新リビジョンを選択。<br />
-                    旧タスクと入れ替わるローリング更新が走ります。
-                  </div>
-                </div>
-                <div
-                  style="
-                    padding: 16px;
-                    background: #111a24;
-                    border: 1px solid #1c2836;
-                    border-radius: 11px;
-                  "
-                >
-                  <div
-                    style="
-                      font-size: 13.5px;
-                      font-weight: 600;
-                      margin-bottom: 6px;
-                    "
-                  >
-                    増やす/減らす
-                  </div>
-                  <div
-                    style="font-size: 12.5px; color: #8b98a5; line-height: 1.65"
-                  >
-                    サービスの「必要なタスク数」を変えるだけで台数が増減。<br />
-                    さらに「Auto
-                    Scaling」でCPU使用率に応じた自動増減も設定できます。
-                  </div>
-                </div>
-              </div>
-              <div style="margin: 14px 0">
-                <x-import
-                  component-from-global-scope="image-slot"
-                  from="./image-slot.js"
-                  id="ss-ch10-logs"
-                  placeholder="📷 スクショ: タスクの「ログ」タブでアプリのログが流れている状態"
-                  hint-size="100%,200px"
-                  style="width: 100%; height: 200px"
-                ></x-import>
-              </div>
-
-              <h3
-                style="
-                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
-                  font-size: 19px;
-                  font-weight: 600;
-                  margin: 30px 0 12px;
-                "
-              >
-                片付け（課金を止める順番）
-              </h3>
-              <div
-                style="
-                  display: flex;
-                  gap: 13px;
-                  margin: 14px 0;
-                  padding: 15px 17px;
-                  background: rgba(239, 68, 68, 0.06);
-                  border: 1px solid rgba(239, 68, 68, 0.24);
-                  border-radius: 11px;
-                "
-              >
-                <span style="font-size: 16px; flex: 0 0 auto">⚠️</span>
-                <div
-                  style="font-size: 13.5px; line-height: 1.7; color: #e6a7a7"
-                >
-                  <strong style="color: #f0807f">削除は依存の逆順で</strong> —
-                  使っている物が残っていると削除に失敗します。<br />
-                  上から順に消してください。
-                </div>
-              </div>
-              <ol
-                style="
-                  margin: 12px 0 20px;
-                  padding-left: 20px;
-                  font-size: 14px;
-                  line-height: 2.1;
-                  color: #c3cdd7;
-                "
-              >
-                <li>ECSサービス（タスク数を0に更新 → 削除）→ クラスター削除</li>
-                <li>ALB削除 → ターゲットグループ削除</li>
-                <li>
-                  RDSインスタンス削除（最終スナップショット不要にチェック）
-                </li>
-                <li>NAT Gateway削除 → 解放されたElastic IPも解放</li>
-                <li>VPC削除（サブネット等も一括で消える）</li>
-                <li>ECRリポジトリ削除（イメージごと）</li>
-                <li>パラメータストアの4つ、CloudWatchロググループを削除</li>
-                <li>
-                  Route
-                  53：Aレコード削除。ドメイン自体は年額課金なので更新設定を確認（自動更新オフに）
-                </li>
-              </ol>
-              <div
-                style="
-                  display: flex;
-                  gap: 13px;
-                  margin: 18px 0;
-                  padding: 15px 17px;
-                  background: rgba(34, 197, 94, 0.06);
-                  border: 1px solid rgba(34, 197, 94, 0.22);
-                  border-radius: 11px;
-                "
-              >
-                <span style="font-size: 16px; flex: 0 0 auto">✅</span>
-                <div
-                  style="font-size: 13.5px; line-height: 1.75; color: #a8dab8"
-                >
-                  <strong style="color: #5fd685">最後の確認</strong> —
-                  翌日以降に Billing
-                  コンソールの「コスト詳細」を開き、課金が止まっていることを確認したら完了です。<br />
-                  おつかれさまでした。
-                </div>
-              </div>
-
-              <sc-if
-                value="{{ showChecklist }}"
-                hint-placeholder-val="{{ true }}"
-              >
-                <div
-                  style="
-                    margin: 30px 0 4px;
-                    padding: 16px 18px 10px;
-                    background: #0e1620;
-                    border: 1px solid #1c2836;
-                    border-radius: 13px;
-                  "
-                >
-                  <div
-                    style="
-                      display: flex;
-                      align-items: center;
-                      gap: 9px;
-                      margin-bottom: 6px;
-                      padding: 0 4px;
-                    "
-                  >
-                    <span style="font-size: 13px">✅</span
-                    ><span
-                      style="
-                        font-size: 12.5px;
-                        font-weight: 600;
-                        color: #8b98a5;
-                        letter-spacing: 0.04em;
-                      "
-                      >この章のチェック</span
-                    >
-                  </div>
-                  <sc-for
-                    list="{{ checks_ch10 }}"
-                    as="item"
-                    hint-placeholder-count="3"
-                  >
-                    <div
-                      data-id="{{ item.id }}"
-                      onClick="{{ toggleItem }}"
-                      style="
-                        display: flex;
-                        gap: 12px;
-                        align-items: flex-start;
-                        cursor: pointer;
-                        padding: 9px 8px;
-                        border-radius: 8px;
-                      "
-                      style-hover="background:#131b26"
-                    >
-                      <span style="{{ item.boxStyle }}">✓</span
-                      ><span style="{{ item.txtStyle }}">{{ item.label }}</span>
-                    </div>
-                  </sc-for>
-                </div>
-              </sc-if>
-            </section>
-
             <footer
               style="
                 margin-top: 70px;
@@ -8037,7 +8606,7 @@ http://<"ALBのDNS名">
             >
               <div style="font-size: 12.5px; color: #5f6f7e; line-height: 1.6">
                 ECS on Fargate 実務ハンズオン資料 — 2026年7月版<br />NAT
-                Gateway・RDS・ALBは置いておくだけで課金されます。終わったら必ず10章の削除手順を。
+                Gateway・RDS・ALBは置いておくだけで課金されます。終わったら必ず9章の削除手順を。
               </div>
               <a
                 href="#top"
@@ -8077,8 +8646,8 @@ http://<"ALBのDNS名">
             { id: 'ch6', num: '06', title: 'ECR — イメージ置き場' },
             { id: 'ch7', num: '07', title: 'ECS — クラスターとタスク定義' },
             { id: 'ch8', num: '08', title: 'ALB & サービス起動' },
-            { id: 'ch9', num: '09', title: 'Route 53 & HTTPS 化' },
-            { id: 'ch10', num: '10', title: '運用の基本と片付け' },
+            { id: 'ch10', num: '09', title: '片付け' },
+            { id: 'ch9', num: 'EX', title: '付録: Route 53 & HTTPS 化' },
           ];
           this.checkData = {
             ch0: [
@@ -8140,8 +8709,6 @@ http://<"ALBのDNS名">
               { id: 'c10d', label: '独自ドメインのHTTPSで表示された' },
             ],
             ch10: [
-              { id: 'c11a', label: 'ログとメトリクスの見方がわかった' },
-              { id: 'c11b', label: '新バージョンのデプロイ手順を理解した' },
               { id: 'c11c', label: 'リソースを全て削除した(続けない場合)' },
             ],
           };
