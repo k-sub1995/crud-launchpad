@@ -5367,9 +5367,9 @@
                 "
               >
                 いよいよ動かします。<br />
-                ALB（玄関）を立て、<strong style="color: #e6edf3"
-                  >画面も /api/* も同じNext.jsコンテナへ転送</strong
-                >する設定を行い、ECSサービスでコンテナを常駐させます。
+                ALB（玄関）を立てて<strong style="color: #e6edf3"
+                  >Next.jsコンテナへ転送</strong
+                >する設定を行い、ECSでコンテナを常駐させます。
               </p>
 
               <h3
@@ -5382,6 +5382,187 @@
               >
                 手順 1 — ターゲットグループを作成
               </h3>
+
+              <!-- TIPS: ターゲットグループとは？ -->
+              <div
+                style="
+                  margin: 18px 0;
+                  padding: 18px;
+                  background: rgba(255, 153, 0, 0.05);
+                  border: 1px solid rgba(255, 153, 0, 0.18);
+                  border-radius: 11px;
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-bottom: 14px;
+                  "
+                >
+                  <span style="font-size: 16px">💡</span>
+                  <strong
+                    style="
+                      font-size: 14px;
+                      color: #e6edf3;
+                      letter-spacing: 0.02em;
+                    "
+                    >TIPS — ターゲットグループ is 何？ →
+                    ALBの「転送先リスト」です</strong
+                  >
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: stretch;
+                    gap: 14px;
+                  "
+                >
+                  <!-- ALB -->
+                  <div
+                    style="
+                      flex: 1 1 150px;
+                      background: #0e1620;
+                      border: 1px solid #1c2836;
+                      border-radius: 10px;
+                      padding: 14px;
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: center;
+                    "
+                  >
+                    <div
+                      style="
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: #aab6c2;
+                        margin-bottom: 10px;
+                        text-align: center;
+                      "
+                    >
+                      🚪 ALB（玄関）
+                    </div>
+                    <div
+                      style="
+                        padding: 8px 10px;
+                        background: #0a1119;
+                        border: 1px solid #24323f;
+                        border-radius: 7px;
+                        font-size: 12.5px;
+                        color: #cdd9e5;
+                        text-align: center;
+                      "
+                    >
+                      リクエストを受ける
+                    </div>
+                  </div>
+                  <!-- 矢印 -->
+                  <div
+                    style="
+                      flex: 0 0 auto;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 20px;
+                      color: var(--accent, #ff9900);
+                    "
+                  >
+                    ➡
+                  </div>
+                  <!-- ターゲットグループ -->
+                  <div
+                    style="
+                      flex: 1 1 220px;
+                      background: #0e1620;
+                      border: 1px solid rgba(255, 153, 0, 0.35);
+                      border-radius: 10px;
+                      padding: 14px;
+                    "
+                  >
+                    <div
+                      style="
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: var(--accent, #ff9900);
+                        margin-bottom: 10px;
+                        text-align: center;
+                      "
+                    >
+                      📇 ターゲットグループ（転送先リスト）
+                    </div>
+                    <div style="display: grid; gap: 4px">
+                      <div
+                        style="
+                          padding: 8px 10px;
+                          background: rgba(255, 153, 0, 0.14);
+                          border: 1px solid rgba(255, 153, 0, 0.35);
+                          border-radius: 7px;
+                          font-size: 12.5px;
+                          color: #ffc266;
+                          text-align: center;
+                        "
+                      >
+                        📦 タスク #1（:3000）✅ 健康
+                      </div>
+                      <div
+                        style="
+                          padding: 8px 10px;
+                          background: rgba(255, 153, 0, 0.14);
+                          border: 1px solid rgba(255, 153, 0, 0.35);
+                          border-radius: 7px;
+                          font-size: 12.5px;
+                          color: #ffc266;
+                          text-align: center;
+                        "
+                      >
+                        📦 タスク #2（:3000）✅ 健康
+                      </div>
+                      <div
+                        style="
+                          padding: 8px 10px;
+                          border: 1px dashed #24323f;
+                          border-radius: 7px;
+                          font-size: 12.5px;
+                          color: #6b7a89;
+                          text-align: center;
+                        "
+                      >
+                        📦 不健康なタスクは外される
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        margin-top: 10px;
+                        font-size: 12px;
+                        color: #aab6c2;
+                        text-align: center;
+                      "
+                    >
+                      ヘルスチェック（/api/health）で常に監視
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="
+                    margin-top: 14px;
+                    font-size: 13px;
+                    line-height: 1.75;
+                    color: #d8cbb5;
+                  "
+                >
+                  ALB本体は「受付」だけで、<strong style="color: #e6edf3"
+                    >どこに流すかはターゲットグループが持っています</strong
+                  >。ECSサービスと紐付けると、タスクの起動・入れ替えのたびに<strong
+                    style="color: #e6edf3"
+                    >新しいタスクのIPが自動で登録・解除される</strong
+                  >ので、IPを手で管理する必要はありません。ヘルスチェックに失敗したタスクへは転送されなくなります。
+                </div>
+              </div>
+
               <div
                 style="
                   margin: 14px 0;
@@ -5467,9 +5648,10 @@
                         color: #c3cdd7;
                       "
                     >
-                      タイプは「<strong style="color: #e6edf3"
+                      タイプ：「<strong style="color: #e6edf3"
                         >IPアドレス</strong
-                      >」(Fargateはこれ)。名前
+                      >」<br />
+                      ターゲットグループ名：
                       <code
                         style="
                           font-family: 'IBM Plex Mono', monospace;
@@ -5479,8 +5661,10 @@
                           color: #e6b877;
                         "
                         >app-tg</code
-                      >、プロトコルHTTP:3000、VPCは
-                      handson-vpc、ヘルスチェックパス
+                      ><br />
+                      プロトコルHTTP：3000<br />
+                      VPC：handson-vpc<br />
+                      ヘルスチェックパス：
                       <code
                         style="
                           font-family: 'IBM Plex Mono', monospace;
@@ -5490,7 +5674,184 @@
                           color: #e6b877;
                         "
                         >/api/health</code
-                      >。ターゲットは登録せず作成（サービスが自動登録する）。
+                      ><br />
+                      上記設定で次へ。
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(73).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(74).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(75).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(76).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    グループ名：app-tg<br />
+                    ポート：3000
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(77).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    handson-vpc
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(78).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    ヘルスチェックパス：/api/health
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(79).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    残りはデフォルトで次へ
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(80).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    デフォルトのまま次へ
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(81).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    ターゲットグループの作成
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(82).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(83).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    作成完了
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(84).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
                     </div>
                   </div>
                 </div>
@@ -5591,7 +5952,7 @@
                         color: #c3cdd7;
                       "
                     >
-                      名前
+                      名前：
                       <code
                         style="
                           font-family: 'IBM Plex Mono', monospace;
@@ -5601,10 +5962,12 @@
                           color: #e6b877;
                         "
                         >handson-alb</code
-                      >、「インターネット向け」、VPCは
-                      handson-vpc、マッピングで<strong style="color: #e6edf3"
+                      ><br />「インターネット向け」<br />
+                      VPC：handson-vpc<br />
+                      マッピング：<strong style="color: #e6edf3"
                         >パブリックサブネット2つ</strong
-                      >を選択、SGは
+                      >を選択<br />
+                      SG：
                       <code
                         style="
                           font-family: 'IBM Plex Mono', monospace;
@@ -5614,7 +5977,7 @@
                           color: #e6b877;
                         "
                         >alb-sg</code
-                      >。<br />
+                      ><br />
                       リスナー HTTP:80 の転送先に
                       <code
                         style="
@@ -5627,7 +5990,7 @@
                         >app-tg</code
                       >
                       を指定して作成。<br />
-                      画面も
+                      ※画面も
                       <code
                         style="
                           font-family: 'IBM Plex Mono', monospace;
@@ -5640,7 +6003,186 @@
                       >
                       も同じコンテナが処理するため、パスルーティングのルール追加は不要。
                     </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(85).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(86).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(87).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(88).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    ロードバランサー名：handson-alb
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(89).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    VPC：handson-vpc
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(90).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    アベイラビリティーゾーンとサブネット<br />
+                    1a, 1cともに☑<br />
+                    publicが選択されていることを確認
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(91).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
                   </div>
+                  セキュリティグループ：alb-sg<br/>
+                  デフォルトは削除
+                  <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(92).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    デフォルトアクション > ターゲットグループ：app-tg<br/>
+                    ※リスナーは HTTP:80のまま。<br/>
+                    ブラウザ→ALBは80、ALB→コンテナは3000に流す。<br />
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(93).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    設定確認してロードバランサーの作成
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(94).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(95).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    作成完了
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(96).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
                 </div>
               </div>
 
@@ -5654,6 +6196,39 @@
               >
                 手順 3 — ECSサービスを起動
               </h3>
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 14px 0;
+                  padding: 15px 17px;
+                  background: rgba(255, 153, 0, 0.05);
+                  border: 1px solid rgba(255, 153, 0, 0.18);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">💡</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #d8cbb5"
+                >
+                  <strong style="color: var(--accent, #ff9900)"
+                    >この手順でやること</strong
+                  >
+                  — 7章で作ったタスク定義（設計図）から<strong
+                    style="color: #e6edf3"
+                    >実際にコンテナを起動し、ターゲットグループ（app-tg）に繋いでALB経由でアプリを公開</strong
+                  >します。<br />
+                  起動には「サービス」を使います。単発の「タスクを実行」だと落ちたら終わりだからです。<br />
+                  サービスは常駐Webアプリ用の仕組みで、<br />
+                  <strong style="color: #e6edf3"
+                    >①指定した数のタスクを常に維持（落ちたら自動で再起動）</strong
+                  ><br />
+                  <strong style="color: #e6edf3"
+                    >②タスクのIPをターゲットグループに自動登録</strong
+                  ><br />
+                  をやってくれます。
+                </div>
+              </div>
               <div
                 style="
                   margin: 14px 0;
@@ -5789,20 +6364,233 @@
                       >
                       を選択して作成。
                     </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(52).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(97).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    handson-cluster > サービス > 作成
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(98).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    タスク定義ファミリー：handson-appを選択
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(99).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    サービス名：app-svc
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(100).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    ネットワーキング > VPC：handson-vpc
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(101).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    サブネット：プライベートサブネット2つ<br/>
+                    ※外から直接コンテナに入れないようにするため
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(102).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    セキュリティグループ名：app-sg
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(103).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    パブリックIP：オフ
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(104).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    ロードバランシング > ロードバランシングを使用
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(105).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    Application Load Balancer：既存のロードバランサーを使用 > handson-alb
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(106).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    リスナー：既存のリスナーを使用 > HTTP:80
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(107).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    ターゲットグループ：既存のターゲットグループを使用 > app-tg
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(108).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    残りはデフォルトで作成
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(109).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    作成完了
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(110).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-              <div style="margin: 14px 0">
-                <x-import
-                  component-from-global-scope="image-slot"
-                  from="./image-slot.js"
-                  id="ss-ch8-services"
-                  placeholder="📷 スクショ: クラスター画面でサービスが「アクティブ」、タスクが「実行中」の状態"
-                  hint-size="100%,240px"
-                  style="width: 100%; height: 240px"
-                ></x-import>
-              </div>
-
               <h3
                 style="
                   font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
@@ -5865,12 +6653,42 @@
                 </div>
                 <pre
                   style="margin: 0; padding: 15px 16px; overflow-x: auto"
-                ><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre"># ALB詳細画面の「DNS名」をコピーして
-curl http://handson-alb-xxxx.ap-northeast-1.elb.amazonaws.com/api/health
-# =&gt; {"status":"ok"}
+                ><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre"># ブラウザアドレスに以下を入力
+http://<"ALBのDNS名">
 
-# ブラウザで同じDNS名を開くと Next.js のページが表示される</code></pre>
+# Next.js のページが表示される</code></pre>
               </div>
+              EC2 > ロードバランサー > handson-alb > DNS名をコピー
+              <div
+                style="
+                  margin: 24px 0;
+                  padding: 18px;
+                  background: #ffffff;
+                  border: 1px solid #1c2836;
+                  border-radius: 13px;
+                "
+              >
+                <img
+                  src="../../images/aws/deploy/貼り付けられた画像%20(111).png"
+                  style="width: 100%; height: auto; display: block"
+                />
+              </div>
+              ブラウザで開く
+              <div
+                style="
+                  margin: 24px 0;
+                  padding: 18px;
+                  background: #ffffff;
+                  border: 1px solid #1c2836;
+                  border-radius: 13px;
+                "
+              >
+                <img
+                  src="../../images/aws/deploy/貼り付けられた画像%20(112).png"
+                  style="width: 100%; height: auto; display: block"
+                />
+              </div>
+
               <div
                 style="
                   display: flex;
