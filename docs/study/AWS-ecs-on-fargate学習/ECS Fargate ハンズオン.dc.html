@@ -2915,7 +2915,14 @@
                     </div>
                   </div>
                 </div>
-                <div style="display: flex; gap: 14px; padding: 16px 0 0">
+                <div
+                  style="
+                    display: flex;
+                    gap: 14px;
+                    padding: 16px 0;
+                    border-bottom: 1px solid #141e28;
+                  "
+                >
                   <div
                     style="
                       width: 26px;
@@ -3024,7 +3031,7 @@
                       "
                     ><code>aws ssm put-parameter \
   --name "/handson/db/url" \
-  --value "postgresql://appuser:&lt;控えたマスターパスワード&gt;@&lt;控えたエンドポイント&gt;:5432/appdb" \
+  --value "postgresql://postgres:&lt;控えたマスターパスワード&gt;@&lt;控えたエンドポイント&gt;:5432/appdb" \
   --type SecureString</code></pre>
 
                     <div
@@ -3100,6 +3107,267 @@
                     </div>
                   </div>
                 </div>
+                <div style="display: flex; gap: 14px; padding: 16px 0">
+                  <div
+                    style="
+                      width: 26px;
+                      height: 26px;
+                      border-radius: 7px;
+                      background: rgba(255, 153, 0, 0.14);
+                      color: var(--accent, #ff9900);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 12px;
+                      font-weight: 600;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    5
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                      "
+                    >
+                      最後に、アプリが使う<strong style="color: #e6edf3"
+                        >テーブルを作成</strong
+                      >する。<br />
+                      現状DBにテーブルがなく、アプリと連携してもCRUDがすべて失敗する。<br />
+                      DBはプライベートで外から入れないため、<strong
+                        style="color: #e6edf3"
+                        >CloudShellのVPC環境</strong
+                      >（VPC内で動くCloudShell）を作ってpsqlコマンドで接続する。
+                    </div>
+                    <div
+                      style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 6px;
+                        margin: 12px 0 7px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11.5px;
+                      "
+                    >
+                      <span
+                        style="
+                          padding: 3px 9px;
+                          background: #0a1119;
+                          border: 1px solid #24323f;
+                          border-radius: 6px;
+                          color: #cdd9e5;
+                        "
+                        >CloudShell左上の「+」</span
+                      ><span style="color: #5f6f7e">›</span
+                      ><span
+                        style="
+                          padding: 3px 9px;
+                          background: rgba(255, 153, 0, 0.14);
+                          border: 1px solid rgba(255, 153, 0, 0.3);
+                          border-radius: 6px;
+                          color: var(--accent, #ff9900);
+                        "
+                        >VPC環境を作成</span
+                      >
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(113).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                     <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(114).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                      "
+                    >
+                      Name: 任意<br/>
+                      VPC: <strong style="color: #e6edf3">handson-vpc<br/></strong>
+                      サブネット:
+                      <strong style="color: #e6edf3">プライベートサブネットどちらか1つ<br/></strong>
+                      セキュリティグループ:
+                      <strong style="color: #e6edf3">app-sg</strong><br />
+                      <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(115).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(116).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(117).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+                    上記設定で作成
+                    <div
+                      style="
+                        margin: 24px 0;
+                        padding: 18px;
+                        background: #ffffff;
+                        border: 1px solid #1c2836;
+                        border-radius: 13px;
+                      "
+                    >
+                      <img
+                        src="../../images/aws/deploy/貼り付けられた画像%20(118).png"
+                        style="width: 100%; height: auto; display: block"
+                      />
+                    </div>
+
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                        margin: 12px 0 0;
+                      "
+                    >
+                      起動したら、psqlを入れて接続する（URLは手順4で登録したものと同じ）
+                    </div>
+                    <pre
+                      style="
+                        margin: 10px 0 0 0;
+                        background: #0f172a;
+                        color: #e2e8f0;
+                        border-radius: 10px;
+                        padding: 12px 14px;
+                        font-size: 12.5px;
+                        line-height: 1.7;
+                        overflow-x: auto;
+                        font-family:
+                          'IBM Plex Mono', 'SF Mono', Menlo, Consolas, monospace;
+                      "
+                    ><code>sudo dnf install -y postgresql18
+psql "postgresql://postgres:&lt;控えたマスターパスワード&gt;@&lt;控えたエンドポイント&gt;:5432/appdb"</code></pre>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                        margin: 12px 0 0;
+                      "
+                    >
+                      接続できたら、次のSQLでテーブルを作る
+                    </div>
+                    <pre
+                      style="
+                        margin: 10px 0 0 0;
+                        background: #0f172a;
+                        color: #e2e8f0;
+                        border-radius: 10px;
+                        padding: 12px 14px;
+                        font-size: 12.5px;
+                        line-height: 1.7;
+                        overflow-x: auto;
+                        font-family:
+                          'IBM Plex Mono', 'SF Mono', Menlo, Consolas, monospace;
+                      "
+                    ><code>CREATE TABLE "Recipe" (
+  "id" SERIAL NOT NULL,
+  "name" TEXT NOT NULL,
+  "ingredients" JSONB NOT NULL,
+  "steps" TEXT[],
+  "url" TEXT,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL,
+  CONSTRAINT "Recipe_pkey" PRIMARY KEY ("id")
+);</code></pre>
+                    <div
+                      style="
+                        display: flex;
+                        gap: 11px;
+                        margin: 12px 0 0;
+                        padding: 12px 15px;
+                        background: rgba(34, 197, 94, 0.06);
+                        border: 1px solid rgba(34, 197, 94, 0.22);
+                        border-radius: 10px;
+                      "
+                    >
+                      <span style="font-size: 15px; flex: 0 0 auto">✅</span>
+                      <div
+                        style="
+                          font-size: 13px;
+                          line-height: 1.7;
+                          color: #a8dab8;
+                        "
+                      >
+                        <strong style="color: #5fd685"
+                          >実行するとこうなる</strong
+                        >
+                        — <code>CREATE TABLE</code> と表示される。<br />
+                        <code>\dt</code> で Recipe テーブルが見えれば成功。<br />
+                        <code>SELECT * FROM "Recipe";</code> で
+                        <code>(0 rows)</code>
+                        が返ることも確認しておく<br/>
+                        （ダブルクォート必須。無いと小文字の
+                        recipe を探しに行ってエラーになる）。<br />
+                        確認できたら <code>\q</code> で抜けてOK。<br />
+                        使い終わったVPC環境のCloudShellは画面右の「アクション」から削除してよい。
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div
                 style="
@@ -3117,10 +3385,11 @@
                   style="font-size: 13.5px; line-height: 1.75; color: #a8dab8"
                 >
                   <strong style="color: #5fd685">実行するとこうなる</strong> —
-                  DBが起動します。<br />
-                  現状ではパブリックアクセスなし +
-                  db-sgの制限により、どこからも接続できません。<br />
-                  7章でECSタスク(app-sg)が動き始めて、初めて接続できるようになります。
+                  DBが起動し、テーブルも準備できた状態になります。<br />
+                  パブリックアクセスなし +
+                  db-sgの制限により、インターネットからは接続できません。<br />
+                  接続できるのはapp-sgを持つリソースだけ（上のCloudShell
+                  VPC環境や、7章で動き始めるECSタスク）。
                 </div>
               </div>
 
@@ -3420,7 +3689,7 @@
                           font-size: 11px;
                           word-break: break-all;
                         "
-                        >postgresql://appuser:（4章のパスワード）@（4章で控えたRDSエンドポイント）:5432/appdb</span
+                        >postgresql://postgres:（4章のパスワード）@（4章で控えたRDSエンドポイント）:5432/appdb</span
                       >
                     </div>
                   </div>
@@ -3516,7 +3785,7 @@
                         font-size: 11px;
                         word-break: break-all;
                       "
-                      >postgresql://appuser:（パスワード）@（RDSエンドポイント）:5432/appdb</span
+                      >postgresql://postgres:（パスワード）@（RDSエンドポイント）:5432/appdb</span
                     >
                   </div>
                 </div>
