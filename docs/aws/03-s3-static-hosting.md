@@ -5,6 +5,8 @@ S3単体公開は構成が簡単ですが、S3ウェブサイトエンドポイ�
 
 目安: 90分
 
+分からない用語が出てきたら [用語集](terms-03-s3.md) を参照してください。
+
 ## 参考サイト
 
 - [【小ネタ】Amazon S3 で静的ウェブサイトホスティングを試してみた](https://dev.classmethod.jp/articles/aws-s3-web-iwazaki/)

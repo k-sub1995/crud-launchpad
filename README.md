@@ -52,6 +52,7 @@ S3の静的ウェブサイトホスティングで、最小構成の静的サイ
 
 - [座学：AWS公開前の確認事項](docs/aws/02-services.md)
 - [ハンズオン：S3単体の静的ウェブサイトホスティング手順](docs/aws/03-s3-static-hosting.md)
+- [用語集：S3単体公開](docs/aws/terms-03-s3.md)
 
 ### 4. S3 + CloudFront
 
@@ -59,6 +60,7 @@ S3を非公開にし、CloudFront経由でHTTPS配信する本番寄りの構成
 OAC、キャッシュ、HTTPS、CDNの基本を学べるため、ソリューションアーキテクト志望でも説明しやすい構成です。
 
 - [ハンズオン：S3 + CloudFrontの静的サイト公開手順](docs/aws/04-s3-cloudfront-hosting.md)
+- [用語集：S3 + CloudFront公開](docs/aws/terms-04-cloudfront.md)
 
 ## Appendix1: 参考サービス
 

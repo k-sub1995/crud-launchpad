@@ -5,6 +5,8 @@ S3単体公開から、S3を非公開にしてCloudFront経由で配信する構
 
 目安: 90分
 
+分からない用語が出てきたら [用語集](terms-04-cloudfront.md) を参照してください。
+
 ## 参考サイト
 
 - [S3 の静的ウェブサイトホスティングに CloudFront を追加する](https://dev.classmethod.jp/articles/cloudfront-s3web/)
