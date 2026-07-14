@@ -275,3 +275,5 @@ IAMやCloudFrontなど一部のサービスはリージョンに属さず、画�
 - [AWSアカウント作成手順](00-account-signup.md)
 - [AWSアカウント初期設定手順](01-account-initial-setup.md)
 - [AWS公開手順の入口](README.md)
+- [用語集: S3単体の静的サイト公開](terms-03-s3.md)
+- [用語集: S3 + CloudFront公開](terms-04-cloudfront.md)
