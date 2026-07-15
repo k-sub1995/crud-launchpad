@@ -26,7 +26,8 @@ Actionsが無効化されている場合、workflowファイルをpushしても�
 
 - `Actions permissions` でActionsの実行が許可されていること
 - 利用できるActionが制限されている場合、このworkflowで使うGitHub公式Actionが許可されていること
-- `Workflow permissions` で `GITHUB_TOKEN` の権限設定を確認すること
+- `Workflow permissions` で `GITHUB_TOKEN` の権限設定を確認すること  
+  （`GITHUB_TOKEN` はworkflow実行のたびにGitHubが自動発行する一時的な認証情報です。自分でパスワードを用意する必要はありません。次の`permissions`の書き方で、この一時トークンに何を許可するかを指定します。）
 
 このworkflowで使うActionはすべてGitHub公式のActionです。
 

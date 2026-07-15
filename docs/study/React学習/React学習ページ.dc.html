@@ -335,7 +335,7 @@ document.<span style="color:#fcd34d">getElementById</span>("likeButton")
       <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#ff6b6b">05</span>
       <h2 style="font-size:26px;margin:0">フォーム — 値を「取りに行く」から「常に持っている」へ</h2>
     </div>
-    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">レシピ登録フォームの例です。今の <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">form-utils.js</span> は、ボタンが押された瞬間に <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">.value</span> をDOMへ取りに行きます。Reactの<strong>制御コンポーネント</strong>では入力値が常にstateにあるので、入力しながらのバリデーションや連動表示がタダで手に入ります。両方に文字を入れてみてください。</p>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">レシピ登録フォームの例です。今の <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">form-utils.js</span> は、ボタンが押された瞬間に <span style="font-family:ui-monospace,Menlo,monospace;font-size:0.9em;background:#eef2f7;padding:1px 6px;border-radius:4px">.value</span> をDOMへ取りに行きます。Reactの<strong>制御コンポーネント</strong>（入力欄のvalueをstateで管理する書き方。「コンポーネント」自体は07章で詳しく扱います）では入力値が常にstateにあるので、入力しながらのバリデーションや連動表示がタダで手に入ります。両方に文字を入れてみてください。</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
       <div>
         <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">JavaScript — 今のコード（form-utils.js）</div>
