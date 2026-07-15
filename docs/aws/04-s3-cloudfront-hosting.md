@@ -51,10 +51,7 @@ S3単体公開では、S3ウェブサイトエンドポイントを使い、S3�
    ![alt text](image-37.png)
 5. Specify originのBrowse S3から03で公開したS3バケットを選択します。
    ![alt text](image-38.png)
-   ※バケットを選択すると `Origin access control settings` という項目が表示されます。  
-   これは「CloudFrontだけがこの非公開S3バケットを読めるようにする鍵」を設定する項目です（この鍵がOAC = Origin Access Control）。
-   - 作成すると画面上部に「バケットポリシーの更新が必要です」という警告と、コピー用のポリシー文が表示されます。
-     警告が出てもそのまま進めます。
+   ※バケットを選択すると、S3バケットの設定に関する警告が表示されますが、そのまま進めます。
 6. Enable securityはそのまま次へ。
    ![alt text](image-39.png)
    ※WAFによるセキュリティ保護が有効になります。
