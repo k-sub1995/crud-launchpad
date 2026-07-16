@@ -193,15 +193,15 @@ body { margin: 0; background: #f7fafc; }
         <button onClick="{{ toggleQuizIam2 }}" style="min-height:34px;background:#7c3aed;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
       </sc-if>
       <sc-if value="{{ quizIam2Revealed }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. グループは、恒常的に所属する人間ユーザーの集まりに同じ権限セットを一括で与える仕組みです（例: 開発チーム全員に同じポリシーを付与）。<br>ロールは特定の作業や期間だけ一時的に引き受ける権限で、人間だけでなくEC2やLambdaなどのAWSサービスにも付けられる点がグループと決定的に異なります。<br><b>💼 現場では:</b> 「人間への恒常的な権限はグループ（またはIAM Identity Center）、EC2やLambdaなどのサービスにはロール」が定石です。</div>
+        <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. グループは、恒常的に所属する人間ユーザーの集まりに同じ権限セットを一括で与える仕組みです（例: 開発チーム全員に同じポリシーを付与）。<br>ロールは特定の作業や期間だけ一時的に引き受ける権限です<br/>人間だけでなくEC2やLambdaなどのAWSサービスにも付けられる点がグループと決定的に異なります。<br><b>💼 現場では:</b> 「人間への恒常的な権限はグループ（またはIAM Identity Center）、EC2やLambdaなどのサービスにはロール」が定石です。</div>
       </sc-if>
 
-      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. 今回のハンズオンでは作業用IAMユーザーにAdministratorAccessを付与しました。これを実務でそのまま使い続けると、具体的にどんな問題がありますか？</p>
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. 今回のハンズオンでは作業用IAMユーザーにAdministratorAccessを付与しました。実務で使い続けると具体的にどんな問題がありますか？</p>
       <sc-if value="{{ !quizIam3Revealed }}" hint-placeholder-val="{{ true }}">
         <button onClick="{{ toggleQuizIam3 }}" style="min-height:34px;background:#7c3aed;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
       </sc-if>
       <sc-if value="{{ quizIam3Revealed }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 最小権限の原則に反し、そのユーザーの認証情報が漏洩したり誤操作をした場合の被害範囲が、特定のサービスに留まらずアカウント全体（他のリソースの削除・課金設定の変更など）に及びます。<br>実務では、担当する業務に必要な操作だけを許可する個別ポリシーを作成し、IAMユーザーやロールにアタッチするのが基本です。</div>
+        <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 最小権限の原則に反します<br/>ユーザーの認証情報が漏洩したり誤操作をした場合の被害範囲がアカウント全体（他のリソースの削除・課金設定の変更など）に及びます。<br>個人では動作を優先してAdministratorAccessを付与することがよくあります。<br/><b>💼 現場では:</b> 担当する業務に必要な操作だけを許可する個別ポリシーを作成し、IAMユーザーやロールにアタッチするのが基本です。</div>
       </sc-if>
     </div>
 
