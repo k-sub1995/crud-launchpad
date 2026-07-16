@@ -249,3 +249,7 @@ document.getElementById('go-fargate-study').addEventListener('click', () => {
   location.href =
     './docs/study/AWS-ecs-on-fargate学習/ECS Fargate ハンズオン.dc.html';
 });
+
+document.getElementById('go-aws-support-study').addEventListener('click', () => {
+  location.href = './docs/study/AWS学習サポート/AWS学習サポート.dc.html';
+});

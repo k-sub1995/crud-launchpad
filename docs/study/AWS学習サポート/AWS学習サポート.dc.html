@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+html { scroll-behavior: smooth; }
+body { margin: 0; background: #f7fafc; }
+</style>
+</helmet>
+
+<div style="font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#0f172a;padding:48px 24px 80px 24px;line-height:1.7">
+<div style="max-width:1080px;margin:0 auto">
+
+  <!-- ============ HERO ============ -->
+  <header data-screen-label="00 導入" style="margin-bottom:56px">
+    <a href="../../../index.html" style="display:inline-flex;align-items:center;gap:6px;color:#6b7280;text-decoration:none;font-size:13px;font-weight:600;margin-bottom:14px">← ホームに戻る</a>
+    <div style="display:inline-flex;align-items:center;gap:8px;background:#232f3e;color:#ff9900;padding:6px 16px;border-radius:999px;font-weight:700;font-size:13px;letter-spacing:0.04em">AWSハンズオン 理解サポート</div>
+    <h1 style="font-size:34px;margin:18px 0 10px 0;line-height:1.3">01〜04ハンズオンの理解を振り返る</h1>
+    <p style="color:#6b7280;font-size:16px;margin:0;max-width:720px">コンソール操作・IAM・S3・CloudFrontのハンズオンで「手を動かしたこと」を、もう一度言葉で説明できるか確認するためのページです。<br>各章にQ&amp;A、クイズ（ボタンを押すと回答が出ます）、チェックリストを置いています。</p>
+
+    <!-- TOC -->
+    <nav style="margin-top:24px;display:flex;flex-wrap:wrap;gap:8px">
+      <a href="#ch0" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">00 コンソール基本操作</a>
+      <a href="#ch1" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">01 IAM（登録系）</a>
+      <a href="#ch2" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">02 S3 / CloudFront</a>
+      <a href="#appendix" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">Appendix SAA書籍</a>
+    </nav>
+  </header>
+
+  <!-- ============ CH0 コンソール基本操作 ============ -->
+  <section id="ch0" data-screen-label="00 コンソール基本操作" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#64748b">00</span>
+      <h2 style="font-size:26px;margin:0">🧭 コンソール基本操作</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 20px 0">個別のサービスを触る前に、マネジメントコンソール自体の読み方・移動の仕方を確認します。<br>「どこに何があるか」が分かると、以降の章で迷いにくくなります。</p>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;display:flex;gap:14px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#64748b;flex-shrink:0">1</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">トップ画面の構成を確認する</div>
+          <div style="color:#6b7280;font-size:13px">サインイン直後のトップ画面には、次の要素があります。<br>ハンバーガーメニュー（左上・全サービス一覧）<br>サービス検索バー（上部中央）<br>リージョン選択（上部右寄り）<br>アカウント名・通知・設定（右上）</div>
+          <img src="../../images/aws/supports/marked/1_トップ全体_marked.png" alt="トップ画面: ハンバーガーメニュー・検索バー・リージョン選択・通知/設定・アカウント名を赤枠で強調" style="max-width:100%;margin-top:10px;border-radius:8px;border:1px solid #e5e7eb" />
+        </div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;display:flex;gap:14px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#64748b;flex-shrink:0">2</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">サービスを検索して開く</div>
+          <div style="color:#6b7280;font-size:13px">検索バーにサービス名（例: S3、EC2）を入力すると候補が一覧表示されます。<br>サービス名だけでなく、機能名の一部でも候補に出ることがあります。</div>
+          <img src="../../images/aws/supports/marked/2_検索バー_marked.png" alt="検索バーに「EC2」と入力した状態: サジェスト部分を赤枠で強調" style="max-width:100%;margin-top:10px;border-radius:8px;border:1px solid #e5e7eb" />
+        </div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;display:flex;gap:14px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#64748b;flex-shrink:0">3</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">サービス画面の共通構造を確認する</div>
+          <div style="color:#6b7280;font-size:13px">多くのサービス画面は、次の共通構造になっています。<br>パンくずリスト（上部・今どのサービス/画面にいるか）<br>左サイドバー（そのサービス内の関連機能一覧）<br>メインコンテンツ（中央・実際の操作部分）</div>
+          <img src="../../images/aws/supports/marked/3_サービス_marked.png" alt="EC2ダッシュボード: パンくずリスト・左サイドバー・メインコンテンツを赤枠で強調" style="max-width:100%;margin-top:10px;border-radius:8px;border:1px solid #e5e7eb" />
+        </div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;display:flex;gap:14px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#64748b;flex-shrink:0">4</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">サイドバーから関連サービスへ移動する</div>
+          <div style="color:#6b7280;font-size:13px">左サイドバーには、そのサービスと関連が深い別サービスへの入り口が含まれていることがあります。<br>例: EC2の左サイドバーからロードバランサー画面を直接開ける。</div>
+          <img src="../../images/aws/supports/marked/4_サイドバー_marked.png" alt="EC2の左サイドバーから「ロードバランサー」を開いた状態: 遷移リンクを赤枠で強調" style="max-width:100%;margin-top:10px;border-radius:8px;border:1px solid #e5e7eb" />
+        </div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;display:flex;gap:14px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#64748b;flex-shrink:0">5</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">お気に入り登録でショートカットを作る</div>
+          <div style="color:#6b7280;font-size:13px">よく使うサービスは検索結果の星マークからお気に入り登録できます。<br>登録すると画面上部に常時表示されるようになります。</div>
+          <img src="../../images/aws/supports/marked/5_star1_marked.png" alt="検索結果の星マーク: お気に入り登録ボタンを赤枠で強調" style="max-width:100%;margin-top:10px;border-radius:8px;border:1px solid #e5e7eb" />
+          <img src="../../images/aws/supports/marked/5_start2_marked.png" alt="お気に入り登録後: 画面上部に常時表示されるアイコンを赤枠で強調" style="max-width:100%;margin-top:10px;border-radius:8px;border:1px solid #e5e7eb" />
+        </div>
+      </div>
+    </div>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. あるサービスの画面から、関連する別サービスの画面へ移動する方法は、大きく分けて2つあります。それぞれ何ですか？</p>
+      <sc-if value="{{ !quizConsoleRevealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizConsole }}" style="min-height:34px;background:#64748b;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizConsoleRevealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 1つはサービス検索バーで目的のサービス名を直接検索する方法。<br>もう1つは、今開いているサービスの左サイドバーから関連サービスへ移動する方法です（例: EC2のサイドバーからロードバランサーを開く）。<br>前者は「行き先が分かっている」場合、後者は「今のサービスと関連が深い機能を探す」場合に向いています。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. 「探している機能がサービス検索バーで見つからない」ときに確認すべきことを2つ挙げてください。</p>
+      <sc-if value="{{ !quizConsole2Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizConsole2 }}" style="min-height:34px;background:#64748b;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizConsole2Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 1つは、今いるサービスの左サイドバー内に、探している機能がサブメニューとして隠れていないか。<br>もう1つは、リージョンが正しいか（AWSにはリージョンごとに独立したリソースが多く、別リージョンで作ったものは別リージョンでは見えません）。</div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">迷ったときのチェックリスト（{{ consoleCheckedCount }} / {{ consoleCheckTotal }}）</div>
+      <sc-for list="{{ consoleChecklist }}" as="item" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #64748b;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CH1 IAM ============ -->
+  <section id="ch1" data-screen-label="01 IAM（登録系）" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#7c3aed">01</span>
+      <h2 style="font-size:26px;margin:0">🔐 IAM — 登録系の基本</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">「誰が」「何をできるか」を管理する仕組みです。<br>ユーザー・グループ・ロール・ポリシーの4つの言葉を混同しないことが最初のハードルです。</p>
+
+    <!-- 学習補助: 比較 -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#f1e9fe;color:#7c3aed;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">IAMユーザー</div>
+        <div style="color:#4b5563;font-size:13.5px">人（またはアプリ）1人分の認証情報。<br>ログインして操作する主体そのもの。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#f1e9fe;color:#7c3aed;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">IAMグループ</div>
+        <div style="color:#4b5563;font-size:13.5px">複数のユーザーをまとめる箱。<br>グループにポリシーを付けると、所属ユーザー全員に効く。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#f1e9fe;color:#7c3aed;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">IAMロール</div>
+        <div style="color:#4b5563;font-size:13.5px">「一時的に借りる」権限の入れ物。<br>人にもAWSサービス（例: EC2）にも付けられる。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#f1e9fe;color:#7c3aed;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">ポリシー</div>
+        <div style="color:#4b5563;font-size:13.5px">「何ができるか」を定義したルール文書。<br>ユーザー/グループ/ロールにアタッチして使う。</div>
+      </div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#faf5ff;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#7c3aed;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#7c3aed;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#4c1d95;margin-bottom:4px">本来の正しい権限付与の考え方</div>
+        <div style="color:#4b5563">最小権限の原則（必要な操作だけを許可する個別ポリシーを作る）が基本です。<br>今回のハンズオンでは学習を優先し、簡略化のためAdministratorAccess（管理者権限）を付与しています。<br>本番運用ではこのまま使い続けないよう注意してください。</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;background:#faf5ff;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#7c3aed;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#7c3aed;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#4c1d95;margin-bottom:4px">rootユーザーを使ってはいけない理由</div>
+        <div style="color:#4b5563">権限を制限できず、誤操作や漏洩時の被害がアカウント全体に及ぶためです。<br>日常操作はIAMユーザー（またはロール）で行い、rootは初期設定など限られた場面だけに使います。</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. ポリシーとは何ですか？IAMロールとの違いを説明してください。</p>
+      <sc-if value="{{ !quizIam1Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizIam1 }}" style="min-height:34px;background:#7c3aed;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizIam1Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. ポリシーは「何ができるか」を定義したルール文書（JSON形式の権限定義）そのもので、それ単体では動きません。<br>誰か・何かにアタッチして初めて効力を持ちます。<br>一方IAMロールは、人やAWSサービス（EC2など）が一時的に「借りる」権限の入れ物という主体側の存在です。<br>ロールにポリシーをアタッチすることで、初めてそのロールを引き受けた側が実際に操作できるようになります。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. IAMグループとIAMロールは、どちらも「複数の対象にまとめて権限を与える」ように見えますが、使い分けの基準は何ですか？</p>
+      <sc-if value="{{ !quizIam2Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizIam2 }}" style="min-height:34px;background:#7c3aed;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizIam2Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. グループは、恒常的に所属する人間ユーザーの集まりに同じ権限セットを一括で与える仕組みです（例: 開発チーム全員に同じポリシーを付与）。<br>ロールは特定の作業や期間だけ一時的に引き受ける権限で、人間だけでなくEC2やLambdaなどのAWSサービスにも付けられる点がグループと決定的に異なります。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. 今回のハンズオンでは作業用IAMユーザーにAdministratorAccessを付与しました。これを実務でそのまま使い続けると、具体的にどんな問題がありますか？</p>
+      <sc-if value="{{ !quizIam3Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizIam3 }}" style="min-height:34px;background:#7c3aed;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizIam3Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 最小権限の原則に反し、そのユーザーの認証情報が漏洩したり誤操作をした場合の被害範囲が、特定のサービスに留まらずアカウント全体（他のリソースの削除・課金設定の変更など）に及びます。<br>実務では、担当する業務に必要な操作だけを許可する個別ポリシーを作成し、IAMユーザーやロールにアタッチするのが基本です。</div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ iamCheckedCount }} / {{ iamCheckTotal }}）</div>
+      <sc-for list="{{ iamChecklist }}" as="item" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #7c3aed;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CH2 S3 / CloudFront ============ -->
+  <section id="ch2" data-screen-label="02 S3 / CloudFront" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#c2660a">02</span>
+      <h2 style="font-size:26px;margin:0">☁️ S3 / CloudFront — 静的デプロイ</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">S3は「ファイルを置く場所」、CloudFrontは「ユーザーの一番近くでリクエストを受けるキャッシュ層」です。<br>この2つの役割分担を押さえます。</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">03: S3単体公開</div>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
+          S3の「静的ウェブサイトホスティング」を有効化し、バケットを公開読み取り可能にする。<br>HTTPのみ。<br>S3ウェブサイトエンドポイントに直接アクセスされる。
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">04: CloudFront経由公開</div>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
+          S3は非公開のままOAC経由でCloudFrontだけがアクセスできるようにする。<br>ユーザーはCloudFrontのURL（HTTPS）にアクセスし、キャッシュ・WAF等の恩恵を受ける。
+        </div>
+      </div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#fff7ed;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#c2660a;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#c2660a;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#92580a;margin-bottom:4px">S3のユースケースは静的サイトだけではない</div>
+        <div style="color:#4b5563">S3は汎用のオブジェクトストレージで、バックアップ、ログ保管、データレイク、他サービスとの連携先など幅広く使われます。<br>静的サイトホスティングはその中の代表的な使い方の一つです。</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;background:#fff7ed;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#c2660a;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#c2660a;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#92580a;margin-bottom:4px">CloudFrontはユーザーから見てどこに関わるか</div>
+        <div style="color:#4b5563">ユーザーが最初にアクセスする窓口として関わります。<br>ユーザーのリクエストはまずCloudFrontに届き、キャッシュがあればそこで即座に返し、なければS3（オリジン）まで取りに行きます。</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. 「S3バケットを作って、フォルダを作って、ファイルを入れて」でサイトは公開されますか？</p>
+      <sc-if value="{{ !quizS3BucketRevealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizS3Bucket }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizS3BucketRevealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. まだ公開されません。<br>デフォルトではブロックパブリックアクセスが有効なので、バケット作成・アップロードだけでは非公開のままです。<br>静的ウェブサイトホスティングの有効化と、公開読み取りを許可するバケットポリシーの設定が別途必要です。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. どんなケースでCloudFrontを使いますか？</p>
+      <sc-if value="{{ !quizCfCaseRevealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizCfCase }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizCfCaseRevealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 独自ドメイン＋HTTPSで配信したい／世界中からのアクセスをキャッシュで速くしたい／S3を非公開のまま配信したい（OAC）、が代表的なケースです。<br>「社内の1人だけにファイルを渡したい」のような単発の共有にはCloudFrontは不要です。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. OAC（Origin Access Control）は何のためのものですか？S3を非公開のままにする理由と合わせて説明してください。</p>
+      <sc-if value="{{ !quizOacRevealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizOac }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizOacRevealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. OACは、CloudFrontがS3オリジンへアクセスする際に使う認証の仕組みです。<br>S3バケット自体は非公開のままにし、バケットポリシーで「このCloudFrontディストリビューションからのアクセスだけ許可する」という設定を行います。<br>これにより、S3のウェブサイトエンドポイントへ直接アクセスされる経路をふさぎ、必ずCloudFront（HTTPS化・キャッシュ・WAF等の保護）を経由させることができます。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q4. CloudFront経由の静的サイト構成図を思い浮かべられますか？</p>
+      <sc-if value="{{ !quizArchRevealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizArch }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">答え合わせする</button>
+      </sc-if>
+      <sc-if value="{{ quizArchRevealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">
+          <img src="../../aws/s3-cloudfront-architecture.svg" alt="S3 + CloudFront構成図" style="max-width:100%;background:#ffffff;border-radius:6px;padding:8px" />
+          <div style="margin-top:8px">ユーザー → CloudFront（OAC） → 非公開S3バケット、という矢印が描ければOKです。</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ s3CheckedCount }} / {{ s3CheckTotal }}）</div>
+      <sc-for list="{{ s3Checklist }}" as="item" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #c2660a;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ Appendix ============ -->
+  <section id="appendix" data-screen-label="Appendix SAA書籍" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#64748b">Appendix</span>
+      <h2 style="font-size:26px;margin:0">SAA書籍で深掘りする</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 20px 0">ここまでのハンズオンで登場したサービスについて、より深く理解したい場合はAWS SAA（ソリューションアーキテクト − アソシエイト）の書籍で該当箇所を読んでみてください。</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">IAM</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">S3</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">CloudFront</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">WAF</span>
+    </div>
+  </section>
+
+</div>
+</div>
+
+<script type="text/x-dc" data-dc-script data-props="{&quot;showQa&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;表示&quot;,&quot;description&quot;:&quot;各章のQ&amp;Aコラムを表示&quot;}}">
+class Component extends DCLogic {
+  state = {
+    quizRevealed: {},
+    consoleChecked: {},
+    iamChecked: {},
+    s3Checked: {}
+  };
+
+  CONSOLE_CHECKLIST_DEFS = [
+    { id: "breadcrumb", label: "今どのサービスの画面にいるか（パンくずリストを確認する）" },
+    { id: "sidebar", label: "探している機能は、今いるサービスの左サイドバー内にあるか、それとも別サービスか" },
+    { id: "region", label: "リージョンは正しいか（サービスによってはリージョンをまたいで見えないリソースがある）" }
+  ];
+  IAM_CHECKLIST_DEFS = [
+    { id: "role", label: "IAMユーザー・グループ・ロール・ポリシーの役割をそれぞれ一言で説明できる" },
+    { id: "least", label: "最小権限の原則を説明できる" },
+    { id: "root", label: "rootユーザーを使わない理由を2つ以上言える" },
+    { id: "shouldbe", label: "今回のハンズオンで「本来ならどうすべきだったか」を言える" }
+  ];
+  S3_CHECKLIST_DEFS = [
+    { id: "usecase", label: "S3のユースケースを静的サイト以外に1つ以上言える" },
+    { id: "diff", label: "S3単体公開とCloudFront経由公開の違いを説明できる" },
+    { id: "oac", label: "OACの役割を説明できる" },
+    { id: "diagram", label: "構成図を見ずに大まかな矢印（ユーザー→CloudFront→S3）を描ける" }
+  ];
+
+  toggleQuiz = (id) => this.setState(s => ({ quizRevealed: { ...s.quizRevealed, [id]: !s.quizRevealed[id] } }));
+  toggleQuizConsole = () => this.toggleQuiz("console");
+  toggleQuizConsole2 = () => this.toggleQuiz("console2");
+  toggleQuizIam1 = () => this.toggleQuiz("iam1");
+  toggleQuizIam2 = () => this.toggleQuiz("iam2");
+  toggleQuizIam3 = () => this.toggleQuiz("iam3");
+  toggleQuizS3Bucket = () => this.toggleQuiz("s3bucket");
+  toggleQuizCfCase = () => this.toggleQuiz("cfcase");
+  toggleQuizOac = () => this.toggleQuiz("oac");
+  toggleQuizArch = () => this.toggleQuiz("arch");
+
+  toggleConsoleCheck = (id) => this.setState(s => ({ consoleChecked: { ...s.consoleChecked, [id]: !s.consoleChecked[id] } }));
+  toggleIamCheck = (id) => this.setState(s => ({ iamChecked: { ...s.iamChecked, [id]: !s.iamChecked[id] } }));
+  toggleS3Check = (id) => this.setState(s => ({ s3Checked: { ...s.s3Checked, [id]: !s.s3Checked[id] } }));
+
+  renderVals() {
+    const s = this.state;
+    const buildItems = (defs, checkedMap, toggleFn) => defs.map(def => {
+      const checked = !!checkedMap[def.id];
+      return {
+        label: def.label,
+        mark: checked ? "✓" : "",
+        bg: checked ? "#7c3aed" : "transparent",
+        toggle: () => toggleFn(def.id)
+      };
+    });
+    const consoleItems = buildItems(this.CONSOLE_CHECKLIST_DEFS, s.consoleChecked, this.toggleConsoleCheck).map(it => ({
+      ...it,
+      bg: it.mark ? "#64748b" : "transparent"
+    }));
+    const iamItems = buildItems(this.IAM_CHECKLIST_DEFS, s.iamChecked, this.toggleIamCheck);
+    const s3Items = buildItems(this.S3_CHECKLIST_DEFS, s.s3Checked, this.toggleS3Check).map(it => ({
+      ...it,
+      bg: it.mark ? "#c2660a" : "transparent"
+    }));
+
+    return {
+      qaOn: this.props.showQa ?? true,
+
+      quizConsoleRevealed: !!s.quizRevealed.console,
+      toggleQuizConsole: this.toggleQuizConsole,
+      quizConsole2Revealed: !!s.quizRevealed.console2,
+      toggleQuizConsole2: this.toggleQuizConsole2,
+
+      quizIam1Revealed: !!s.quizRevealed.iam1,
+      toggleQuizIam1: this.toggleQuizIam1,
+      quizIam2Revealed: !!s.quizRevealed.iam2,
+      toggleQuizIam2: this.toggleQuizIam2,
+      quizIam3Revealed: !!s.quizRevealed.iam3,
+      toggleQuizIam3: this.toggleQuizIam3,
+
+      quizS3BucketRevealed: !!s.quizRevealed.s3bucket,
+      toggleQuizS3Bucket: this.toggleQuizS3Bucket,
+      quizCfCaseRevealed: !!s.quizRevealed.cfcase,
+      toggleQuizCfCase: this.toggleQuizCfCase,
+      quizOacRevealed: !!s.quizRevealed.oac,
+      toggleQuizOac: this.toggleQuizOac,
+      quizArchRevealed: !!s.quizRevealed.arch,
+      toggleQuizArch: this.toggleQuizArch,
+
+      consoleChecklist: consoleItems,
+      consoleCheckedCount: consoleItems.filter(it => it.mark).length,
+      consoleCheckTotal: consoleItems.length,
+
+      iamChecklist: iamItems,
+      iamCheckedCount: iamItems.filter(it => it.mark).length,
+      iamCheckTotal: iamItems.length,
+
+      s3Checklist: s3Items,
+      s3CheckedCount: s3Items.filter(it => it.mark).length,
+      s3CheckTotal: s3Items.length
+    };
+  }
+}
+</script>
+</body>
+</html>
