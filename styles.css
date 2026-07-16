@@ -384,7 +384,13 @@ button:focus-visible {
 
 .study-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: center;
   margin-top: 16px;
+}
+
+.study-actions .button,
+.study-actions-label {
+  white-space: nowrap;
 }
