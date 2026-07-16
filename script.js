@@ -20,9 +20,16 @@ const FIXED_MESSAGE_SETS = {
     'それ以来、浜辺ではカニとペンギンが並んで歩く姿がよく見られるらしい',
     'Pruduced by Claude Sonnet 5...',
   ],
+  kaniPenNews2026: [
+    '京都水族館では、ペンギン50羽の恋の相関図が今年も更新されたらしい',
+    'すみだ水族館には、赤ちゃんペンギン「じんべえ」が春に仲間入りした',
+    '一方カニ界では、敦賀に日本初のテーマパーク「かにファクトリー」が誕生した',
+    '主役の座をめぐって、今日もカニとペンギンは火花を散らしている',
+    'Produced by Claude Fable 5...',
+  ],
 };
 
-const ACTIVE_FIXED_MESSAGE_SET = 'kaniPenStory';
+const ACTIVE_FIXED_MESSAGE_SET = 'kaniPenNews2026';
 
 const form = document.querySelector('#entry-form');
 const entryIdInput = document.querySelector('#entry-id');
@@ -250,6 +257,8 @@ document.getElementById('go-fargate-study').addEventListener('click', () => {
     './docs/study/AWS-ecs-on-fargate学習/ECS Fargate ハンズオン.dc.html';
 });
 
-document.getElementById('go-aws-support-study').addEventListener('click', () => {
-  location.href = './docs/study/AWS学習サポート/AWS学習サポート.dc.html';
-});
+document
+  .getElementById('go-aws-support-study')
+  .addEventListener('click', () => {
+    location.href = './docs/study/AWS学習サポート/AWS学習サポート.dc.html';
+  });

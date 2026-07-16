@@ -105,15 +105,15 @@ body { margin: 0; background: #f7fafc; }
         <button onClick="{{ toggleQuizConsole }}" style="min-height:34px;background:#64748b;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
       </sc-if>
       <sc-if value="{{ quizConsoleRevealed }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 1つはサービス検索バーで目的のサービス名を直接検索する方法。<br>もう1つは、今開いているサービスの左サイドバーから関連サービスへ移動する方法です（例: EC2のサイドバーからロードバランサーを開く）。<br>前者は「行き先が分かっている」場合、<br/>後者は「今のサービスと関連が深い機能を探す」場合に向いています。</div>
+        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 1つはサービス検索バーで目的のサービス名を直接検索する方法。<br>もう1つは、今開いているサービスの左サイドバーから関連サービスへ移動する方法です（例: EC2のサイドバーからロードバランサーを開く）。<br>前者は「行き先が分かっている」場合、<br/>後者は「今のサービスと関連が深い機能を探す」場合に向いています。<br><b>💼 現場では:</b> 検索バー＋お気に入りが主です。日常業務で触るサービスは数個に固まるためです。サイドバー遷移はEC2とロードバランサーのように同じ画面系列を行き来する作業で使います。</div>
       </sc-if>
 
-      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. 「探している機能がサービス検索バーで見つからない」ときに確認すべきことを2つ挙げてください。</p>
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. 「探している機能が見つからない」「作ったはずのリソースが見えない」——それぞれの場合、何を確認しますか？</p>
       <sc-if value="{{ !quizConsole2Revealed }}" hint-placeholder-val="{{ true }}">
         <button onClick="{{ toggleQuizConsole2 }}" style="min-height:34px;background:#64748b;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
       </sc-if>
       <sc-if value="{{ quizConsole2Revealed }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 1つは、今いるサービスの左サイドバー内に、探している機能がサブメニューとして隠れていないか。<br>もう1つは、リージョンが正しいか（AWSにはリージョンごとに独立したリソースが多く、別リージョンで作ったものは別リージョンでは見えません）。</div>
+        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 機能が見つからない場合は、今いるサービスの左サイドバー内にサブメニューとして隠れていないかを確認します。<br>作ったはずのリソースが見えない場合は、リージョンが正しいかを確認します（多くのリソースはリージョンごとに独立しており、別リージョンで作ったものは表示されません）。<br><b>💼 現場では:</b> 「リソースが消えた」の原因は大半がリージョン違いです。定番のハマりどころなので、迷子になったらまずリージョンを疑ってください。</div>
       </sc-if>
     </div>
 
@@ -180,12 +180,12 @@ body { margin: 0; background: #f7fafc; }
     <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
       <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
 
-      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. ポリシーとは何ですか？IAMロールとの違いを説明してください。</p>
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. IAMポリシーとは何ですか？IAMロールとの違いを説明してください。</p>
       <sc-if value="{{ !quizIam1Revealed }}" hint-placeholder-val="{{ true }}">
         <button onClick="{{ toggleQuizIam1 }}" style="min-height:34px;background:#7c3aed;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
       </sc-if>
       <sc-if value="{{ quizIam1Revealed }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. ポリシーは「何ができるか」を定義したルール文書（JSON形式の権限定義）そのもので、それ単体では動きません。<br>誰か・何かにアタッチして初めて効力を持ちます。<br>一方IAMロールは、人やAWSサービス（EC2など）が一時的に「借りる」権限の入れ物という主体側の存在です。<br>ロールにポリシーをアタッチすることで、初めてそのロールを引き受けた側が実際に操作できるようになります。</div>
+        <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. ポリシーは「何ができるか」を定義したルール文書（JSON形式の権限定義）そのもので、それ単体では動きません。<br>誰か・何かにアタッチして初めて効力を持ちます。<br>一方IAMロールは、人やAWSサービス（EC2など）が一時的に「借りる」権限の入れ物という主体側の存在です。<br>ロールにポリシーをアタッチすることで、初めてそのロールを引き受けた側が実際に操作できるようになります。<br><b>💼 現場では:</b> ゼロからJSONを書くより、まずAWS管理ポリシーで足りるか確認し、足りない部分だけカスタムポリシーを作る流れが多いです。</div>
       </sc-if>
 
       <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. IAMグループとIAMロールは、どちらも「複数の対象にまとめて権限を与える」ように見えますが、使い分けの基準は何ですか？</p>
@@ -193,7 +193,7 @@ body { margin: 0; background: #f7fafc; }
         <button onClick="{{ toggleQuizIam2 }}" style="min-height:34px;background:#7c3aed;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
       </sc-if>
       <sc-if value="{{ quizIam2Revealed }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. グループは、恒常的に所属する人間ユーザーの集まりに同じ権限セットを一括で与える仕組みです（例: 開発チーム全員に同じポリシーを付与）。<br>ロールは特定の作業や期間だけ一時的に引き受ける権限で、人間だけでなくEC2やLambdaなどのAWSサービスにも付けられる点がグループと決定的に異なります。</div>
+        <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. グループは、恒常的に所属する人間ユーザーの集まりに同じ権限セットを一括で与える仕組みです（例: 開発チーム全員に同じポリシーを付与）。<br>ロールは特定の作業や期間だけ一時的に引き受ける権限で、人間だけでなくEC2やLambdaなどのAWSサービスにも付けられる点がグループと決定的に異なります。<br><b>💼 現場では:</b> 「人間への恒常的な権限はグループ（またはIAM Identity Center）、EC2やLambdaなどのサービスにはロール」が定石です。</div>
       </sc-if>
 
       <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. 今回のハンズオンでは作業用IAMユーザーにAdministratorAccessを付与しました。これを実務でそのまま使い続けると、具体的にどんな問題がありますか？</p>
@@ -229,7 +229,7 @@ body { margin: 0; background: #f7fafc; }
       <div>
         <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">03: S3単体公開</div>
         <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
-          S3の「静的ウェブサイトホスティング」を有効化し、バケットを公開読み取り可能にする。<br>HTTPのみ。<br>S3ウェブサイトエンドポイントに直接アクセスされる。
+          S3の「静的ウェブサイトホスティング」を有効化し、バケットを公開読み取り可能にする。<br>S3には証明書の設定機能などがないためHTTPのみで、S3ウェブサイトエンドポイントに直接アクセスされる。
         </div>
       </div>
       <div>
@@ -273,7 +273,7 @@ body { margin: 0; background: #f7fafc; }
         <button onClick="{{ toggleQuizS3Bucket }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
       </sc-if>
       <sc-if value="{{ quizS3BucketRevealed }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. まだ公開されません。<br>デフォルトではブロックパブリックアクセスが有効なので、バケット作成・アップロードだけでは非公開のままです。<br>静的ウェブサイトホスティングの有効化と、公開読み取りを許可するバケットポリシーの設定が別途必要です。</div>
+        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. まだ公開されません。<br>デフォルトではブロックパブリックアクセスが有効なので、バケット作成・アップロードだけでは非公開のままです。<br>静的ウェブサイトホスティングの有効化と、公開読み取りを許可するバケットポリシーの設定が別途必要です。<br><b>💼 現場では:</b> 公開設定は情報漏洩事故の定番です。ブロックパブリックアクセスは原則有効のまま運用し、公開が必要な場合もCloudFront経由にするのが基本です。</div>
       </sc-if>
 
       <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. どんなケースでCloudFrontを使いますか？</p>
@@ -281,7 +281,7 @@ body { margin: 0; background: #f7fafc; }
         <button onClick="{{ toggleQuizCfCase }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
       </sc-if>
       <sc-if value="{{ quizCfCaseRevealed }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 独自ドメイン＋HTTPSで配信したい／世界中からのアクセスをキャッシュで速くしたい／S3を非公開のまま配信したい（OAC）、が代表的なケースです。<br>「社内の1人だけにファイルを渡したい」のような単発の共有にはCloudFrontは不要です。</div>
+        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 独自ドメイン＋HTTPSで配信したい／世界中からのアクセスをキャッシュで速くしたい／S3を非公開のまま配信したい（OAC）、が代表的なケースです。<br>「社内の1人だけにファイルを渡したい」のような単発の共有にはCloudFrontは不要です。<br><b>💼 現場では:</b> 本番のWeb公開ではほぼ必ずCloudFrontを前段に置きます。S3単体公開は社内ドキュメント検証や学習用途にとどまります。</div>
       </sc-if>
 
       <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. S3のファイルを更新したのに、CloudFrontのURLでは古い表示のままです。なぜですか？どう反映させますか？</p>
@@ -289,7 +289,7 @@ body { margin: 0; background: #f7fafc; }
         <button onClick="{{ toggleQuizInvalidation }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
       </sc-if>
       <sc-if value="{{ quizInvalidationRevealed }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. CloudFrontがエッジロケーションに保持している古いキャッシュを返し続けているためです。<br>キャッシュの有効期限（TTL）が切れるのを待つか、すぐに反映したい場合はキャッシュ無効化（invalidation）を実行して、対象パスのキャッシュを破棄します。</div>
+        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. CloudFrontがエッジロケーションに保持している古いキャッシュを返し続けているためです。<br>キャッシュの有効期限（TTL）が切れるのを待つか、すぐに反映したい場合はキャッシュ無効化（invalidation）を実行して、対象パスのキャッシュを破棄します。<br><b>💼 現場では:</b> リリース時にinvalidationを実行する運用のほか、ファイル名にハッシュを付けてキャッシュ問題自体を回避する設計（キャッシュバスティング）もよく使われます。</div>
       </sc-if>
 
       <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q4. OAC（Origin Access Control）は何のためのものですか？S3を非公開のままにする理由と合わせて説明してください。</p>
@@ -297,7 +297,7 @@ body { margin: 0; background: #f7fafc; }
         <button onClick="{{ toggleQuizOac }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
       </sc-if>
       <sc-if value="{{ quizOacRevealed }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. OACは、CloudFrontがS3オリジンへアクセスする際に使う認証の仕組みです。<br>S3バケット自体は非公開のままにし、バケットポリシーで「このCloudFrontディストリビューションからのアクセスだけ許可する」という設定を行います。<br>これにより、S3バケットへ直接アクセスされる経路をふさぎ、必ずCloudFront（HTTPS化・キャッシュ・WAF等の保護）を経由させることができます。</div>
+        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. OACは、CloudFrontがS3オリジンへアクセスする際に使う認証の仕組みです。<br>S3バケット自体は非公開のままにし、バケットポリシーで「このCloudFrontディストリビューションからのアクセスだけ許可する」という設定を行います。<br>これにより、S3バケットへ直接アクセスされる経路をふさぎ、必ずCloudFront（HTTPS化・キャッシュ・WAF等の保護）を経由させることができます。<br><b>💼 現場では:</b> 以前はOAI（Origin Access Identity）という旧方式が主流でした。現在の新規構成ではOACが推奨のため、古い記事を読むときは違いに注意してください。</div>
       </sc-if>
 
       <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q5. CloudFront経由の静的サイト構成図を思い浮かべられますか？</p>
