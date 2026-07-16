@@ -22,7 +22,7 @@ body { margin: 0; background: #f7fafc; }
     <a href="../../../index.html" style="display:inline-flex;align-items:center;gap:6px;color:#6b7280;text-decoration:none;font-size:13px;font-weight:600;margin-bottom:14px">← ホームに戻る</a>
     <div style="display:inline-flex;align-items:center;gap:8px;background:#232f3e;color:#ff9900;padding:6px 16px;border-radius:999px;font-weight:700;font-size:13px;letter-spacing:0.04em">AWSハンズオン 理解サポート</div>
     <h1 style="font-size:34px;margin:18px 0 10px 0;line-height:1.3">01〜04ハンズオンの理解を振り返る</h1>
-    <p style="color:#6b7280;font-size:16px;margin:0;max-width:720px">コンソール操作・IAM・S3・CloudFrontのハンズオンで「手を動かしたこと」を、もう一度言葉で説明できるか確認するためのページです。<br>各章にQ&amp;A、クイズ（ボタンを押すと回答が出ます）、チェックリストを置いています。</p>
+    <p style="color:#6b7280;font-size:16px;margin:0;max-width:720px">コンソール操作・IAM・S3・CloudFrontのハンズオンで「手を動かしたこと」を、<br/>もう一度言葉で説明できるか確認するためのページです。<br>各章にTIPS、クイズ（ボタンを押すと回答例が出ます）、チェックリストを用意しました。<br/>是非学びの加速にお使いください。</p>
 
     <!-- TOC -->
     <nav style="margin-top:24px;display:flex;flex-wrap:wrap;gap:8px">
@@ -70,7 +70,7 @@ body { margin: 0; background: #f7fafc; }
         <div style="font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#64748b;flex-shrink:0">4</div>
         <div>
           <div style="font-weight:700;font-size:14px;margin-bottom:6px">サイドバーから関連サービスへ移動する</div>
-          <div style="color:#6b7280;font-size:13px">左サイドバーには、そのサービスと関連が深い別サービスへの入り口が含まれていることがあります。<br>例: EC2の左サイドバーからロードバランサー画面を直接開ける。</div>
+          <div style="color:#6b7280;font-size:13px">左サイドバーには、そのサービスと関連が深い別サービスへの入り口が含まれていることがあります。<br>例: EC2の左サイドバーからロードバランサー画面を直接開けます。</div>
           <img src="../../images/aws/supports/marked/4_サイドバー_marked.png" alt="EC2の左サイドバーから「ロードバランサー」を開いた状態: 遷移リンクを赤枠で強調" style="max-width:100%;margin-top:10px;border-radius:8px;border:1px solid #e5e7eb" />
         </div>
       </div>
@@ -85,6 +85,17 @@ body { margin: 0; background: #f7fafc; }
       </div>
     </div>
 
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#f1f5f9;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#64748b;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#64748b;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#334155;margin-bottom:4px">リージョン選択が効かないサービスもある</div>
+        <div style="color:#4b5563">IAMやCloudFrontはグローバルサービスで、リージョンを切り替えても表示される内容は変わりません。</div>
+      </div>
+    </div>
+    </sc-if>
+
     <!-- クイズ -->
     <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
       <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
@@ -94,7 +105,7 @@ body { margin: 0; background: #f7fafc; }
         <button onClick="{{ toggleQuizConsole }}" style="min-height:34px;background:#64748b;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
       </sc-if>
       <sc-if value="{{ quizConsoleRevealed }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 1つはサービス検索バーで目的のサービス名を直接検索する方法。<br>もう1つは、今開いているサービスの左サイドバーから関連サービスへ移動する方法です（例: EC2のサイドバーからロードバランサーを開く）。<br>前者は「行き先が分かっている」場合、後者は「今のサービスと関連が深い機能を探す」場合に向いています。</div>
+        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 1つはサービス検索バーで目的のサービス名を直接検索する方法。<br>もう1つは、今開いているサービスの左サイドバーから関連サービスへ移動する方法です（例: EC2のサイドバーからロードバランサーを開く）。<br>前者は「行き先が分かっている」場合、<br/>後者は「今のサービスと関連が深い機能を探す」場合に向いています。</div>
       </sc-if>
 
       <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. 「探している機能がサービス検索バーで見つからない」ときに確認すべきことを2つ挙げてください。</p>
@@ -229,6 +240,11 @@ body { margin: 0; background: #f7fafc; }
       </div>
     </div>
 
+    <div style="margin-top:14px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:8px">03 → 04 で変更したこと（振り返り）</div>
+      <div style="color:#4b5563;font-size:13.5px">公開読み取り用のバケットポリシーを、CloudFront（OAC）だけを許可するポリシーへ置き換える<br>ブロックパブリックアクセスを有効に戻す<br>S3の静的ウェブサイトホスティングを無効化する</div>
+    </div>
+
     <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
     <div style="margin-top:16px;background:#fff7ed;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
       <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#c2660a;color:#ffffff;font-size:15px">💡</span>
@@ -268,15 +284,23 @@ body { margin: 0; background: #f7fafc; }
         <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 独自ドメイン＋HTTPSで配信したい／世界中からのアクセスをキャッシュで速くしたい／S3を非公開のまま配信したい（OAC）、が代表的なケースです。<br>「社内の1人だけにファイルを渡したい」のような単発の共有にはCloudFrontは不要です。</div>
       </sc-if>
 
-      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. OAC（Origin Access Control）は何のためのものですか？S3を非公開のままにする理由と合わせて説明してください。</p>
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. S3のファイルを更新したのに、CloudFrontのURLでは古い表示のままです。なぜですか？どう反映させますか？</p>
+      <sc-if value="{{ !quizInvalidationRevealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizInvalidation }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizInvalidationRevealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. CloudFrontがエッジロケーションに保持している古いキャッシュを返し続けているためです。<br>キャッシュの有効期限（TTL）が切れるのを待つか、すぐに反映したい場合はキャッシュ無効化（invalidation）を実行して、対象パスのキャッシュを破棄します。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q4. OAC（Origin Access Control）は何のためのものですか？S3を非公開のままにする理由と合わせて説明してください。</p>
       <sc-if value="{{ !quizOacRevealed }}" hint-placeholder-val="{{ true }}">
         <button onClick="{{ toggleQuizOac }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
       </sc-if>
       <sc-if value="{{ quizOacRevealed }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. OACは、CloudFrontがS3オリジンへアクセスする際に使う認証の仕組みです。<br>S3バケット自体は非公開のままにし、バケットポリシーで「このCloudFrontディストリビューションからのアクセスだけ許可する」という設定を行います。<br>これにより、S3のウェブサイトエンドポイントへ直接アクセスされる経路をふさぎ、必ずCloudFront（HTTPS化・キャッシュ・WAF等の保護）を経由させることができます。</div>
+        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. OACは、CloudFrontがS3オリジンへアクセスする際に使う認証の仕組みです。<br>S3バケット自体は非公開のままにし、バケットポリシーで「このCloudFrontディストリビューションからのアクセスだけ許可する」という設定を行います。<br>これにより、S3バケットへ直接アクセスされる経路をふさぎ、必ずCloudFront（HTTPS化・キャッシュ・WAF等の保護）を経由させることができます。</div>
       </sc-if>
 
-      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q4. CloudFront経由の静的サイト構成図を思い浮かべられますか？</p>
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q5. CloudFront経由の静的サイト構成図を思い浮かべられますか？</p>
       <sc-if value="{{ !quizArchRevealed }}" hint-placeholder-val="{{ true }}">
         <button onClick="{{ toggleQuizArch }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">答え合わせする</button>
       </sc-if>
@@ -291,7 +315,7 @@ body { margin: 0; background: #f7fafc; }
     <!-- チェックリスト -->
     <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
       <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ s3CheckedCount }} / {{ s3CheckTotal }}）</div>
-      <sc-for list="{{ s3Checklist }}" as="item" hint-placeholder-count="4">
+      <sc-for list="{{ s3Checklist }}" as="item" hint-placeholder-count="5">
         <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
           <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #c2660a;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
           <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
@@ -318,7 +342,7 @@ body { margin: 0; background: #f7fafc; }
 </div>
 </div>
 
-<script type="text/x-dc" data-dc-script data-props="{&quot;showQa&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;表示&quot;,&quot;description&quot;:&quot;各章のQ&amp;Aコラムを表示&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;showQa&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;表示&quot;,&quot;description&quot;:&quot;各章のTIPSコラムを表示&quot;}}">
 class Component extends DCLogic {
   state = {
     quizRevealed: {},
@@ -342,7 +366,8 @@ class Component extends DCLogic {
     { id: "usecase", label: "S3のユースケースを静的サイト以外に1つ以上言える" },
     { id: "diff", label: "S3単体公開とCloudFront経由公開の違いを説明できる" },
     { id: "oac", label: "OACの役割を説明できる" },
-    { id: "diagram", label: "構成図を見ずに大まかな矢印（ユーザー→CloudFront→S3）を描ける" }
+    { id: "diagram", label: "構成図を見ずに大まかな矢印（ユーザー→CloudFront→S3）を描ける" },
+    { id: "cleanup", label: "使い終わったリソースの削除手順を知っている（04のサービス削除を参照）" }
   ];
 
   toggleQuiz = (id) => this.setState(s => ({ quizRevealed: { ...s.quizRevealed, [id]: !s.quizRevealed[id] } }));
@@ -353,6 +378,7 @@ class Component extends DCLogic {
   toggleQuizIam3 = () => this.toggleQuiz("iam3");
   toggleQuizS3Bucket = () => this.toggleQuiz("s3bucket");
   toggleQuizCfCase = () => this.toggleQuiz("cfcase");
+  toggleQuizInvalidation = () => this.toggleQuiz("invalidation");
   toggleQuizOac = () => this.toggleQuiz("oac");
   toggleQuizArch = () => this.toggleQuiz("arch");
 
@@ -400,6 +426,8 @@ class Component extends DCLogic {
       toggleQuizS3Bucket: this.toggleQuizS3Bucket,
       quizCfCaseRevealed: !!s.quizRevealed.cfcase,
       toggleQuizCfCase: this.toggleQuizCfCase,
+      quizInvalidationRevealed: !!s.quizRevealed.invalidation,
+      toggleQuizInvalidation: this.toggleQuizInvalidation,
       quizOacRevealed: !!s.quizRevealed.oac,
       toggleQuizOac: this.toggleQuizOac,
       quizArchRevealed: !!s.quizRevealed.arch,
