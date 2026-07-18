@@ -1,0 +1,44 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="https-pattern-a" id="httpsa1">
+    <mxGraphModel dx="1255" dy="1768" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="cert" parent="1" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=1;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.certificate_manager;" value="ACM&#xa;証明書" vertex="1">
+          <mxGeometry height="40" width="30" x="475" y="15" as="geometry" />
+        </mxCell>
+        <mxCell id="certLink" edge="1" parent="1" source="cert" target="alb" style="fontSize=11;strokeColor=#7AA116;strokeWidth=2;dashed=1;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="users" parent="1" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=13;fontStyle=1;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.users;" value="ユーザー" vertex="1">
+          <mxGeometry height="64" width="64" x="30" y="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="r53" parent="1" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#8C4FFF;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=13;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.route_53;" value="Route53&#xa;名前解決" vertex="1">
+          <mxGeometry height="64" width="64" x="230" y="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="alb" parent="1" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=13;fontStyle=1;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.application_load_balancer;" value="ALB&#xa;TLS終端" vertex="1">
+          <mxGeometry height="64" width="64" x="450" y="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ecs" parent="1" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=13;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.fargate;" value="ECSタスク&#xa;HTTPで受信" vertex="1">
+          <mxGeometry height="64" width="64" x="680" y="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" edge="1" parent="1" source="users" target="r53" value="HTTPS" style="fontSize=12;fontColor=#0f172a;strokeColor=#0f172a;strokeWidth=2.5;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontStyle=1;endArrow=block;endFill=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="r53" target="alb" value="HTTPS" style="fontSize=12;fontColor=#0f172a;strokeColor=#0f172a;strokeWidth=2.5;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontStyle=1;endArrow=block;endFill=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="alb" target="ecs" value="HTTP" style="fontSize=12;fontColor=#64748b;strokeColor=#94a3b8;strokeWidth=2.5;dashed=1;edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontStyle=1;endArrow=block;endFill=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

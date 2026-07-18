@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+html { scroll-behavior: smooth; }
+body { margin: 0; background: #f7fafc; }
+</style>
+</helmet>
+
+<div style="font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#0f172a;padding:48px 24px 80px 24px;line-height:1.7">
+<div style="max-width:1080px;margin:0 auto">
+
+  <!-- ============ HERO ============ -->
+  <header data-screen-label="00 導入" style="margin-bottom:56px">
+    <a href="../../../index.html" style="display:inline-flex;align-items:center;gap:6px;color:#6b7280;text-decoration:none;font-size:13px;font-weight:600;margin-bottom:14px">← ホームに戻る</a>
+    <div style="display:inline-flex;align-items:center;gap:8px;background:#232f3e;color:#ff9900;padding:6px 16px;border-radius:999px;font-weight:700;font-size:13px;letter-spacing:0.04em">AWSハンズオン 理解サポート</div>
+    <h1 style="font-size:34px;margin:18px 0 10px 0;line-height:1.3">動的デプロイ（ECS on Fargate）の理解を振り返る</h1>
+    <p style="color:#6b7280;font-size:16px;margin:0;max-width:720px">VPC・SG・RDS・ECR・ECS・ALBのハンズオンで「手を動かしたこと」を、<br/>もう一度言葉と図で説明できるか確認するためのページです。<br>各章にTIPS、クイズ（ボタンを押すと回答例が出ます）、チェックリストを用意しました。<br/>特にネットワーク周りは図を中心に振り返ります。</p>
+
+    <!-- TOC -->
+    <nav style="margin-top:24px;display:flex;flex-wrap:wrap;gap:8px">
+      <a href="#ch0" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">00 全体像</a>
+      <a href="#ch1" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">01 ネットワーク</a>
+      <a href="#ch2" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">02 入口と振り分け</a>
+      <a href="#ch3" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">03 データと秘密情報</a>
+      <a href="#ch4" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">04 コンテナ</a>
+      <a href="#ch5" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">05 トラブルシューティング</a>
+      <a href="#ch6" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">06 気付き → 次の一歩</a>
+      <a href="#https" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">補足 HTTPS化（座学）</a>
+      <a href="#appendix" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">Appendix SAA書籍</a>
+    </nav>
+  </header>
+
+  <!-- ============ CH0 全体像 ============ -->
+  <section id="ch0" data-screen-label="00 全体像" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#64748b">00</span>
+      <h2 style="font-size:26px;margin:0">🗺️ 全体像 — なぜ静的デプロイと違うのか</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 20px 0">静的サイトは「完成したファイルを置くだけ」でしたが、動的アプリは「サーバーが動き続けて、リクエストのたびに処理をする」必要があります。<br>まず、この違いと登場人物の全体像を押さえます。</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">静的デプロイ（前回まで）</div>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
+          HTML/CSS/JSという「完成品のファイル」をS3に置き、CloudFrontが配るだけ。<br>サーバー側で計算する処理がないので、置き場所と配送だけ考えればよい。
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#e4eefc;color:#1d55b4;border:1px solid #c9dcf6;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">動的デプロイ（今回）</div>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
+          Next.jsアプリがリクエストごとにDBを読み書きして応答を作る。<br>「アプリを動かし続ける場所（ECS）」「DB（RDS）」「その間を繋ぐネットワーク（VPC）」が新たに必要になる。
+        </div>
+      </div>
+    </div>
+
+    <!-- コンテナ → ECS → Fargate の3段導入 -->
+    <div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">コンテナとは</div>
+        <div style="color:#4b5563;font-size:13.5px">アプリ本体と、動かすのに必要なもの（Node.js・ライブラリ・設定）を1つの箱に詰めたもの。<br>「自分のPCでは動いたのに」を無くし、どこでも同じように動かせる。<br>Dockerはこの箱を作る・動かす代表的なツール。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">ECSとは</div>
+        <div style="color:#4b5563;font-size:13.5px">コンテナを本番で動かすための「運行管理者」。<br>何個動かすか・落ちたら再起動する・新バージョンに入れ替える、といった管理を引き受けるオーケストレーションサービス。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">Fargateとは</div>
+        <div style="color:#4b5563;font-size:13.5px">コンテナを載せる「土台のサーバー」をAWSに任せる方式（サーバーレス）。<br>EC2方式だと土台のOS管理・台数調整も自分の仕事になるが、Fargateなら「CPUとメモリの量」を指定するだけでよい。</div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:10px">今回作った構成の全体図</div>
+      <div style="overflow-x:auto">
+      <img src="../AWS-ecs-on-fargate学習/architectures/ecs-fargate-architecture-details-no-https.svg" alt="今回作ったECS on Fargate構成図(Route53・ACMなし)" style="min-width:720px;width:100%;background:#ffffff;border-radius:8px" />
+      </div>
+      <div style="margin-top:8px;color:#6b7280;font-size:13px">この図の登場人物を、01〜04章で1つずつ「何者か」「無いとどうなるか」まで振り返ります。<br>※ 今回のハンズオンではRoute53とACMは使っておらず、ALBのDNS名にHTTPでアクセスしました。独自ドメイン＋HTTPS化は<a href="#https" style="color:#0d9488;font-weight:600">補足章（座学）</a>で扱います。</div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#f1f5f9;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#64748b;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#64748b;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#334155;margin-bottom:4px">「ウィザード無しでイメージが湧くか」が今回のゴール</div>
+        <div style="color:#4b5563">マネジメントコンソールのウィザードに従えば作れてしまいますが、それだと「なぜこの画面でこれを選んだのか」が残りません。<br>各サービスの役割と繋がりを自分の言葉で説明できる状態を目指します。</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px">クイズ</div>
+      <div style="margin:0 0 14px 0;font-size:12px;color:#92400e">🔺 発展 … ハンズオンの範囲を超える知識を含む問題です。今は解けなくても大丈夫。</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. <span style="display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;padding:0 8px;border-radius:999px;font-weight:700;font-size:11px;margin-right:4px;vertical-align:1px">🔺 発展</span>コンテナとは何ですか？「仮想マシン（EC2にOSを立てる）との違い」を交えて説明してください。</p>
+      <sc-if value="{{ !quizOv1Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizOv1 }}" style="min-height:34px;background:#64748b;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizOv1Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. アプリと実行に必要な環境（ランタイム・ライブラリ・設定）を1つにまとめたパッケージです。<br>仮想マシンはOSごと丸ごと複製するため起動が遅く重いのに対し、コンテナはホストのOSを共有して「アプリに必要な部分だけ」を隔離するため、軽量で起動が速く、同じイメージならどこでも同じ動作をします。<br><b>💼 現場では:</b> 「開発環境では動いたのに本番で動かない」を潰せるのが最大の価値です。ローカル開発（docker compose）から本番（ECS）まで同じイメージを使い回します。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. ECSとFargateの関係を説明してください。それぞれ何を担当しますか？</p>
+      <sc-if value="{{ !quizOv2Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizOv2 }}" style="min-height:34px;background:#64748b;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizOv2Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. ECSは「コンテナをいくつ・どう動かすか」を管理するオーケストレーター（運行管理者）です。<br>Fargateは、そのコンテナを実際に載せる「土台のサーバー」を用意する起動タイプの1つで、サーバーの管理をAWSが肩代わりします。<br>つまり「管理はECS、土台はFargate」という分担で、Fargateの代わりにEC2を土台にする選択肢もあります。<br><b>💼 現場では:</b> まずFargateが第一候補です。OSのパッチ当てや台数管理が不要なぶん運用が軽く、EC2起動タイプはGPUが必要・コストを極限まで下げたい等の特殊事情がある場合に検討します。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. 今回のNext.jsアプリは、なぜS3+CloudFrontの静的デプロイでは公開できないのでしょうか？</p>
+      <sc-if value="{{ !quizOv3Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizOv3 }}" style="min-height:34px;background:#64748b;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizOv3Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. S3は置かれたファイルをそのまま返すことしかできず、サーバー側でコードを実行できないためです。<br>今回のアプリはリクエストのたびにDBを読み書きしてページを組み立てる（SSR・APIルート）ので、Node.jsが動き続けるサーバーが必要になります。<br>そのサーバー役がECS上のコンテナです。<br><b>💼 現場では:</b> 「静的で済むものは静的に寄せる」が定石です。動的サーバーは維持費も運用の手間も掛かるため、LPやドキュメントはS3+CloudFront、アプリ本体だけECS、のように使い分けます。</div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ ovCheckedCount }} / {{ ovCheckTotal }}）</div>
+      <sc-for list="{{ ovChecklist }}" as="item" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #64748b;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CH1 ネットワーク ============ -->
+  <section id="ch1" data-screen-label="01 ネットワーク" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#7c3aed">01</span>
+      <h2 style="font-size:26px;margin:0">🕸️ ネットワーク — VPC / サブネット / IGW / NAT / AZ</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">今回いちばん大事な章です。<br>「アプリやDBを、インターネットからどれだけ離れた場所に置くか」を設計するのがネットワークで、以降のすべてのサービスはこの上に載ります。</p>
+
+    <!-- 用語カード -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#f1e9fe;color:#7c3aed;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">VPC</div>
+        <div style="color:#4b5563;font-size:13.5px">AWSの中に作る「自分専用のネットワーク区画」。<br>この中に置いたものは、許可した経路以外では外と繋がらない。<br>敷地全体のイメージ。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#f1e9fe;color:#7c3aed;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">サブネット</div>
+        <div style="color:#4b5563;font-size:13.5px">VPCの中をさらに区切った部屋。<br>「インターネットに面した部屋（パブリック）」と「面していない部屋（プライベート）」を分けて使う。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#f1e9fe;color:#7c3aed;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">IGW（インターネットゲートウェイ）</div>
+        <div style="color:#4b5563;font-size:13.5px">VPCとインターネットを繋ぐ唯一の玄関。<br>これをVPCにアタッチし、ルートを向けたサブネットだけが外と直接通信できる。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#f1e9fe;color:#7c3aed;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">NATゲートウェイ</div>
+        <div style="color:#4b5563;font-size:13.5px">プライベートサブネットの住人が「外に出る用事だけ」を済ませるための出口。<br>外から中への進入は通さない、一方通行のドア。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#f1e9fe;color:#7c3aed;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">AZ（アベイラビリティゾーン）</div>
+        <div style="color:#4b5563;font-size:13.5px">リージョン内で物理的に離れたデータセンター群。<br>2つ以上のAZにまたがって配置すると、片方の障害でもサービスが止まらない。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#f1e9fe;color:#7c3aed;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">ルートテーブル</div>
+        <div style="color:#4b5563;font-size:13.5px">各サブネットの「道案内表」。<br>0.0.0.0/0（外向き）の行き先がIGWならパブリック、NATならプライベート——サブネットの性格はここで決まる。</div>
+      </div>
+    </div>
+
+    <!-- ネットワーク経路図 -->
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:10px">経路で見るVPC — 「入ってくる道」と「出ていく道」</div>
+      <div style="margin-bottom:6px;color:#6b7280;font-size:13px">この構成は「今回作った構成の全体図」と同じVPC・同じAZ-1aを使っています。<br>同じ構成のまま、道順ごとに矢印だけを分けて描いたのが以下の2枚です。</div>
+      <div style="overflow-x:auto">
+      <img src="architectures/vpc-route-inbound.svg" alt="入口のルート図" style="min-width:720px;width:100%">
+      </div>
+      <div style="margin-top:16px;overflow-x:auto">
+      <img src="architectures/vpc-route-outbound.svg" alt="出口のルート図" style="min-width:720px;width:100%">
+      </div>
+      <div style="margin-top:8px;color:#6b7280;font-size:13px">実線＝ユーザーのリクエストが「入ってくる道」（必ずALBを通る）。<br>紫の点線＝プライベートサブネットの住人が「出ていく道」（NAT経由の一方通行）。<br>この2本の道を別々に描けるようになるのがこの章のゴールです。</div>
+    </div>
+
+    <!-- 無いとどうなる図 -->
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:10px">これが無いとどうなる？</div>
+      <div style="overflow-x:auto">
+      <img src="architectures/vpc-failure-modes.svg" alt="これが無いとどうなる図" style="min-width:720px;width:100%">
+      </div>
+      <div style="margin-top:8px;color:#6b7280;font-size:13px">「動かなくなるもの」を1つずつ言えると、各部品の存在理由が説明できるようになります。</div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#faf5ff;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#7c3aed;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#7c3aed;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#4c1d95;margin-bottom:4px">「パブリック/プライベート」はサブネット自体の属性ではない</div>
+        <div style="color:#4b5563">サブネット作成画面に「パブリックにする」というスイッチはありません。<br>ルートテーブルの0.0.0.0/0の行き先がIGWならパブリック、NAT（または無し）ならプライベート、と呼び分けているだけです。<br>迷ったらルートテーブルを見るのが正解です。</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;background:#faf5ff;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#7c3aed;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#7c3aed;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#4c1d95;margin-bottom:4px">NATゲートウェイは「置いてあるだけ」で課金される</div>
+        <div style="color:#4b5563">時間課金＋データ処理課金で、学習用アカウントの請求で一番驚かれやすいサービスです。<br>ハンズオンが終わったら削除する、を徹底してください。</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. パブリックサブネットとプライベートサブネットの違いは、何によって決まりますか？また、今回ALBとECS/RDSをどちらに置きましたか？</p>
+      <sc-if value="{{ !quizNet1Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizNet1 }}" style="min-height:34px;background:#7c3aed;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizNet1Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. ルートテーブルで決まります。<br>外向き通信（0.0.0.0/0）の行き先がIGWに向いていればパブリック、向いていなければプライベートです。<br>今回は、外から受け付ける必要があるALBとNATゲートウェイをパブリックへ、外から直接触られたくないECSタスクとRDSをプライベートへ置きました。<br><b>💼 現場では:</b> 「外に晒すのは入口（ALB）だけ、アプリとDBは奥に隠す」がWeb構成の原則です。この配置を崩す構成はレビューでまず指摘されます。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. IGWとNATゲートウェイは、どちらも「外と通信するためのもの」に見えます。決定的な違いは何ですか？</p>
+      <sc-if value="{{ !quizNet2Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizNet2 }}" style="min-height:34px;background:#7c3aed;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizNet2Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 通信の向きです。<br>IGWは双方向の玄関で、外から中へのアクセスも中から外へのアクセスも通します。<br>NATゲートウェイは「中から外へ」の一方通行専用で、中から始めた通信の返事は通しますが、外から始めた通信は一切通しません。<br>だからプライベートサブネットの安全性を保ったまま、ECRからのpullやOSアップデートだけができます。<br><b>💼 現場では:</b> 「外に出たいだけならNAT、外から受けたいならIGW＋パブリック配置」と覚えます。この区別が曖昧なままだと、後のトラブルシューティングで必ず迷子になります。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. サブネットを2つのAZに分けて作ったのはなぜですか？1つのAZに全部置くと何が困りますか？</p>
+      <sc-if value="{{ !quizNet3Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizNet3 }}" style="min-height:34px;background:#7c3aed;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizNet3Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. AZは物理的に離れたデータセンター群なので、片方のAZで障害（停電・ネットワーク断など）が起きても、もう片方でサービスを続けられるようにするためです。<br>1つのAZに全部置くと、そのAZの障害＝サービス全停止になります。<br>また、ALBやRDS（マルチAZ構成）はそもそも「2つ以上のAZのサブネット」を要求するため、1AZでは作れません。<br><b>💼 現場では:</b> 本番は最低2AZが常識です。ただしAZをまたぐ通信やNATの複数配置はコストが増えるため、検証環境は1AZ相当に絞るなどメリハリを付けます。</div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ netCheckedCount }} / {{ netCheckTotal }}）</div>
+      <sc-for list="{{ netChecklist }}" as="item" hint-placeholder-count="5">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #7c3aed;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CH2 入口と振り分け ============ -->
+  <section id="ch2" data-screen-label="02 入口と振り分け" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#db2777">02</span>
+      <h2 style="font-size:26px;margin:0">🚪 入口と振り分け — ALB / ターゲットグループ / SG</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">ユーザーのリクエストを最初に受け止めて、健康なコンテナに振り分けるのがALB。<br>そして各所のドアの通行ルールを決めるのがセキュリティグループ（SG）です。</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#fce7f3;color:#db2777;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">ALB</div>
+        <div style="color:#4b5563;font-size:13.5px">Application Load Balancer。<br>リクエストを複数のコンテナへ分散する受付係。<br>HTTPの中身（パスやホスト名）を見て振り分けられるレイヤー7のロードバランサー。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#fce7f3;color:#db2777;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">ターゲットグループ</div>
+        <div style="color:#4b5563;font-size:13.5px">ALBが振り分ける「宛先リスト」。<br>ECSサービスと紐付けると、タスクの起動・停止に合わせて宛先が自動で登録・解除される。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#fce7f3;color:#db2777;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">ヘルスチェック</div>
+        <div style="color:#4b5563;font-size:13.5px">ALBが宛先に定期的に「生きてる？」と確認する仕組み。<br>失敗が続いた宛先には振り分けを止め、ECS側はそのタスクを入れ替える。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#fce7f3;color:#db2777;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">セキュリティグループ（SG）</div>
+        <div style="color:#4b5563;font-size:13.5px">リソース単位のファイアウォール。<br>「許可するものだけを書く」ホワイトリスト方式で、書いていない通信はすべて拒否される。</div>
+      </div>
+    </div>
+
+    <!-- SGチェーン図 -->
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:10px">SGチェーン — 「前段のSGだけを許可する」の連鎖</div>
+      <div style="overflow-x:auto">
+      <img src="architectures/sg-chain.svg" alt="SGチェーン図" style="min-width:720px;width:100%">
+      </div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#fdf2f8;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#db2777;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#db2777;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#9d174d;margin-bottom:4px">「レイヤー」はOSI参照モデルの階層のこと</div>
+        <div style="color:#4b5563">レイヤー4（トランスポート層）はIPアドレスとポート番号までしか見えず、レイヤー7（アプリケーション層）はHTTPの中身（URLパス・ヘッダーなど）まで見えます。<br>ALBはL7なので「/apiはこのグループへ」のようなパスベースの振り分けができます。<br>L4で高速に捌くNLB（Network Load Balancer）という別の選択肢もあります。</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. SGは「ホワイトリスト」「ブラックリスト」どちらの方式ですか？その方式だと何が嬉しいですか？</p>
+      <sc-if value="{{ !quizEdge1Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizEdge1 }}" style="min-height:34px;background:#db2777;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizEdge1Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fdf2f8;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. ホワイトリスト方式です。<br>「許可する通信だけ」をルールとして書き、書かれていない通信はすべて自動的に拒否されます。<br>拒否ルールの書き漏らしで穴が開く心配がなく、「開けた覚えのあるものしか開いていない」状態を保てるのが利点です。<br><b>💼 現場では:</b> SGのルール一覧は「この構成の通信仕様書」としてそのまま読めます。逆に0.0.0.0/0で全開放されたSSHやDBポートは監査で真っ先に指摘される定番です。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. ターゲットグループは何のためにありますか？「ALBが直接ECSタスクに送ればいいのでは」に答えてください。</p>
+      <sc-if value="{{ !quizEdge2Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizEdge2 }}" style="min-height:34px;background:#db2777;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizEdge2Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fdf2f8;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. ECSタスクは入れ替わるたびにIPアドレスが変わるため、ALBに固定の宛先を直接教える方法では破綻します。<br>ターゲットグループという「宛先リスト」を間に挟み、ECSサービスがタスクの起動・停止に合わせてリストを自動更新することで、ALBは常に「今生きている宛先」へ送れます。<br>ヘルスチェックの設定もこのターゲットグループ単位で持ちます。<br><b>💼 現場では:</b> 新旧バージョンを2つのターゲットグループに分けて徐々に切り替える（ブルー/グリーンデプロイ）など、リリース戦略の単位としても使われます。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. ヘルスチェックは何をしていて、失敗が続くと何が起きますか？</p>
+      <sc-if value="{{ !quizEdge3Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizEdge3 }}" style="min-height:34px;background:#db2777;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizEdge3Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fdf2f8;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. ALBがターゲット（ECSタスク）の指定パス（例: /）へ定期的にHTTPリクエストを送り、正常な応答（200など）が返るかを確認しています。<br>失敗が続いたターゲットはunhealthy扱いになって振り分け対象から外れ、ECSサービスがそのタスクを止めて新しいタスクを起動します。<br>つまり「壊れたコンテナを自動で入れ替える」仕組みの起点です。<br><b>💼 現場では:</b> unhealthyの原因はアプリ障害よりも「ヘルスチェックのパス間違い」「SGでポートが通っていない」などの設定ミスが大半です。タスクが起動→即終了を繰り返していたら、まずここを疑います。</div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ edgeCheckedCount }} / {{ edgeCheckTotal }}）</div>
+      <sc-for list="{{ edgeChecklist }}" as="item" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #db2777;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CH3 データと秘密情報 ============ -->
+  <section id="ch3" data-screen-label="03 データと秘密情報" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#2563eb">03</span>
+      <h2 style="font-size:26px;margin:0">🗄️ データと秘密情報 — RDS / パラメータストア</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">アプリのデータを預かるRDSと、DBパスワードなどの秘密情報をコードの外に置くためのパラメータストアです。</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#dbeafe;color:#2563eb;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">RDS</div>
+        <div style="color:#4b5563;font-size:13.5px">PostgreSQLやMySQLなどのDBを「マネージド」で使えるサービス。<br>バックアップ・パッチ適用・障害時のフェイルオーバーをAWSが引き受けてくれる。<br>EC2に自分でDBを入れる場合、これらは全部自分の仕事になる。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#dbeafe;color:#2563eb;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">パラメータストア</div>
+        <div style="color:#4b5563;font-size:13.5px">Systems Managerの一機能で、設定値や秘密情報（DB接続文字列など）の保管庫。<br>ECSのタスク定義から参照でき、コンテナ起動時に環境変数として注入される。<br>秘密をコードやイメージに埋め込まずに済む。</div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:8px">Aurora と 素のRDS（RDS for PostgreSQL）の使い分け</div>
+      <div style="color:#4b5563;font-size:13.5px">どちらも「マネージドなPostgreSQL互換DB」ですが、性格が違います。<br><b>RDS for PostgreSQL</b>: コミュニティ版PostgreSQLそのもの。小さく始められて安く、学習・小規模サービス向き。<br><b>Aurora</b>: AWSがストレージ層を作り直した上位版。性能・可用性・スケールに優れるが、最低コストが高い。<br>迷ったら「まず素のRDSで始めて、性能や可用性の要求が上がったらAuroraを検討」で問題ありません。</div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#eff6ff;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#2563eb;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#2563eb;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#1d4ed8;margin-bottom:4px">RDSも「置いてあるだけ」で課金される</div>
+        <div style="color:#4b5563">RDSはインスタンスが起動している時間で課金されます（NATゲートウェイと並ぶ消し忘れ課金の2トップ）。<br>使わない期間は一時停止（最大7日）か削除を忘れずに。</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px">クイズ</div>
+      <div style="margin:0 0 14px 0;font-size:12px;color:#92400e">🔺 発展 … ハンズオンの範囲を超える知識を含む問題です。今は解けなくても大丈夫。</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. RDSを使うのと、EC2に自分でPostgreSQLをインストールするのとでは、何が違いますか？</p>
+      <sc-if value="{{ !quizData1Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizData1 }}" style="min-height:34px;background:#2563eb;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizData1Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#eff6ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. DBエンジン自体は同じですが、運用の担当範囲が違います。<br>RDSでは自動バックアップ・パッチ適用・マルチAZのフェイルオーバー・ストレージ拡張をAWSが提供します。<br>EC2に自分で入れる場合、これらをすべて自分で設計・運用する必要があり、障害対応も深夜に自分でやることになります。<br><b>💼 現場では:</b> DBを自前運用する理由（特殊な拡張やOSレベルのチューニングが必要など）がない限り、RDS一択です。「運用をお金で買う」典型例として説明されます。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. <span style="display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;padding:0 8px;border-radius:999px;font-weight:700;font-size:11px;margin-right:4px;vertical-align:1px">🔺 発展</span>パラメータストアとSecrets Managerは何が違いますか？どちらを選ぶべきでしょうか？</p>
+      <sc-if value="{{ !quizData2Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizData2 }}" style="min-height:34px;background:#2563eb;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizData2Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#eff6ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. どちらも秘密情報の保管庫ですが、Secrets Managerには「シークレットの自動ローテーション（定期的なパスワード自動変更、RDSとの連携）」があり、その分有料です。<br>パラメータストア（スタンダード）は無料で、設定値と秘密情報を手軽に置けますが、ローテーションは自前になります。<br>学習・小規模ならパラメータストア、本番のDB認証情報でローテーション要件があるならSecrets Manager、が目安です。<br><b>💼 現場では:</b> 「DBパスワード類はSecrets Manager、それ以外の設定値はパラメータストア」と使い分けるチームが多いです。コストとローテーション要否で決めます。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. DBの接続情報を、コンテナイメージの中に直接書いてはいけないのはなぜですか？</p>
+      <sc-if value="{{ !quizData3Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizData3 }}" style="min-height:34px;background:#2563eb;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizData3Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#eff6ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. イメージを手に入れた人全員にパスワードが渡ってしまうためです。<br>イメージはECRから取得したり、レイヤーを展開したりすれば中身を見られます。<br>また、パスワードを変えるたびにイメージの作り直しが必要になり、環境ごと（開発/本番）に接続先を変えることもできなくなります。<br>だから秘密情報は外部（パラメータストア）に置き、起動時に注入します。<br><b>💼 現場では:</b> Gitリポジトリへの秘密情報コミットも同じ理由でNGです。push前に検知するツール（git-secrets等）を入れるのが一般的です。</div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ dataCheckedCount }} / {{ dataCheckTotal }}）</div>
+      <sc-for list="{{ dataChecklist }}" as="item" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #2563eb;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CH4 コンテナ ============ -->
+  <section id="ch4" data-screen-label="04 コンテナ" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#c2660a">04</span>
+      <h2 style="font-size:26px;margin:0">📦 コンテナの置き場と実行 — ECR / ECS</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">作ったコンテナイメージを「どこに置いて」「どう動かすか」。<br>ECS周りは似た用語が多いので、タスク定義・タスク・サービス・クラスターを区別できれば勝ちです。</p>
+
+    <div style="margin-top:4px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:8px">ECR — イメージの置き場（push → pull の流れ）</div>
+      <div style="color:#4b5563;font-size:13.5px">Elastic Container Registry。Docker Hubに相当するAWS内のイメージ置き場です。<br>①手元（またはCI）で <code style="background:#f1f5f9;padding:1px 6px;border-radius:4px">docker build</code> → ②ECRへ <code style="background:#f1f5f9;padding:1px 6px;border-radius:4px">docker push</code> → ③ECSがタスク起動時にECRから pull、という流れで届きます。<br>pushには認証（<code style="background:#f1f5f9;padding:1px 6px;border-radius:4px">aws ecr get-login-password</code>）が必要で、pull側の権限はタスク実行ロールが持ちます。</div>
+    </div>
+
+    <!-- ECS用語カード -->
+    <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#fdf1e0;color:#c2660a;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">タスク定義</div>
+        <div style="color:#4b5563;font-size:13.5px">コンテナの起動レシピ。<br>どのイメージを、CPU/メモリいくつで、どんな環境変数で動かすかを書いた設計書。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#fdf1e0;color:#c2660a;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">タスク</div>
+        <div style="color:#4b5563;font-size:13.5px">タスク定義から実際に起動した実体（実行中のコンテナ群）。<br>レシピに対する「料理そのもの」。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#fdf1e0;color:#c2660a;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">サービス</div>
+        <div style="color:#4b5563;font-size:13.5px">「タスクを常に○個動かし続ける」を守る監督。<br>落ちたら自動で起動し直し、ALBのターゲットグループへの登録も担う。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#fdf1e0;color:#c2660a;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">クラスター</div>
+        <div style="color:#4b5563;font-size:13.5px">タスクやサービスをまとめる論理的な入れ物。<br>Fargateならサーバー管理がないため「プロジェクトの箱」くらいの感覚でよい。</div>
+      </div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#fff7ed;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#c2660a;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#c2660a;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#92580a;margin-bottom:4px">タスク実行ロールとタスクロールは別物</div>
+        <div style="color:#4b5563">タスク実行ロールは「ECSがタスクを立ち上げるため」の権限（ECRからpull、パラメータストア読み取り、ログ出力）。<br>タスクロールは「アプリ自身がAWSを使うため」の権限（例: アプリがS3にファイルを置く）。<br>「起動するための権限」と「動いてから使う権限」で分かれています。</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. コードを修正してから、それが本番のECSで動き出すまでの流れを順番に説明してください。</p>
+      <sc-if value="{{ !quizCon1Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizCon1 }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizCon1Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. ①docker buildで新しいイメージを作る → ②ECRへpushする → ③タスク定義の新リビジョンを作る（新イメージを指す） → ④ECSサービスを更新する → ⑤サービスが新タスク定義でタスクを起動し、ヘルスチェックが通ったらALBの振り分け先が新タスクに切り替わり、旧タスクが停止される。<br><b>💼 現場では:</b> この一連の流れは手作業ではなくCI/CD（GitHub Actionsなど）で自動化します。「mainにマージしたら勝手に本番へ」が標準的なゴールです。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. 「タスク定義」「タスク」「サービス」「クラスター」を、それぞれ一言で説明してください。</p>
+      <sc-if value="{{ !quizCon2Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizCon2 }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizCon2Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. タスク定義＝コンテナの起動レシピ（設計書）。<br>タスク＝そのレシピから起動した実行中の実体。<br>サービス＝タスクを指定数だけ動かし続ける監督（自動復旧・ALB連携）。<br>クラスター＝それらをまとめる入れ物。<br>「レシピ→料理→料理を出し続ける店長→お店」の比喩で覚えると混ざりにくいです。<br><b>💼 現場では:</b> 障害調査で「サービスのイベント」→「タスクの停止理由」→「タスクのログ」の順に掘るため、この階層関係が頭に入っているかで調査速度が大きく変わります。</div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ conCheckedCount }} / {{ conCheckTotal }}）</div>
+      <sc-for list="{{ conChecklist }}" as="item" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #c2660a;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CH5 トラブルシューティング ============ -->
+  <section id="ch5" data-screen-label="05 トラブルシューティング" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#dc2626">05</span>
+      <h2 style="font-size:26px;margin:0">🚑 トラブルシューティングの順序</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 20px 0">「ALBのDNS名にアクセスしたのに画面が出ない」。<br>このとき手当たり次第に見るのではなく、リクエストの通り道の順（外→中）に確認するのが鉄則です。</p>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;display:flex;gap:14px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#dc2626;flex-shrink:0">1</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">SG — ドアは開いているか</div>
+          <div style="color:#6b7280;font-size:13px">ALBのSGはインターネットから80/443を許可しているか。<br>ECSのSGは「ALBのSGから」アプリのポート（3000）を許可しているか。<br>RDSのSGは「ECSのSGから」5432を許可しているか。<br>症状: タイムアウト（応答が永遠に返らない）はSGの疑いが濃い。</div>
+        </div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;display:flex;gap:14px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#dc2626;flex-shrink:0">2</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">ターゲットグループ — 宛先はいるか、healthyか</div>
+          <div style="color:#6b7280;font-size:13px">ターゲットが1つも登録されていない → ECSサービスとの紐付けを確認。<br>登録されているがunhealthy → ヘルスチェックのパス・ポート設定と、SG（ALB→ECS間）を確認。<br>症状: 503 Service Unavailableは「振り分け先がいない」サイン。</div>
+        </div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;display:flex;gap:14px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#dc2626;flex-shrink:0">3</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">タスク — そもそも起動しているか</div>
+          <div style="color:#6b7280;font-size:13px">タスクが起動→即停止を繰り返す場合、サービスのイベント欄と「タスクの停止理由」を見る。<br>ECRからpullできない（NAT/権限）、パラメータストアを読めない（実行ロール）、が定番。<br>症状: 実行中タスク数が希望数に届かない。</div>
+        </div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;display:flex;gap:14px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#dc2626;flex-shrink:0">4</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">アプリのログ — 最後にコードを疑う</div>
+          <div style="color:#6b7280;font-size:13px">ここまで来て初めてCloudWatch Logsでアプリのエラーを読む。<br>DB接続エラーならRDSのSG・接続文字列（パラメータストアの値）を確認。<br>症状: 500 Internal Server Errorはアプリ側に到達している証拠。</div>
+        </div>
+      </div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#fef2f2;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#dc2626;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#dc2626;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#991b1b;margin-bottom:4px">体感では、詰まりの大半はネットワーク周り（SG・TG）</div>
+        <div style="color:#4b5563">「コードが悪いのでは」と疑う前に、SGの許可とターゲットグループの状態を先に見ると早く着地します。<br>エラーの種類（タイムアウト / 503 / 500）で、どの段で止まっているかの当たりも付けられます。</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. ALBのDNS名にアクセスすると「503 Service Unavailable」が返ります。タイムアウトではなく503です。どこから調べますか？</p>
+      <sc-if value="{{ !quizTs1Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizTs1 }}" style="min-height:34px;background:#dc2626;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizTs1Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fef2f2;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 503が返るということは、ALB自体には届いています（SGの外側は通っている）。<br>ALBが「振り分けられる健康な宛先がいない」と言っているので、ターゲットグループを見ます。<br>ターゲットが未登録ならECSサービスとの紐付け、unhealthyならヘルスチェック設定とALB→ECS間のSG、タスクがそもそも起動していないならECS側（停止理由・ログ）へ掘り進めます。<br><b>💼 現場では:</b> ステータスコードは「どこまで届いたかの証言」です。タイムアウト＝ALB手前、503＝ALBまで、500＝アプリまで、とまず切り分けます。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. ECSタスクが「起動→数分後に停止」を繰り返しています。アプリのログには特にエラーがありません。何が起きていそうですか？</p>
+      <sc-if value="{{ !quizTs2Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizTs2 }}" style="min-height:34px;background:#dc2626;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizTs2Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fef2f2;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. ヘルスチェック失敗によるタスクの入れ替えが疑わしいです。<br>アプリは正常に動いていても、ヘルスチェックのパスが間違っている（そのパスが404を返す）、またはALB→ECS間のSGでポートが通っていないと、ALBからはunhealthyに見えます。<br>unhealthyなタスクはECSサービスによって停止・再作成されるため、「元気なのに殺され続ける」ループになります。<br><b>💼 現場では:</b> この「ヘルスチェック設定ミスによる再起動ループ」は初回構築の定番ハマりです。ターゲットグループのヘルスチェック結果と、タスクの停止理由（Task failed ELB health checks）を突き合わせれば確定できます。</div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ tsCheckedCount }} / {{ tsCheckTotal }}）</div>
+      <sc-for list="{{ tsChecklist }}" as="item" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #dc2626;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CH6 気付き → 次の一歩 ============ -->
+  <section id="ch6" data-screen-label="06 気付き" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#059669">06</span>
+      <h2 style="font-size:26px;margin:0">🌱 作ってみて気付くこと → 次の一歩</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 20px 0">ここまで手を動かした人が必ず感じる「気付き」は、そのまま次に学ぶべきテーマに繋がっています。</p>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">「1から手で作るの、大変すぎない？」 → IaC（Infrastructure as Code）</div>
+        <div style="color:#6b7280;font-size:13px">VPC→サブネット→SG→RDS→ECR→ECS→ALBと、順番も依存関係も多く、画面ポチポチでは再現も共有もできません。<br>この構成をコード（Terraform・CDK・CloudFormation）で書けば、同じ環境を何度でも・別環境（dev/stg/prod）にも作れます。<br>「今日ウィザードで選んだ項目」がそのままコードのパラメータになるので、ハンズオン直後がIaC入門の最高のタイミングです。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">「デプロイのたびに手でpushして更新するの？」 → CI/CD</div>
+        <div style="color:#6b7280;font-size:13px">build→push→タスク定義更新→サービス更新の流れは、GitHub Actionsなどで自動化するのが標準です。<br>「mainにマージされたら本番に反映」まで組めると、開発の景色が変わります。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">「消し忘れが怖い」 → コスト管理</div>
+        <div style="color:#6b7280;font-size:13px">NATゲートウェイとRDSは「置いてあるだけ」で課金される代表格です。<br>Budgets（予算アラート）の設定と、ハンズオン後の片付け（09章）をセットで習慣にしてください。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">「本番はこれで十分？」 → 監視・ログ・スケーリング</div>
+        <div style="color:#6b7280;font-size:13px">今回の構成に、CloudWatchアラーム（異常検知）、オートスケーリング（負荷に応じたタスク数の増減）、WAF（攻撃対策）を足していくと本番相当に近づきます。<br>SAAの学習範囲とも重なる領域です。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 補足 HTTPS化（座学） ============ -->
+  <section id="https" data-screen-label="補足 HTTPS化" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#0d9488">補足</span>
+      <h2 style="font-size:26px;margin:0">🔒 HTTPS化 — ACM / Route53 / CloudFront（座学）</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">今回のハンズオンではALBのDNS名（HTTP）で動作確認しましたが、実際の公開には独自ドメイン＋HTTPSが必須です。<br>手を動かす前の座学として、登場人物と2つの構成パターンを押さえておきます。</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#ccfbf1;color:#0d9488;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">Route53</div>
+        <div style="color:#4b5563;font-size:13.5px">AWSのDNSサービス。<br>「example.com にアクセスされたらこのALB（またはCloudFront）へ」という名前解決の対応表を管理する。<br>ドメインの購入もここでできる。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#ccfbf1;color:#0d9488;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">ACM</div>
+        <div style="color:#4b5563;font-size:13.5px">AWS Certificate Manager。<br>HTTPSに必要なサーバー証明書を無料で発行し、更新も自動でやってくれる。<br>発行した証明書はALBやCloudFrontにアタッチして使う（証明書単体では何も起きない）。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="display:inline-flex;background:#ccfbf1;color:#0d9488;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:8px">CloudFront（再登場）</div>
+        <div style="color:#4b5563;font-size:13.5px">静的デプロイ編ではS3の前段でしたが、ALBをオリジンにもできる。<br>動的アプリの前段に置くと、HTTPS終端に加えてキャッシュ・WAF・エッジ配信の恩恵を受けられる。</div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">構成パターンを切り替えて比べる</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+        <button onClick="{{ setHttpsPatternA }}" style="{{ httpsBtnAStyle }}">パターンA: Route53 + ACM + ALB</button>
+        <button onClick="{{ setHttpsPatternB }}" style="{{ httpsBtnBStyle }}">パターンB: CloudFrontを前段に置く</button>
+      </div>
+
+      <sc-if value="{{ httpsPatternIsA }}" hint-placeholder-val="{{ true }}">
+      <div style="overflow-x:auto">
+        <img src="architectures/https-pattern-a.svg" alt="パターンA構成図" style="min-width:640px;width:100%">
+      </div>
+      <div style="margin-top:12px;font-size:13.5px;color:#4b5563">
+        ユーザー → <b>Route53</b>（名前解決） → <b>ALB</b>（ACMの証明書でHTTPS終端） → ECS。<br>ALBにHTTPS(443)リスナーを追加し、ACMで発行した証明書をアタッチ。<br>HTTP(80)はHTTPSへリダイレクトさせるのが定番。<br>構成がシンプルで、今回のハンズオンの自然な延長。
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ httpsPatternIsB }}" hint-placeholder-val="{{ false }}">
+      <div style="overflow-x:auto">
+        <img src="architectures/https-pattern-b.svg" alt="パターンB構成図" style="min-width:640px;width:100%">
+      </div>
+      <div style="margin-top:12px;font-size:13.5px;color:#4b5563">
+        ユーザー → Route53 → <b>CloudFront</b>（証明書はここ） → ALB → ECS。<br>静的アセットのキャッシュ・WAF・世界配信をエッジで受けられる。<br>静的デプロイ編の構成と合流するイメージで、「静的はS3オリジン、動的はALBオリジン」を1つのCloudFrontに同居させる構成も組める。
+      </div>
+      </sc-if>
+    </div>
+
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:8px">どちらを選ぶか</div>
+      <div style="font-size:13.5px;color:#4b5563">
+        パターンAが向くケース：エッジキャッシュやWAF、複数オリジンの統合が要件になく、まずシンプルにHTTPS化したい場合。<br>パターンBが向くケース：グローバル配信・CDNキャッシュ・WAFが要件にある場合や、静的アセット（S3）と動的処理（ALB）を1つのCloudFrontに同居させたい場合。<br><b>迷ったらパターンAでよい。</b>CloudFrontはALBの前段に後からいつでも足せるため、要件が固まってから追加する方が手戻りが少ない。
+      </div>
+    </div>
+
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:10px">参考: HTTPS化まで含めた理想形の構成図</div>
+      <div style="display:inline-flex;background:#ccfbf1;color:#0f766e;border:1px solid #99f6e4;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:10px">この構成図はパターンA</div>
+      <img src="../AWS-ecs-on-fargate学習/architectures/ecs-fargate-architecture.drawio.svg" alt="Route53とACMを含むECS on Fargate構成図（理想形・パターンA）" style="max-width:100%;background:#ffffff;border-radius:8px" />
+      <div style="margin-top:8px;color:#6b7280;font-size:13px">パターンAを実装すると、00章の構成図にRoute53とACMが加わってこの形になります。あくまで参考図で、今回のハンズオンでは作っていません。</div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#f0fdfa;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#0d9488;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#0d9488;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#0f766e;margin-bottom:4px">CloudFront用のACM証明書は「バージニア北部（us-east-1）」で発行する</div>
+        <div style="color:#4b5563">ALB用の証明書はALBと同じリージョンで発行しますが、CloudFrontはグローバルサービスのため、証明書はus-east-1で発行したものしか使えません。<br>「証明書が選択肢に出てこない」の原因No.1なので、座学の今のうちに覚えておいてください。</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;background:#f0fdfa;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#0d9488;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#0d9488;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#0f766e;margin-bottom:4px">HTTPSは「終端」の後ろでHTTPに戻ってよい</div>
+        <div style="color:#4b5563">ALB（またはCloudFront）でTLSを終端したら、その後ろのALB→ECS間はVPC内の閉じた通信なのでHTTPで流すのが一般的です。<br>「ユーザーとの間だけ暗号化されていればまず十分」という割り切りで、コンテナ側に証明書を持たせる必要はありません。</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;background:#f0fdfa;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#0d9488;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#0d9488;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#0f766e;margin-bottom:4px">なぜこのハンズオンでは独自ドメイン＋HTTPS化をやらなかったのか</div>
+        <div style="color:#4b5563">Route53とACM自体は無料利用枠の範囲でも試せますが、名前解決に使う.comドメインの取得には年間10ドル前後のコストがかかります。<br>無料の範囲だけで完結させたい本ハンズオンでは、この部分だけ座学（読むだけ）に留めています。</div>
+      </div>
+    </div>
+    </sc-if>
+  </section>
+
+  <!-- ============ Appendix ============ -->
+  <section id="appendix" data-screen-label="Appendix SAA書籍" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#64748b">Appendix</span>
+      <h2 style="font-size:26px;margin:0">SAA書籍で深掘りする</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 20px 0">今回登場したサービスは、SAA（ソリューションアーキテクト − アソシエイト）試験の中心領域とほぼ重なります。<br>より深く理解したい場合は書籍で該当章を読んでみてください。</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">VPC</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">ELB（ALB）</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">ECS / Fargate</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">ECR</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">RDS / Aurora</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">Systems Manager</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">Route53</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">ACM</span>
+    </div>
+  </section>
+
+</div>
+</div>
+
+<sc-if value="{{ showBackToTop }}" hint-placeholder-val="{{ false }}">
+  <button onClick="{{ scrollToTop }}" aria-label="トップへ戻る" style="position:fixed;right:24px;bottom:24px;width:44px;height:44px;border-radius:50%;background:#232f3e;color:#ff9900;border:none;box-shadow:0 4px 12px rgba(0,0,0,0.2);cursor:pointer;font-size:18px;z-index:50">↑</button>
+</sc-if>
+
+<script type="text/x-dc" data-dc-script data-props="{&quot;showQa&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;表示&quot;,&quot;description&quot;:&quot;各章のTIPSコラムを表示&quot;}}">
+class Component extends DCLogic {
+  state = {
+    quizRevealed: {},
+    ovChecked: {},
+    netChecked: {},
+    edgeChecked: {},
+    dataChecked: {},
+    conChecked: {},
+    tsChecked: {},
+    httpsPattern: "A",
+    showBackToTop: false
+  };
+
+  componentDidMount() {
+    window.addEventListener("scroll", this._onScroll, { passive: true });
+  }
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this._onScroll);
+  }
+  _onScroll = () => {
+    const show = window.scrollY > 400;
+    if (show !== this.state.showBackToTop) this.setState({ showBackToTop: show });
+  };
+  scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+  OV_CHECKLIST_DEFS = [
+    { id: "container", label: "コンテナとは何かを、仮想マシンとの違いを交えて一言で説明できる" },
+    { id: "ecsfargate", label: "ECSとFargateの役割分担（管理役と土台役）を説明できる" },
+    { id: "diagram", label: "全体図の矢印（ユーザー→ALB→ECS→RDS）を見ずに描ける" }
+  ];
+  NET_CHECKLIST_DEFS = [
+    { id: "vpc", label: "VPC・サブネット・ルートテーブルの関係を一言ずつ説明できる" },
+    { id: "pubpriv", label: "パブリック/プライベートの違いが「ルートテーブルで決まる」ことを説明できる" },
+    { id: "igwnat", label: "IGW（双方向の玄関）とNAT（外向き専用の出口）の違いを説明できる" },
+    { id: "nonat", label: "NATが無いと何が起きるか（ECR pull失敗→タスク起動不可）を言える" },
+    { id: "az", label: "AZを2つ以上に分ける理由を説明できる" }
+  ];
+  EDGE_CHECKLIST_DEFS = [
+    { id: "l7", label: "ALBがレイヤー7である意味（HTTPの中身を見て振り分けられる）を説明できる" },
+    { id: "tg", label: "ターゲットグループが必要な理由（タスクのIPが入れ替わる）を説明できる" },
+    { id: "hc", label: "ヘルスチェック失敗時に何が起きるか（振り分け除外→タスク入れ替え）を言える" },
+    { id: "sgchain", label: "SGチェーン（0.0.0.0/0→sg-alb→sg-ecs→sg-rds）を描ける" }
+  ];
+  DATA_CHECKLIST_DEFS = [
+    { id: "rds", label: "RDSを使うメリット（自前運用との違い）を2つ以上言える" },
+    { id: "aurora", label: "AuroraとRDS for PostgreSQLの使い分けの目安を言える" },
+    { id: "ssm", label: "パラメータストアとSecrets Managerの違い（ローテーション）を説明できる" }
+  ];
+  CON_CHECKLIST_DEFS = [
+    { id: "ecr", label: "ECRの役割と、push→pullの流れを説明できる" },
+    { id: "terms", label: "タスク定義・タスク・サービス・クラスターを一言ずつ区別できる" },
+    { id: "deploy", label: "コード修正から本番反映までの流れ（build→push→タスク定義→サービス更新）を言える" },
+    { id: "roles", label: "タスク実行ロールとタスクロールの違いを説明できる" }
+  ];
+  TS_CHECKLIST_DEFS = [
+    { id: "order", label: "「SG→ターゲットグループ→タスク→ログ」の順に調べる理由を説明できる" },
+    { id: "status", label: "タイムアウト / 503 / 500 がそれぞれ「どこまで届いたか」を言える" },
+    { id: "hcloop", label: "ヘルスチェック失敗による再起動ループの仕組みを説明できる" }
+  ];
+
+  toggleQuiz = (id) => this.setState(s => ({ quizRevealed: { ...s.quizRevealed, [id]: !s.quizRevealed[id] } }));
+  toggleQuizOv1 = () => this.toggleQuiz("ov1");
+  toggleQuizOv2 = () => this.toggleQuiz("ov2");
+  toggleQuizOv3 = () => this.toggleQuiz("ov3");
+  toggleQuizNet1 = () => this.toggleQuiz("net1");
+  toggleQuizNet2 = () => this.toggleQuiz("net2");
+  toggleQuizNet3 = () => this.toggleQuiz("net3");
+  toggleQuizEdge1 = () => this.toggleQuiz("edge1");
+  toggleQuizEdge2 = () => this.toggleQuiz("edge2");
+  toggleQuizEdge3 = () => this.toggleQuiz("edge3");
+  toggleQuizData1 = () => this.toggleQuiz("data1");
+  toggleQuizData2 = () => this.toggleQuiz("data2");
+  toggleQuizData3 = () => this.toggleQuiz("data3");
+  toggleQuizCon1 = () => this.toggleQuiz("con1");
+  toggleQuizCon2 = () => this.toggleQuiz("con2");
+  toggleQuizTs1 = () => this.toggleQuiz("ts1");
+  toggleQuizTs2 = () => this.toggleQuiz("ts2");
+
+  toggleOvCheck = (id) => this.setState(s => ({ ovChecked: { ...s.ovChecked, [id]: !s.ovChecked[id] } }));
+  toggleNetCheck = (id) => this.setState(s => ({ netChecked: { ...s.netChecked, [id]: !s.netChecked[id] } }));
+  toggleEdgeCheck = (id) => this.setState(s => ({ edgeChecked: { ...s.edgeChecked, [id]: !s.edgeChecked[id] } }));
+  toggleDataCheck = (id) => this.setState(s => ({ dataChecked: { ...s.dataChecked, [id]: !s.dataChecked[id] } }));
+  toggleConCheck = (id) => this.setState(s => ({ conChecked: { ...s.conChecked, [id]: !s.conChecked[id] } }));
+  toggleTsCheck = (id) => this.setState(s => ({ tsChecked: { ...s.tsChecked, [id]: !s.tsChecked[id] } }));
+
+  setHttpsPatternA = () => this.setState({ httpsPattern: "A" });
+  setHttpsPatternB = () => this.setState({ httpsPattern: "B" });
+
+  renderVals() {
+    const s = this.state;
+    const buildItems = (defs, checkedMap, toggleFn, color) => defs.map(def => {
+      const checked = !!checkedMap[def.id];
+      return {
+        label: def.label,
+        mark: checked ? "✓" : "",
+        bg: checked ? color : "transparent",
+        toggle: () => toggleFn(def.id)
+      };
+    });
+    const ovItems = buildItems(this.OV_CHECKLIST_DEFS, s.ovChecked, this.toggleOvCheck, "#64748b");
+    const netItems = buildItems(this.NET_CHECKLIST_DEFS, s.netChecked, this.toggleNetCheck, "#7c3aed");
+    const edgeItems = buildItems(this.EDGE_CHECKLIST_DEFS, s.edgeChecked, this.toggleEdgeCheck, "#db2777");
+    const dataItems = buildItems(this.DATA_CHECKLIST_DEFS, s.dataChecked, this.toggleDataCheck, "#2563eb");
+    const conItems = buildItems(this.CON_CHECKLIST_DEFS, s.conChecked, this.toggleConCheck, "#c2660a");
+    const tsItems = buildItems(this.TS_CHECKLIST_DEFS, s.tsChecked, this.toggleTsCheck, "#dc2626");
+
+    const httpsPatternIsA = s.httpsPattern !== "B";
+    const httpsPatternIsB = s.httpsPattern === "B";
+    const httpsBtnActiveStyle = "background:#0d9488;color:#ffffff;border:1px solid #0d9488;padding:8px 16px;border-radius:999px;font-weight:700;font-size:13px;cursor:pointer";
+    const httpsBtnInactiveStyle = "background:#ffffff;color:#0f766e;border:1px solid #99f6e4;padding:8px 16px;border-radius:999px;font-weight:700;font-size:13px;cursor:pointer";
+
+    return {
+      qaOn: this.props.showQa ?? true,
+
+      httpsPatternIsA,
+      httpsPatternIsB,
+      setHttpsPatternA: this.setHttpsPatternA,
+      setHttpsPatternB: this.setHttpsPatternB,
+      httpsBtnAStyle: httpsPatternIsA ? httpsBtnActiveStyle : httpsBtnInactiveStyle,
+      httpsBtnBStyle: httpsPatternIsB ? httpsBtnActiveStyle : httpsBtnInactiveStyle,
+
+      quizOv1Revealed: !!s.quizRevealed.ov1,
+      toggleQuizOv1: this.toggleQuizOv1,
+      quizOv2Revealed: !!s.quizRevealed.ov2,
+      toggleQuizOv2: this.toggleQuizOv2,
+      quizOv3Revealed: !!s.quizRevealed.ov3,
+      toggleQuizOv3: this.toggleQuizOv3,
+
+      quizNet1Revealed: !!s.quizRevealed.net1,
+      toggleQuizNet1: this.toggleQuizNet1,
+      quizNet2Revealed: !!s.quizRevealed.net2,
+      toggleQuizNet2: this.toggleQuizNet2,
+      quizNet3Revealed: !!s.quizRevealed.net3,
+      toggleQuizNet3: this.toggleQuizNet3,
+
+      quizEdge1Revealed: !!s.quizRevealed.edge1,
+      toggleQuizEdge1: this.toggleQuizEdge1,
+      quizEdge2Revealed: !!s.quizRevealed.edge2,
+      toggleQuizEdge2: this.toggleQuizEdge2,
+      quizEdge3Revealed: !!s.quizRevealed.edge3,
+      toggleQuizEdge3: this.toggleQuizEdge3,
+
+      quizData1Revealed: !!s.quizRevealed.data1,
+      toggleQuizData1: this.toggleQuizData1,
+      quizData2Revealed: !!s.quizRevealed.data2,
+      toggleQuizData2: this.toggleQuizData2,
+      quizData3Revealed: !!s.quizRevealed.data3,
+      toggleQuizData3: this.toggleQuizData3,
+
+      quizCon1Revealed: !!s.quizRevealed.con1,
+      toggleQuizCon1: this.toggleQuizCon1,
+      quizCon2Revealed: !!s.quizRevealed.con2,
+      toggleQuizCon2: this.toggleQuizCon2,
+
+      quizTs1Revealed: !!s.quizRevealed.ts1,
+      toggleQuizTs1: this.toggleQuizTs1,
+      quizTs2Revealed: !!s.quizRevealed.ts2,
+      toggleQuizTs2: this.toggleQuizTs2,
+
+      ovChecklist: ovItems,
+      ovCheckedCount: ovItems.filter(it => it.mark).length,
+      ovCheckTotal: ovItems.length,
+
+      netChecklist: netItems,
+      netCheckedCount: netItems.filter(it => it.mark).length,
+      netCheckTotal: netItems.length,
+
+      edgeChecklist: edgeItems,
+      edgeCheckedCount: edgeItems.filter(it => it.mark).length,
+      edgeCheckTotal: edgeItems.length,
+
+      dataChecklist: dataItems,
+      dataCheckedCount: dataItems.filter(it => it.mark).length,
+      dataCheckTotal: dataItems.length,
+
+      conChecklist: conItems,
+      conCheckedCount: conItems.filter(it => it.mark).length,
+      conCheckTotal: conItems.length,
+
+      tsChecklist: tsItems,
+      tsCheckedCount: tsItems.filter(it => it.mark).length,
+      tsCheckTotal: tsItems.length,
+
+      showBackToTop: s.showBackToTop,
+      scrollToTop: this.scrollToTop
+    };
+  }
+}
+</script>
+</body>
+</html>

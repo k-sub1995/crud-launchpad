@@ -940,7 +940,7 @@ export async function registerRecipe(formData) {
           <sc-if value="{{ quizAnswered }}" hint-placeholder-val="{{ false }}">
             <div style="background:{{ quizResultBg }};border-radius:8px;padding:12px 16px;font-size:14px">
               <strong>{{ quizVerdict }}</strong><br>
-              <span style="color:#4b5563">{{ quizReason }}</span>
+              <span style="color:#4b5563;white-space:pre-line">{{ quizReason }}</span>
             </div>
           </sc-if>
         </div>
@@ -1910,12 +1910,12 @@ class Component extends DCLogic {
   ];
 
   QUIZ = [
-    { label: "RecipeList（一覧の描画）", server: true, reason: "recipes配列をmapしてRecipeCardを並べるだけならstateもイベントも不要で、サーバーでHTMLにして送れます。今の実装はonEdit/onDeleteをバケツリレーしているので、編集UIをRecipeCard側に閉じ込めるのが移行のコツです。" },
-    { label: "SearchBox（検索入力）", server: false, reason: "onChangeで入力のたびにqueryを更新する制御コンポーネントなので\"use client\"が必須。今のSearchBox.jsxの中身はそのままで、先頭に1行足すだけです。" },
-    { label: "RecipeCardの編集モード", server: false, reason: "isEditingで表示を切り替え、textareaをonChangeで制御する典型的なクライアント部品です。editRecipeTextのstateはApp.jsxからRecipeCard自身に移すと、propsのバケツリレーも8本→4本に減ります。" },
-    { label: "RegisterRecipeForm（登録フォーム）", server: false, reason: "recipeText/recipeUrlを自分のuseStateで持つ制御コンポーネント。入力部分はクライアントに残し、送信先のonRegister（parseRecipeText＋追加）はServer Actionへ分けるのが基本形です。" },
-    { label: "defaultRecipes.js（初期データ）", server: true, reason: "ただのデータ（純JS）です。サーバー側に置けば、初期レシピをHTMLに焼き込んだ状態で届けられます（DBのseedデータにするのが基本形）。" },
-    { label: "app-header（h1とview-switcher）", server: true, reason: "今はonClick＋setViewModeのボタンですが、Next.jsでは<Link>に変わるので実はサーバーでOK。「現在ページのハイライト」にusePathname()を使う場合だけ、その部分をクライアントに切り出します。" }
+    { label: "RecipeList（一覧の描画）", server: true, reason: "recipes配列をmapしてRecipeCardを並べるだけならstateもイベントも不要で、サーバーでHTMLにして送れます。\n今の実装はonEdit/onDeleteをバケツリレーしているので、編集UIをRecipeCard側に閉じ込めるのが移行のコツです。" },
+    { label: "SearchBox（検索入力）", server: false, reason: "onChangeで入力のたびにqueryを更新する制御コンポーネントなので\"use client\"が必須。\n今のSearchBox.jsxの中身はそのままで、先頭に1行足すだけです。" },
+    { label: "RecipeCardの編集モード", server: false, reason: "isEditingで表示を切り替え、textareaをonChangeで制御する典型的なクライアント部品です。\neditRecipeTextのstateはApp.jsxからRecipeCard自身に移すと、propsのバケツリレーも8本→4本に減ります。" },
+    { label: "RegisterRecipeForm（登録フォーム）", server: false, reason: "recipeText/recipeUrlを自分のuseStateで持つ制御コンポーネント。\n入力部分はクライアントに残し、送信先のonRegister（parseRecipeText＋追加）はServer Actionへ分けるのが基本形です。" },
+    { label: "defaultRecipes.js（初期データ）", server: true, reason: "ただのデータ（純JS）です。\nサーバー側に置けば、初期レシピをHTMLに焼き込んだ状態で届けられます（DBのseedデータにするのが基本形）。" },
+    { label: "app-header（h1とview-switcher）", server: true, reason: "今はonClick＋setViewModeのボタンですが、Next.jsでは<Link>に変わるので実はサーバーでOK。\n「現在ページのハイライト」にusePathname()を使う場合だけ、その部分をクライアントに切り出します。" }
   ];
 
   PRISMA_OPS = [

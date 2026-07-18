@@ -260,5 +260,11 @@ document.getElementById('go-fargate-study').addEventListener('click', () => {
 document
   .getElementById('go-aws-support-study')
   .addEventListener('click', () => {
-    location.href = './docs/study/AWS学習サポート/AWS学習サポート.dc.html';
+    location.href = './docs/study/AWS学習サポート/登録〜静的デプロイ.dc.html';
+  });
+
+document
+  .getElementById('go-aws-dynamic-study')
+  .addEventListener('click', () => {
+    location.href = './docs/study/AWS学習サポート/動的デプロイ.dc.html';
   });
