@@ -27,9 +27,16 @@ const FIXED_MESSAGE_SETS = {
     '主役の座をめぐって、今日もカニとペンギンは火花を散らしている',
     'Produced by Claude Fable 5...',
   ],
+  kaniPenSummer2026: [
+    '和歌山ではオウサマペンギンの赤ちゃんが誕生し、7月13日から一般公開されているらしい',
+    '同じ頃、北海道はカニの水揚げ量で全国1位を独走中だった',
+    'ペンギンは羽の生え変わり方を見れば年齢がわかるそうだが、カニは脱皮のたびに年齢がリセットされてしまうらしく、正直な性格が仇になっている',
+    '水族館の片隅ではそんなカニとペンギンがいつも同じ岩陰でくっついて暑さをしのいでいる',
+    'Produced by Claude Sonnet 5...',
+  ],
 };
 
-const ACTIVE_FIXED_MESSAGE_SET = 'kaniPenNews2026';
+const ACTIVE_FIXED_MESSAGE_SET = 'kaniPenSummer2026';
 
 const form = document.querySelector('#entry-form');
 const entryIdInput = document.querySelector('#entry-id');
