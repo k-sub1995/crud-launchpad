@@ -268,3 +268,16 @@ document
   .addEventListener('click', () => {
     location.href = './docs/study/AWS学習サポート/動的デプロイ.dc.html';
   });
+
+document
+  .getElementById('go-vercel-neon-study')
+  .addEventListener('click', () => {
+    location.href =
+      './docs/study/Vercel-Neon学習/Vercel + Neon ハンズオン.dc.html';
+  });
+
+document
+  .getElementById('go-vercel-neon-support')
+  .addEventListener('click', () => {
+    location.href = './docs/study/Vercel-Neon学習/Vercel+Neonデプロイ.dc.html';
+  });
