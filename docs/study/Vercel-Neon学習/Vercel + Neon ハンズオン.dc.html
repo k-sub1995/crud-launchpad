@@ -1,0 +1,3997 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans+JP:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        />
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+          html {
+            scroll-behavior: smooth;
+          }
+          body {
+            margin: 0;
+            background: #0b1016;
+            color: #e6edf3;
+            font-family: 'IBM Plex Sans JP', system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+          }
+          a {
+            color: var(--accent, #00e5a0);
+            text-decoration: none;
+          }
+          a:hover {
+            text-decoration: underline;
+          }
+          ::selection {
+            background: rgba(0, 229, 160, 0.28);
+          }
+          pre::-webkit-scrollbar {
+            height: 8px;
+          }
+          pre::-webkit-scrollbar-thumb {
+            background: #2a3746;
+            border-radius: 8px;
+          }
+          @keyframes fadeUp {
+            from {
+              opacity: 0;
+              transform: translateY(8px);
+            }
+            to {
+              opacity: 1;
+              transform: none;
+            }
+          }
+        </style>
+      </helmet>
+      <div
+        style="--accent:{{ accent }};--code-fs:{{ codeFs }};display:flex;min-height:100vh;background:#0b1016"
+      >
+        <aside
+          style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 100vh;
+            overflow-y: auto;
+            background: #0d141c;
+            border-right: 1px solid #1c2836;
+            padding: 26px 20px 40px;
+            z-index: 20;
+          "
+        >
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 11px;
+              margin-bottom: 6px;
+            "
+          >
+            <div
+              style="
+                width: 38px;
+                height: 38px;
+                border-radius: 9px;
+                background: #111a24;
+                border: 1px solid #1c2836;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+                color: var(--accent, #00e5a0);
+                flex: 0 0 auto;
+              "
+            >
+              ▲
+            </div>
+            <div style="line-height: 1.2">
+              <div
+                style="
+                  font-family: 'Space Grotesk', sans-serif;
+                  font-weight: 700;
+                  font-size: 15px;
+                  letter-spacing: 0.01em;
+                "
+              >
+                Vercel + Neon ハンズオン
+              </div>
+              <div
+                style="
+                  font-family: 'IBM Plex Mono', monospace;
+                  font-size: 10.5px;
+                  color: #5f6f7e;
+                  letter-spacing: 0.08em;
+                  margin-top: 2px;
+                "
+              >
+                2026.07 EDITION
+              </div>
+            </div>
+          </div>
+
+          <div
+            style="
+              margin: 22px 0 24px;
+              padding: 14px;
+              background: #121b25;
+              border: 1px solid #1c2836;
+              border-radius: 11px;
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+                margin-bottom: 9px;
+              "
+            >
+              <span
+                style="
+                  font-size: 11.5px;
+                  color: #8b98a5;
+                  letter-spacing: 0.05em;
+                "
+                >進捗</span
+              >
+              <span
+                style="
+                  font-family: 'IBM Plex Mono', monospace;
+                  font-size: 12px;
+                  color: var(--accent, #00e5a0);
+                  font-weight: 600;
+                "
+                >{{ progressLabel }}</span
+              >
+            </div>
+            <div
+              style="
+                height: 7px;
+                background: #0b1016;
+                border-radius: 99px;
+                overflow: hidden;
+              "
+            >
+              <div
+                style="height:100%;border-radius:99px;background:linear-gradient(90deg,#00b88a,var(--accent,#00e5a0));transition:width .35s ease;width:{{ progressWidth }}"
+              ></div>
+            </div>
+          </div>
+
+          <nav style="display: flex; flex-direction: column; gap: 2px">
+            <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="8">
+              <a
+                href="{{ item.href }}"
+                data-id="{{ item.id }}"
+                onClick="{{ navClick }}"
+                style="{{ item.style }}"
+              >
+                <span style="{{ item.numStyle }}">{{ item.num }}</span>
+                <span style="flex: 1; font-size: 13px; line-height: 1.35"
+                  >{{ item.title }}</span
+                >
+                <span style="{{ item.dotStyle }}"></span>
+              </a>
+            </sc-for>
+          </nav>
+
+          <div
+            style="
+              margin-top: 26px;
+              padding-top: 18px;
+              border-top: 1px solid #1c2836;
+              font-size: 11px;
+              color: #5f6f7e;
+              line-height: 1.6;
+            "
+          >
+            Vercel/Neon初見の方向け。ダッシュボード中心で、GitHubリポジトリの用意から本番URL公開までを通しでやります。
+          </div>
+        </aside>
+
+        <main style="flex: 1; margin-left: 300px; padding: 0 0 120px">
+          <div style="max-width: 900px; margin: 0 auto; padding: 0 48px">
+            <header
+              id="top"
+              style="padding: 80px 0 54px; border-bottom: 1px solid #1c2836"
+            >
+              <div
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 8px;
+                  padding: 6px 13px;
+                  border: 1px solid #2a3746;
+                  border-radius: 99px;
+                  font-family: 'IBM Plex Mono', monospace;
+                  font-size: 11.5px;
+                  color: var(--accent, #00e5a0);
+                  letter-spacing: 0.06em;
+                  margin-bottom: 26px;
+                "
+              >
+                <span
+                  style="
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 99px;
+                    background: var(--accent, #00e5a0);
+                    display: inline-block;
+                  "
+                ></span>
+                HANDS-ON / NEXT.JS (ROUTE HANDLERS) + POSTGRESQL(NEON) / VERCEL
+              </div>
+              <h1
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 50px;
+                  line-height: 1.1;
+                  font-weight: 700;
+                  margin: 0 0 20px;
+                  letter-spacing: -0.01em;
+                "
+              >
+                動的サイトを<br /><span style="color: var(--accent, #00e5a0)"
+                  >Vercel + Neon</span
+                >で<br />ゼロから公開する
+              </h1>
+              <p
+                style="
+                  font-size: 16.5px;
+                  line-height: 1.75;
+                  color: #aab6c2;
+                  max-width: 660px;
+                  margin: 0 0 32px;
+                "
+              >
+                本記事ではGitHubアカウントを作った直後から、<strong
+                  style="color: #e6edf3"
+                  >Webアプリ</strong
+                >（フロント &amp; API: Next.js (Route Handlers) / DB: PostgreSQL
+                on
+                Neon）をVercelで公開するまでを、1つずつ画面を確認しながら進めます。<br />
+                ※本編の構築ゴールは本番URLでの動作確認（5章）までです。<br />
+                任意の付録章に独自ドメイン設定がありますが、ドメイン代の実費がかかります。
+              </p>
+              <div style="display: flex; flex-wrap: wrap; gap: 10px">
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 9px 14px;
+                    background: #121b25;
+                    border: 1px solid #1c2836;
+                    border-radius: 9px;
+                    font-size: 13px;
+                    color: #cdd9e5;
+                  "
+                >
+                  <span style="color: var(--accent, #00e5a0)">▪</span>所要
+                  1.5〜2時間（分割不要）
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 9px 14px;
+                    background: #121b25;
+                    border: 1px solid #1c2836;
+                    border-radius: 9px;
+                    font-size: 13px;
+                    color: #cdd9e5;
+                  "
+                >
+                  <span style="color: var(--accent, #00e5a0)">▪</span
+                  >前提知識ゼロでOK
+                </div>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 18px 0 0;
+                  padding: 15px 17px;
+                  background: rgba(0, 229, 160, 0.05);
+                  border: 1px solid rgba(0, 229, 160, 0.18);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">💡</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #d3e6dd"
+                >
+                  各手順では<strong style="color: #e6edf3"
+                    >変更が必要な設定項目だけ</strong
+                  >を書いています。<br />
+                  記載のない項目は<strong style="color: #e6edf3"
+                    >Vercel / Neon ダッシュボードのデフォルトのまま</strong
+                  >でOKです。
+                </div>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 14px 0 0;
+                  padding: 15px 17px;
+                  background: rgba(88, 166, 255, 0.06);
+                  border: 1px solid rgba(88, 166, 255, 0.22);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">✅</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #b8cbe0"
+                >
+                  <strong style="color: #e6edf3">事前準備（必須）:</strong>
+                  <a
+                    href="./prepare-for-vercel.md"
+                    style="color: #58a6ff; text-decoration: underline"
+                    >prepare-for-vercel.md</a
+                  >
+                  に沿って、<br />
+                  デプロイするアプリの<strong style="color: #e6edf3"
+                    >package.json修正（postinstallの追加）とローカルでのビルド確認</strong
+                  >まで済ませてください。
+                </div>
+              </div>
+            </header>
+
+            <!-- CHAPTERS -->
+
+            <section
+              id="ch0"
+              data-screen-label="00 全体像"
+              style="
+                padding: 60px 0 56px;
+                border-bottom: 1px solid #1c2836;
+                animation: fadeUp 0.5s ease both;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 14px;
+                  margin-bottom: 10px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: var(--accent, #00e5a0);
+                    letter-spacing: 0.08em;
+                  "
+                  >CHAPTER 00</span
+                >
+                <span style="flex: 1; height: 1px; background: #1c2836"></span>
+              </div>
+              <h2
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 31px;
+                  font-weight: 700;
+                  margin: 0 0 16px;
+                  letter-spacing: -0.01em;
+                "
+              >
+                全体像 — Webページが開くまで
+              </h2>
+              <p
+                style="
+                  font-size: 16px;
+                  line-height: 1.8;
+                  color: #aab6c2;
+                  margin: 0 0 24px;
+                "
+              >
+                手を動かす前に、これから作るものの全体像を掴みます。<br />
+                ブラウザに
+                <code
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    background: #0a1119;
+                    padding: 1px 6px;
+                    border-radius: 5px;
+                    color: #e6b877;
+                  "
+                  >https://example.vercel.app</code
+                >
+                と打ってからページが表示されるまで、<br />
+                裏では次のことが起きています。
+              </p>
+
+              <div
+                style="
+                  margin: 24px 0;
+                  padding: 22px;
+                  background: #ffffff;
+                  border: 1px solid #1c2836;
+                  border-radius: 13px;
+                  color: #0b1016;
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 12.5px;
+                  "
+                >
+                  <div
+                    style="
+                      padding: 10px 14px;
+                      border-radius: 9px;
+                      background: #f1f5f9;
+                      border: 1px solid #d8e0e8;
+                      text-align: center;
+                    "
+                  >
+                    🌐<br />ブラウザ
+                  </div>
+                  <span style="color: #94a3b8">→</span>
+                  <div
+                    style="
+                      padding: 10px 14px;
+                      border-radius: 9px;
+                      background: #f1f5f9;
+                      border: 1px solid #d8e0e8;
+                      text-align: center;
+                    "
+                  >
+                    ▲<br />Vercel Edge<br />Network
+                  </div>
+                  <span style="color: #94a3b8">→</span>
+                  <div
+                    style="
+                      padding: 10px 14px;
+                      border-radius: 9px;
+                      background: rgba(0, 229, 160, 0.12);
+                      border: 1px solid rgba(0, 180, 130, 0.4);
+                      text-align: center;
+                    "
+                  >
+                    ⚡<br />Serverless Function<br />(Route Handlers)
+                  </div>
+                  <span style="color: #94a3b8">→</span>
+                  <div
+                    style="
+                      padding: 10px 14px;
+                      border-radius: 9px;
+                      background: #f1f5f9;
+                      border: 1px solid #d8e0e8;
+                      text-align: center;
+                    "
+                  >
+                    🐘<br />Neon Postgres<br />(pooled接続)
+                  </div>
+                </div>
+              </div>
+
+              <ol
+                style="
+                  margin: 12px 0 26px;
+                  padding-left: 20px;
+                  font-size: 14px;
+                  line-height: 2;
+                  color: #c3cdd7;
+                "
+              >
+                <li>
+                  <strong style="color: #e6edf3">リクエスト受信</strong> —
+                  VercelのEdge
+                  NetworkがユーザーのリクエストをGitHub連携済みの最新デプロイへルーティングする
+                </li>
+                <li>
+                  <strong style="color: #e6edf3">画面 &amp; API</strong> —
+                  静的なページはEdge/CDNからそのまま返し、<code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >/api/...</code
+                  >
+                  へのリクエストはNext.jsのRoute HandlerをServerless
+                  Functionとして実行する
+                </li>
+                <li>
+                  <strong style="color: #e6edf3">データ取得</strong> — Route
+                  HandlerがNeonへpooled接続でSQLを投げ、結果をJSONで返す
+                </li>
+                <li>
+                  <strong style="color: #e6edf3">スケール</strong> —
+                  Functionはリクエストのたびに必要な分だけ起動し、アイドル時は課金されない。Neon側のコンピュートも一定時間アクセスが無いと自動サスペンドする
+                </li>
+              </ol>
+
+              <h3
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 19px;
+                  font-weight: 600;
+                  margin: 30px 0 12px;
+                "
+              >
+                登場するサービスと役割
+              </h3>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                  gap: 12px;
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    gap: 12px;
+                    padding: 14px;
+                    background: #111a24;
+                    border: 1px solid #1c2836;
+                    border-radius: 11px;
+                  "
+                >
+                  <div
+                    style="
+                      width: 38px;
+                      height: 38px;
+                      border-radius: 9px;
+                      background: #0a1119;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 19px;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    ▲
+                  </div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 600">Vercel</div>
+                    <div
+                      style="font-size: 12px; color: #8b98a5; line-height: 1.55"
+                    >
+                      Next.jsのホスティング基盤。git
+                      pushで自動ビルド&amp;公開する
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    gap: 12px;
+                    padding: 14px;
+                    background: #111a24;
+                    border: 1px solid #1c2836;
+                    border-radius: 11px;
+                  "
+                >
+                  <div
+                    style="
+                      width: 38px;
+                      height: 38px;
+                      border-radius: 9px;
+                      background: #0a1119;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 19px;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    🐙
+                  </div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 600">
+                      GitHub連携
+                    </div>
+                    <div
+                      style="font-size: 12px; color: #8b98a5; line-height: 1.55"
+                    >
+                      mainブランチへのpushがVercelの自動デプロイのトリガーになる
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    gap: 12px;
+                    padding: 14px;
+                    background: #111a24;
+                    border: 1px solid #1c2836;
+                    border-radius: 11px;
+                  "
+                >
+                  <div
+                    style="
+                      width: 38px;
+                      height: 38px;
+                      border-radius: 9px;
+                      background: #0a1119;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 19px;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    ⚡
+                  </div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 600">
+                      Serverless Function
+                    </div>
+                    <div
+                      style="font-size: 12px; color: #8b98a5; line-height: 1.55"
+                    >
+                      Route Handler(/api/...)の実行単位。サーバーを常駐させない
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    gap: 12px;
+                    padding: 14px;
+                    background: #111a24;
+                    border: 1px solid #1c2836;
+                    border-radius: 11px;
+                  "
+                >
+                  <div
+                    style="
+                      width: 38px;
+                      height: 38px;
+                      border-radius: 9px;
+                      background: #0a1119;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 19px;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    🐘
+                  </div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 600">Neon</div>
+                    <div
+                      style="font-size: 12px; color: #8b98a5; line-height: 1.55"
+                    >
+                      サーバーレスのマネージドPostgres。VPC設計もパッチ適用も不要
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    gap: 12px;
+                    padding: 14px;
+                    background: #111a24;
+                    border: 1px solid #1c2836;
+                    border-radius: 11px;
+                  "
+                >
+                  <div
+                    style="
+                      width: 38px;
+                      height: 38px;
+                      border-radius: 9px;
+                      background: #0a1119;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 19px;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    🔐
+                  </div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 600">
+                      環境変数
+                    </div>
+                    <div
+                      style="font-size: 12px; color: #8b98a5; line-height: 1.55"
+                    >
+                      DB接続文字列(DATABASE_URL)をVercel側に1つ登録するだけで済む
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <sc-if
+                value="{{ showChecklist }}"
+                hint-placeholder-val="{{ true }}"
+              >
+                <div
+                  style="
+                    margin: 30px 0 4px;
+                    padding: 16px 18px 10px;
+                    background: #0e1620;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 9px;
+                      margin-bottom: 6px;
+                      padding: 0 4px;
+                    "
+                  >
+                    <span style="font-size: 13px">✅</span
+                    ><span
+                      style="
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        color: #8b98a5;
+                        letter-spacing: 0.04em;
+                      "
+                      >この章のチェック</span
+                    >
+                  </div>
+                  <sc-for
+                    list="{{ checks_ch0 }}"
+                    as="item"
+                    hint-placeholder-count="3"
+                  >
+                    <div
+                      data-id="{{ item.id }}"
+                      onClick="{{ toggleItem }}"
+                      style="
+                        display: flex;
+                        gap: 12px;
+                        align-items: flex-start;
+                        cursor: pointer;
+                        padding: 9px 8px;
+                        border-radius: 8px;
+                      "
+                      style-hover="background:#131b26"
+                    >
+                      <span style="{{ item.boxStyle }}">✓</span
+                      ><span style="{{ item.txtStyle }}">{{ item.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </section>
+
+            <section
+              id="ch1"
+              data-screen-label="01 環境準備"
+              style="
+                padding: 56px 0;
+                border-bottom: 1px solid #1c2836;
+                animation: fadeUp 0.5s ease both;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 14px;
+                  margin-bottom: 10px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: var(--accent, #00e5a0);
+                    letter-spacing: 0.08em;
+                  "
+                  >CHAPTER 01</span
+                >
+                <span style="flex: 1; height: 1px; background: #1c2836"></span>
+              </div>
+              <h2
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 31px;
+                  font-weight: 700;
+                  margin: 0 0 16px;
+                  letter-spacing: -0.01em;
+                "
+              >
+                環境準備
+              </h2>
+              <p
+                style="
+                  font-size: 16px;
+                  line-height: 1.8;
+                  color: #aab6c2;
+                  margin: 0 0 24px;
+                "
+              >
+                アカウントを3つ用意します。AWS版と違い、IAMユーザーやCLIの事前設定は不要です。
+              </p>
+              <h3
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 19px;
+                  font-weight: 600;
+                  margin: 30px 0 12px;
+                "
+              >
+                用意するもの
+              </h3>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                  gap: 12px;
+                "
+              >
+                <div
+                  style="
+                    padding: 16px;
+                    background: #111a24;
+                    border: 1px solid #1c2836;
+                    border-radius: 11px;
+                  "
+                >
+                  <div
+                    style="
+                      font-size: 13px;
+                      font-weight: 600;
+                      margin-bottom: 6px;
+                    "
+                  >
+                    🐙 GitHubアカウント
+                  </div>
+                  <div
+                    style="font-size: 12px; color: #8b98a5; line-height: 1.55"
+                  >
+                    recipe-appをForkした自分のリポジトリにアクセスできること
+                  </div>
+                </div>
+                <div
+                  style="
+                    padding: 16px;
+                    background: #111a24;
+                    border: 1px solid #1c2836;
+                    border-radius: 11px;
+                  "
+                >
+                  <div
+                    style="
+                      font-size: 13px;
+                      font-weight: 600;
+                      margin-bottom: 6px;
+                    "
+                  >
+                    ▲ Vercelアカウント
+                  </div>
+                  <div
+                    style="font-size: 12px; color: #8b98a5; line-height: 1.55"
+                  >
+                    GitHubアカウントでそのままサインアップできる（<strong
+                      style="color: #e6edf3"
+                      >Continue with GitHub</strong
+                    >がおすすめ）
+                  </div>
+                </div>
+                <div
+                  style="
+                    padding: 16px;
+                    background: #111a24;
+                    border: 1px solid #1c2836;
+                    border-radius: 11px;
+                  "
+                >
+                  <div
+                    style="
+                      font-size: 13px;
+                      font-weight: 600;
+                      margin-bottom: 6px;
+                    "
+                  >
+                    🐘 Neonアカウント
+                  </div>
+                  <div
+                    style="font-size: 12px; color: #8b98a5; line-height: 1.55"
+                  >
+                    同じくGitHubアカウントでサインアップ可能
+                  </div>
+                </div>
+                <div
+                  style="
+                    padding: 16px;
+                    background: #111a24;
+                    border: 1px solid #1c2836;
+                    border-radius: 11px;
+                  "
+                >
+                  <div
+                    style="
+                      font-size: 13px;
+                      font-weight: 600;
+                      margin-bottom: 6px;
+                    "
+                  >
+                    ✅ 事前準備doc対応済みのアプリ
+                  </div>
+                  <div
+                    style="font-size: 12px; color: #8b98a5; line-height: 1.55"
+                  >
+                    prepare-for-vercel.md の①②まで完了していること
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style="
+                  margin: 18px 0 0;
+                  padding: 16px 18px;
+                  background: #111a24;
+                  border: 1px solid #1c2836;
+                  border-radius: 11px;
+                "
+              >
+                <div
+                  style="font-size: 13px; font-weight: 600; margin-bottom: 8px"
+                >
+                  ▲ Vercelアカウントの作成
+                </div>
+
+                <div
+                  style="
+                    font-size: 12.5px;
+                    color: #8b98a5;
+                    line-height: 1.6;
+                    margin-bottom: 12px;
+                  "
+                >
+                  <a
+                    href="https://vercel.com"
+                    target="_blank"
+                    rel="noopener"
+                    style="color: #58a6ff; text-decoration: underline"
+                    >vercel.com</a
+                  >
+                  にアクセスします。<br />
+                  右上の<strong style="color: #e6edf3">「Sign Up」</strong
+                  >から登録します。
+                </div>
+                <img
+                  src="assets/vercel-signup-button.png"
+                  alt="vercel.comのトップページ。右上のSign Upボタンを強調"
+                  style="
+                    max-width: 480px;
+                    width: 100%;
+                    border-radius: 10px;
+                    border: 1px solid #1c2836;
+                  "
+                />
+
+                <div
+                  style="
+                    font-size: 12.5px;
+                    color: #8b98a5;
+                    line-height: 1.6;
+                    margin: 18px 0 12px;
+                  "
+                >
+                  認証方法は<strong style="color: #e6edf3"
+                    >「Continue with GitHub」</strong
+                  >がおすすめです。<br />
+                  GitHub連携しておくと、後のリポジトリ連携やCLIログインがスムーズになります。
+                </div>
+                <img
+                  src="assets/vercel-signup-github.png"
+                  alt="Vercelのサインアップ画面。Continue with GitHubボタンにLast Usedバッジが付いている"
+                  style="
+                    max-width: 360px;
+                    width: 100%;
+                    border-radius: 10px;
+                    border: 1px solid #1c2836;
+                  "
+                />
+
+                <div
+                  style="
+                    font-size: 12.5px;
+                    color: #8b98a5;
+                    line-height: 1.6;
+                    margin: 18px 0 12px;
+                  "
+                >
+                  プラン選択画面では、必ず<strong style="color: #e6edf3"
+                    >「I'm working on personal projects」（Hobbyプラン）</strong
+                  >を選んでください。<br />
+                  Hobbyプランは個人・非商用利用なら無料なので、学習用途ではこちらを選びます。
+                </div>
+                <img
+                  src="assets/vercel-choose-plan-hobby.png"
+                  alt="Choose a Plan画面。I'm working on personal projects（Hobby）が選択されている状態"
+                  style="
+                    max-width: 360px;
+                    width: 100%;
+                    border-radius: 10px;
+                    border: 1px solid #1c2836;
+                  "
+                />
+              </div>
+              <div
+                style="
+                  margin: 18px 0 0;
+                  padding: 16px 18px;
+                  background: #111a24;
+                  border: 1px solid #1c2836;
+                  border-radius: 11px;
+                "
+              >
+                <div
+                  style="font-size: 13px; font-weight: 600; margin-bottom: 8px"
+                >
+                  🐘 Neonアカウントの作成
+                </div>
+
+                <div
+                  style="
+                    font-size: 12.5px;
+                    color: #8b98a5;
+                    line-height: 1.6;
+                    margin-bottom: 12px;
+                  "
+                >
+                  <a
+                    href="https://neon.tech"
+                    target="_blank"
+                    rel="noopener"
+                    style="color: #58a6ff; text-decoration: underline"
+                    >neon.tech</a
+                  >
+                  にアクセスします。<br />
+                  認証方法は<strong style="color: #e6edf3"
+                    >「Continue with GitHub」</strong
+                  >がおすすめです。<br />
+                  Vercelと同じGitHubアカウントを使うと後で管理が楽です。
+                </div>
+                <img
+                  src="assets/neon-signup-github.png"
+                  alt="Neonのサインアップ画面。GitHubボタンにカーソルが乗っている状態"
+                  style="
+                    max-width: 360px;
+                    width: 100%;
+                    border-radius: 10px;
+                    border: 1px solid #1c2836;
+                  "
+                />
+              </div>
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 18px 0 0;
+                  padding: 15px 17px;
+                  background: rgba(34, 197, 94, 0.06);
+                  border: 1px solid rgba(34, 197, 94, 0.22);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">✅</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #a8dab8"
+                >
+                  Vercel, Neonとも<strong style="color: #5fd685"
+                    >クレジットカード登録なしの無料枠</strong
+                  >で完結します（本記事執筆時点 / 2026年7月）。<br />
+                  Vercel Hobbyプランは個人・非商用利用の範囲、Neon
+                  Freeプランはプロジェクトあたり0.5GBストレージ・月100
+                  CU-hourの範囲で無料です。学習用途ならまず超えません。
+                </div>
+              </div>
+
+              <sc-if
+                value="{{ showChecklist }}"
+                hint-placeholder-val="{{ true }}"
+              >
+                <div
+                  style="
+                    margin: 30px 0 4px;
+                    padding: 16px 18px 10px;
+                    background: #0e1620;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 9px;
+                      margin-bottom: 6px;
+                      padding: 0 4px;
+                    "
+                  >
+                    <span style="font-size: 13px">✅</span
+                    ><span
+                      style="
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        color: #8b98a5;
+                        letter-spacing: 0.04em;
+                      "
+                      >この章のチェック</span
+                    >
+                  </div>
+                  <sc-for
+                    list="{{ checks_ch1 }}"
+                    as="item"
+                    hint-placeholder-count="4"
+                  >
+                    <div
+                      data-id="{{ item.id }}"
+                      onClick="{{ toggleItem }}"
+                      style="
+                        display: flex;
+                        gap: 12px;
+                        align-items: flex-start;
+                        cursor: pointer;
+                        padding: 9px 8px;
+                        border-radius: 8px;
+                      "
+                      style-hover="background:#131b26"
+                    >
+                      <span style="{{ item.boxStyle }}">✓</span
+                      ><span style="{{ item.txtStyle }}">{{ item.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </section>
+
+            <section
+              id="ch2"
+              data-screen-label="02 Neon"
+              style="
+                padding: 56px 0;
+                border-bottom: 1px solid #1c2836;
+                animation: fadeUp 0.5s ease both;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 14px;
+                  margin-bottom: 10px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: var(--accent, #00e5a0);
+                    letter-spacing: 0.08em;
+                  "
+                  >CHAPTER 02</span
+                >
+                <span style="flex: 1; height: 1px; background: #1c2836"></span>
+              </div>
+              <h2
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 31px;
+                  font-weight: 700;
+                  margin: 0 0 16px;
+                  letter-spacing: -0.01em;
+                "
+              >
+                Neon — PostgreSQL を用意する
+              </h2>
+              <p
+                style="
+                  font-size: 16px;
+                  line-height: 1.8;
+                  color: #aab6c2;
+                  margin: 0 0 24px;
+                "
+              >
+                アプリが使うPostgreSQLをNeon上に作ります。<br />
+                VPC・サブネット・セキュリティグループの設計は不要。DBを1つ作るだけです。
+              </p>
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 14px 0;
+                  padding: 15px 17px;
+                  background: rgba(0, 229, 160, 0.05);
+                  border: 1px solid rgba(0, 229, 160, 0.18);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">🎯</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #d3e6dd"
+                >
+                  <strong style="color: var(--accent, #00e5a0)"
+                    >Neonの目的</strong
+                  >
+                  —
+                  サーバーレスのマネージドPostgres。使っていない時間はコンピュートが自動でサスペンドし、その間は課金されません。
+                </div>
+              </div>
+
+              <h3
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 19px;
+                  font-weight: 600;
+                  margin: 30px 0 4px;
+                "
+              >
+                手順
+              </h3>
+              <div
+                style="
+                  margin: 14px 0;
+                  padding: 0 18px;
+                  background: #0e1620;
+                  border: 1px solid #1c2836;
+                  border-radius: 13px;
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    gap: 14px;
+                    padding: 16px 0;
+                    border-bottom: 1px solid #141e28;
+                  "
+                >
+                  <div
+                    style="
+                      width: 26px;
+                      height: 26px;
+                      border-radius: 7px;
+                      background: rgba(0, 229, 160, 0.14);
+                      color: var(--accent, #00e5a0);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 12px;
+                      font-weight: 600;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    1
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 6px;
+                        margin-bottom: 7px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11.5px;
+                      "
+                    >
+                      <span
+                        style="
+                          padding: 3px 9px;
+                          background: #0a1119;
+                          border: 1px solid #24323f;
+                          border-radius: 6px;
+                          color: #cdd9e5;
+                        "
+                        >neon.tech</span
+                      ><span style="color: #5f6f7e">›</span
+                      ><span
+                        style="
+                          padding: 3px 9px;
+                          background: rgba(0, 229, 160, 0.14);
+                          border: 1px solid rgba(0, 229, 160, 0.3);
+                          border-radius: 6px;
+                          color: var(--accent, #00e5a0);
+                        "
+                        >Sign up</span
+                      >
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                      "
+                    >
+                      <a
+                        href="https://neon.tech"
+                        target="_blank"
+                        rel="noopener"
+                        style="color: #58a6ff; text-decoration: underline"
+                        >neon.tech</a
+                      >
+                      にアクセスします。<br />
+                      右上の<strong style="color: #e6edf3">「Sign up」</strong
+                      >から登録します。<br />
+                    </div>
+                    <img
+                      src="assets/neon-signup-button.png"
+                      alt="neon.techのトップページ。右上のSign upボタンを強調"
+                      style="
+                        max-width: 480px;
+                        width: 100%;
+                        border-radius: 10px;
+                        border: 1px solid #1c2836;
+                        margin: 16px 0 0;
+                      "
+                    />
+                  </div>
+                </div>
+                <div style="display: flex; gap: 14px; padding: 16px 0">
+                  <div
+                    style="
+                      width: 26px;
+                      height: 26px;
+                      border-radius: 7px;
+                      background: rgba(0, 229, 160, 0.14);
+                      color: var(--accent, #00e5a0);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 12px;
+                      font-weight: 600;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    2
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 6px;
+                        margin-bottom: 7px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11.5px;
+                      "
+                    >
+                      <span
+                        style="
+                          padding: 3px 9px;
+                          background: #0a1119;
+                          border: 1px solid #24323f;
+                          border-radius: 6px;
+                          color: #cdd9e5;
+                        "
+                        >Neon コンソール</span
+                      ><span style="color: #5f6f7e">›</span
+                      ><span
+                        style="
+                          padding: 3px 9px;
+                          background: rgba(0, 229, 160, 0.14);
+                          border: 1px solid rgba(0, 229, 160, 0.3);
+                          border-radius: 6px;
+                          color: var(--accent, #00e5a0);
+                        "
+                        >Create a project</span
+                      >
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                      "
+                    >
+                      プロジェクト名は
+                      <code
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          background: #0a1119;
+                          padding: 1px 6px;
+                          border-radius: 5px;
+                          color: #e6b877;
+                        "
+                        >recipe-app</code
+                      >
+                      など分かりやすいものに。<br />
+                      Postgresのバージョンはデフォルトの18のままでOK。<br />
+                      リージョンは<strong style="color: #e6edf3"
+                        >AWS Asia Pacific 1 (Singapore)</strong
+                      >を選びます。
+                    </div>
+                    <img
+                      src="assets/neon-create-project-form.png"
+                      alt="Neonのプロジェクト作成フォーム。Postgresバージョン18、リージョン一覧でSingaporeにカーソルが乗っている状態"
+                      style="
+                        max-width: 480px;
+                        width: 100%;
+                        border-radius: 10px;
+                        border: 1px solid #1c2836;
+                        margin: 16px 0 0;
+                      "
+                    />
+                    <div
+                      style="
+                        display: flex;
+                        gap: 13px;
+                        margin: 18px 0 0;
+                        padding: 15px 17px;
+                        background: rgba(0, 229, 160, 0.05);
+                        border: 1px solid rgba(0, 229, 160, 0.18);
+                        border-radius: 11px;
+                      "
+                    >
+                      <span style="font-size: 16px; flex: 0 0 auto">💡</span>
+                      <div
+                        style="
+                          font-size: 13.5px;
+                          line-height: 1.75;
+                          color: #d3e6dd;
+                        "
+                      >
+                        <strong style="color: var(--accent, #00e5a0)"
+                          >なぜリージョンを近くにするか</strong
+                        >
+                        — アプリ(Vercel
+                        Function)からNeonへのSQL実行は、そのたびにネットワークを往復します。<br />
+                        物理的な距離が離れるほど往復時間（レイテンシ）が増え、特に1リクエストで複数回SQLを投げる処理では体感の遅さに直結します。<br />
+                        Neonには東京リージョンが無いため、日本からはSingaporeが最もレイテンシが小さく、デフォルトのOhio(米国)より有利です。
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                        margin: 18px 0 0;
+                      "
+                    >
+                      作成が完了すると、選択したリージョンと無料プランの内容を示す確認画面が表示されます。<br />
+                      <strong style="color: #e6edf3">Go to project</strong>
+                      をクリックしてプロジェクト画面に進みます。
+                    </div>
+                    <img
+                      src="assets/neon-project-created-goto.png"
+                      alt="Neonのプロジェクト作成完了画面。リージョンSingaporeと無料プランの内容、Go to projectボタン"
+                      style="
+                        max-width: 480px;
+                        width: 100%;
+                        border-radius: 10px;
+                        border: 1px solid #1c2836;
+                        margin: 16px 0 0;
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <sc-if
+                value="{{ showChecklist }}"
+                hint-placeholder-val="{{ true }}"
+              >
+                <div
+                  style="
+                    margin: 30px 0 4px;
+                    padding: 16px 18px 10px;
+                    background: #0e1620;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 9px;
+                      margin-bottom: 6px;
+                      padding: 0 4px;
+                    "
+                  >
+                    <span style="font-size: 13px">✅</span
+                    ><span
+                      style="
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        color: #8b98a5;
+                        letter-spacing: 0.04em;
+                      "
+                      >この章のチェック</span
+                    >
+                  </div>
+                  <sc-for
+                    list="{{ checks_ch2 }}"
+                    as="item"
+                    hint-placeholder-count="3"
+                  >
+                    <div
+                      data-id="{{ item.id }}"
+                      onClick="{{ toggleItem }}"
+                      style="
+                        display: flex;
+                        gap: 12px;
+                        align-items: flex-start;
+                        cursor: pointer;
+                        padding: 9px 8px;
+                        border-radius: 8px;
+                      "
+                      style-hover="background:#131b26"
+                    >
+                      <span style="{{ item.boxStyle }}">✓</span
+                      ><span style="{{ item.txtStyle }}">{{ item.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </section>
+
+            <section
+              id="ch3"
+              data-screen-label="03 Prismaの準備"
+              style="
+                padding: 56px 0;
+                border-bottom: 1px solid #1c2836;
+                animation: fadeUp 0.5s ease both;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 14px;
+                  margin-bottom: 10px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: var(--accent, #00e5a0);
+                    letter-spacing: 0.08em;
+                  "
+                  >CHAPTER 03</span
+                >
+                <span style="flex: 1; height: 1px; background: #1c2836"></span>
+              </div>
+              <h2
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 31px;
+                  font-weight: 700;
+                  margin: 0 0 16px;
+                  letter-spacing: -0.01em;
+                "
+              >
+                Prismaの準備 — マイグレーションを適用
+              </h2>
+              <p
+                style="
+                  font-size: 16px;
+                  line-height: 1.8;
+                  color: #aab6c2;
+                  margin: 0 0 24px;
+                "
+              >
+                手元にある既存のマイグレーションファイル（<code
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    background: #0a1119;
+                    padding: 1px 6px;
+                    border-radius: 5px;
+                    color: #e6b877;
+                  "
+                  >prisma/migrations/</code
+                >）を、まだ空のNeon上のDBに適用します。<br />
+                アプリのコードは一切変更しません。
+              </p>
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 14px 0;
+                  padding: 15px 17px;
+                  background: rgba(0, 229, 160, 0.05);
+                  border: 1px solid rgba(0, 229, 160, 0.18);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">🎯</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #d3e6dd"
+                >
+                  <strong style="color: var(--accent, #00e5a0)"
+                    >ここで実行するコマンド</strong
+                  >
+                  —
+                  <code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >prisma migrate dev</code
+                  >
+                  ではなく
+                  <code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >prisma migrate deploy</code
+                  >。既存のマイグレーションを「適用するだけ」の本番向けコマンドです。
+                </div>
+              </div>
+
+              <h3
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 19px;
+                  font-weight: 600;
+                  margin: 30px 0 12px;
+                "
+              >
+                Neonから接続文字列を2本取得する
+              </h3>
+              <p
+                style="
+                  font-size: 13.5px;
+                  line-height: 1.75;
+                  color: #c3cdd7;
+                  margin: 0 0 16px;
+                "
+              >
+                Neonのプロジェクトダッシュボードで「Connect」を開きます。<br />
+                デフォルトで<strong style="color: #e6edf3"
+                  >Connection pooling がON</strong
+                >（ホスト名に
+                <code
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    background: #0a1119;
+                    padding: 1px 6px;
+                    border-radius: 5px;
+                    color: #e6b877;
+                  "
+                  >-pooler</code
+                >
+                が付く）の接続文字列が表示されるので、まずこれをコピーしておきます。<br />
+                こちらは今は使わず、4章でVercelに設定する
+                <code
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    background: #0a1119;
+                    padding: 1px 6px;
+                    border-radius: 5px;
+                    color: #e6b877;
+                  "
+                  >DATABASE_URL</code
+                >
+                になります。
+              </p>
+              <img
+                src="assets/neon-connect-dialog-pooled-on.png"
+                alt="Neonの「Connect to your branch」ダイアログ。Connection poolingトグルがONで、ホスト名に-poolerが付いた接続文字列が表示されている"
+                style="
+                  max-width: 480px;
+                  width: 100%;
+                  border-radius: 10px;
+                  border: 1px solid #1c2836;
+                  margin: 0 0 6px;
+                "
+              />
+              <p
+                style="
+                  font-size: 12px;
+                  line-height: 1.6;
+                  color: #7d8a99;
+                  margin: 0 0 20px;
+                "
+              >
+                ▲ ここでコピーする1本目（pooled / ホスト名に<code
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    background: #0a1119;
+                    padding: 1px 5px;
+                    border-radius: 4px;
+                    color: #e6b877;
+                  "
+                  >-pooler</code
+                >あり）。4章でVercelの<code
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    background: #0a1119;
+                    padding: 1px 5px;
+                    border-radius: 4px;
+                    color: #e6b877;
+                  "
+                  >DATABASE_URL</code
+                >に設定します。
+              </p>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 0 0 16px;
+                  padding: 15px 17px;
+                  background: rgba(0, 229, 160, 0.05);
+                  border: 1px solid rgba(0, 229, 160, 0.18);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">💡</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #d3e6dd"
+                >
+                  同じダイアログで<strong style="color: #e6edf3"
+                    >Connection poolingをOFF</strong
+                  >にすると、<code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >-pooler</code
+                  >
+                  の付かない<strong style="color: #e6edf3">direct接続</strong
+                  >の文字列に切り替わります。<br />
+                  こちらは、この直後に実行するマイグレーションでだけ使います。<br />
+                  アプリの実行時（Vercel側の環境変数）には使いません。
+                  <img
+                    src="assets/neon-connect-dialog-toggle.png"
+                    alt="Neonの「Connect to your database」ダイアログ。Connection poolingトグルがOFFで、ホスト名に-poolerが付かない接続文字列が表示されている"
+                    style="
+                      max-width: 480px;
+                      width: 100%;
+                      border-radius: 10px;
+                      border: 1px solid #1c2836;
+                      margin: 10px 0 4px;
+                    "
+                  />
+                  <div style="font-size: 12px; color: #9fb3ab">
+                    ▲ OFFにすると表示される2本目（direct /
+                    -poolerなし）。マイグレーションでだけ使います。
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 0 0 24px;
+                  padding: 15px 17px;
+                  background: rgba(88, 166, 255, 0.06);
+                  border: 1px solid rgba(88, 166, 255, 0.22);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">✅</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #b8cbe0"
+                >
+                  <strong style="color: #e6edf3">実行するとこうなる</strong> —
+                  pooled用とdirect用、2本の接続文字列が手元にメモできている状態になります。<br />
+                  schema.prismaの修正やVercel側の2本目の環境変数は不要。使うのはpooledの1本だけです。
+                </div>
+              </div>
+
+              <h3
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 19px;
+                  font-weight: 600;
+                  margin: 30px 0 12px;
+                "
+              >
+                ローカルから一度だけ実行
+              </h3>
+              <div
+                data-code
+                style="
+                  margin: 16px 0;
+                  border: 1px solid #23303f;
+                  border-radius: 11px;
+                  overflow: hidden;
+                  background: #0a1119;
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 9px 14px;
+                    background: #111a24;
+                    border-bottom: 1px solid #1c2836;
+                  "
+                >
+                  <span
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 11.5px;
+                      color: #7c8b99;
+                      letter-spacing: 0.05em;
+                    "
+                    >bash — nextjs-learning ディレクトリで実行</span
+                  ><button
+                    onClick="{{ copyCode }}"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 6px;
+                      background: transparent;
+                      border: 1px solid #2a3746;
+                      color: #8b98a5;
+                      font-size: 11.5px;
+                      padding: 4px 11px;
+                      border-radius: 7px;
+                      cursor: pointer;
+                      font-family: 'IBM Plex Mono', monospace;
+                      transition: all 0.15s;
+                    "
+                    style-hover="border-color:var(--accent,#00e5a0);color:var(--accent,#00e5a0)"
+                  >
+                    <span style="font-size: 12px">⧉</span
+                    ><span data-lbl>コピー</span>
+                  </button>
+                </div>
+                <pre
+                  style="margin: 0; padding: 15px 16px; overflow-x: auto"
+                ><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre"># <直接接続の文字列> は上でConnection poolingをOFFにして控えたもの
+# URLに含まれる "&" をシェルに解釈させないよう、必ずダブルクォートで囲むこと
+export DATABASE_URL="&lt;Neonのdirect接続文字列&gt;"
+bunx prisma migrate deploy</code></pre>
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 18px 0;
+                  padding: 15px 17px;
+                  background: rgba(255, 138, 76, 0.07);
+                  border: 1px solid rgba(255, 138, 76, 0.28);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">⚠️</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #e2c9b8"
+                >
+                  接続文字列に<code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >&amp;channel_binding=require</code
+                  >
+                  など<strong style="color: #e6edf3">&amp;を含む</strong
+                  >ため、<br />
+                  必ず<strong style="color: #e6edf3"
+                    >ダブルクォートで囲むのを忘れずに</strong
+                  >。
+                </div>
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 18px 0;
+                  padding: 15px 17px;
+                  background: rgba(88, 166, 255, 0.06);
+                  border: 1px solid rgba(88, 166, 255, 0.22);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">✅</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #b8cbe0"
+                >
+                  <strong style="color: #e6edf3">実行するとこうなる</strong> —
+                  <code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >Applying migration ...</code
+                  >
+                  のログが流れ、最後に
+                  <code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >All migrations have been successfully applied.</code
+                  >
+                  と出ればOK。
+                  <img
+                    src="assets/ch3-migrate-deploy-success.png"
+                    alt="実際の成功例。ダブルクォートで囲んだexport DATABASE_URLの後にbunx prisma migrate deployを実行し、Datasourceがneon.techを指した状態でAll migrations have been successfully applied.と出ている"
+                    style="
+                      max-width: 560px;
+                      width: 100%;
+                      border-radius: 10px;
+                      border: 1px solid #1c2836;
+                      margin: 14px 0;
+                    "
+                  /><br />
+                  Neonダッシュボードの「Tables」からも
+                  <code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >Recipe</code
+                  >
+                  テーブルが増えていることを確認できます。
+                  <img
+                    src="assets/neon-recipe-table-created.png"
+                    alt="Neonダッシュボードのproductionブランチ › Tables。publicスキーマにRecipeテーブルが作成され、まだNo rows(空)の状態"
+                    style="
+                      max-width: 560px;
+                      width: 100%;
+                      border-radius: 10px;
+                      border: 1px solid #1c2836;
+                      margin: 14px 0 0;
+                    "
+                  />
+                </div>
+              </div>
+
+              <sc-if
+                value="{{ showChecklist }}"
+                hint-placeholder-val="{{ true }}"
+              >
+                <div
+                  style="
+                    margin: 30px 0 4px;
+                    padding: 16px 18px 10px;
+                    background: #0e1620;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 9px;
+                      margin-bottom: 6px;
+                      padding: 0 4px;
+                    "
+                  >
+                    <span style="font-size: 13px">✅</span
+                    ><span
+                      style="
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        color: #8b98a5;
+                        letter-spacing: 0.04em;
+                      "
+                      >この章のチェック</span
+                    >
+                  </div>
+                  <sc-for
+                    list="{{ checks_ch3 }}"
+                    as="item"
+                    hint-placeholder-count="2"
+                  >
+                    <div
+                      data-id="{{ item.id }}"
+                      onClick="{{ toggleItem }}"
+                      style="
+                        display: flex;
+                        gap: 12px;
+                        align-items: flex-start;
+                        cursor: pointer;
+                        padding: 9px 8px;
+                        border-radius: 8px;
+                      "
+                      style-hover="background:#131b26"
+                    >
+                      <span style="{{ item.boxStyle }}">✓</span
+                      ><span style="{{ item.txtStyle }}">{{ item.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </section>
+
+            <section
+              id="ch4"
+              data-screen-label="04 Vercelへデプロイ"
+              style="
+                padding: 56px 0;
+                border-bottom: 1px solid #1c2836;
+                animation: fadeUp 0.5s ease both;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 14px;
+                  margin-bottom: 10px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: var(--accent, #00e5a0);
+                    letter-spacing: 0.08em;
+                  "
+                  >CHAPTER 04</span
+                >
+                <span style="flex: 1; height: 1px; background: #1c2836"></span>
+              </div>
+              <h2
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 31px;
+                  font-weight: 700;
+                  margin: 0 0 16px;
+                  letter-spacing: -0.01em;
+                "
+              >
+                Vercelへデプロイ
+              </h2>
+              <p
+                style="
+                  font-size: 16px;
+                  line-height: 1.8;
+                  color: #aab6c2;
+                  margin: 0 0 24px;
+                "
+              >
+                Vercel CLIを使い、ローカルの
+                <code
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    background: #0a1119;
+                    padding: 1px 6px;
+                    border-radius: 5px;
+                    color: #e6b877;
+                  "
+                  >nextjs-learning/</code
+                >
+                ディレクトリから直接デプロイします。<br />
+                CLIはコマンドを実行したディレクトリをそのままプロジェクトルートとして扱うため、GUIで必要になる「Root
+                Directory」の設定は不要です。
+              </p>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 18px 0;
+                  padding: 15px 17px;
+                  background: rgba(88, 166, 255, 0.06);
+                  border: 1px solid rgba(88, 166, 255, 0.22);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">✅</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #b8cbe0"
+                >
+                  <strong style="color: #e6edf3">前提:</strong>
+                  Vercelアカウントは作成済であること（1章で作成済み）。
+                </div>
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 18px 0;
+                  padding: 15px 17px;
+                  background: rgba(0, 229, 160, 0.05);
+                  border: 1px solid rgba(0, 229, 160, 0.18);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">💡</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #c3cdd7"
+                >
+                  <strong style="color: #e6edf3">TIPS: GitHub連携という選択肢もある</strong><br />
+                  VercelにはGitHubリポジトリと連携し、pushをトリガーに自動デプロイする機能もある。<br />
+                  mainブランチへのpushで本番環境へ、それ以外のブランチやPRへのpushでプレビュー環境へ、それぞれ自動でデプロイされる。<br />
+                  このハンズオンではローカルからの挙動を理解しやすいCLIデプロイを採用しているが、実務ではGitHub連携の方が一般的。<br />
+                  連携する場合は、Vercelダッシュボードの「Add New...」→「Project」からリポジトリをインポートする。<br />
+                  このハンズオンのようにCLIで先にプロジェクトを作成した場合も、後からGitHub連携に切り替えられる。<br />
+                  「Projects」から対象プロジェクトを開き、「Connect Git Repository」からリポジトリを選択すればよい。
+                </div>
+              </div>
+
+              <h3
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 19px;
+                  font-weight: 600;
+                  margin: 30px 0 4px;
+                "
+              >
+                手順
+              </h3>
+              <div
+                style="
+                  margin: 14px 0;
+                  padding: 0 18px;
+                  background: #0e1620;
+                  border: 1px solid #1c2836;
+                  border-radius: 13px;
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    gap: 14px;
+                    padding: 16px 0;
+                    border-bottom: 1px solid #141e28;
+                  "
+                >
+                  <div
+                    style="
+                      width: 26px;
+                      height: 26px;
+                      border-radius: 7px;
+                      background: rgba(0, 229, 160, 0.14);
+                      color: var(--accent, #00e5a0);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 12px;
+                      font-weight: 600;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    1
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 6px;
+                        margin-bottom: 7px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11.5px;
+                      "
+                    >
+                      <span
+                        style="
+                          padding: 3px 9px;
+                          background: #0a1119;
+                          border: 1px solid #24323f;
+                          border-radius: 6px;
+                          color: #cdd9e5;
+                        "
+                        >nextjs-learning/</span
+                      ><span style="color: #5f6f7e">›</span
+                      ><span
+                        style="
+                          padding: 3px 9px;
+                          background: rgba(0, 229, 160, 0.14);
+                          border: 1px solid rgba(0, 229, 160, 0.3);
+                          border-radius: 6px;
+                          color: var(--accent, #00e5a0);
+                        "
+                        >vercel login</span
+                      >
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                      "
+                    >
+                      <code
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          background: #0a1119;
+                          padding: 1px 6px;
+                          border-radius: 5px;
+                          color: #e6b877;
+                        "
+                        >nextjs-learning/</code
+                      >
+                      に移動してCLIをログインします。<br />
+                      ブラウザが開くので、そこでGitHubアカウントでの認証を確認します。
+                    </div>
+                    <div
+                      data-code
+                      style="
+                        margin: 16px 0;
+                        border: 1px solid #23303f;
+                        border-radius: 11px;
+                        overflow: hidden;
+                        background: #0a1119;
+                      "
+                    >
+                      <div
+                        style="
+                          display: flex;
+                          align-items: center;
+                          justify-content: space-between;
+                          padding: 9px 14px;
+                          background: #111a24;
+                          border-bottom: 1px solid #1c2836;
+                        "
+                      >
+                        <span
+                          style="
+                            font-family: 'IBM Plex Mono', monospace;
+                            font-size: 11.5px;
+                            color: #7c8b99;
+                            letter-spacing: 0.05em;
+                          "
+                          >bash</span
+                        ><button
+                          onClick="{{ copyCode }}"
+                          style="
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                            background: transparent;
+                            border: 1px solid #2a3746;
+                            color: #8b98a5;
+                            font-size: 11.5px;
+                            padding: 4px 11px;
+                            border-radius: 7px;
+                            cursor: pointer;
+                            font-family: 'IBM Plex Mono', monospace;
+                            transition: all 0.15s;
+                          "
+                          style-hover="border-color:var(--accent,#00e5a0);color:var(--accent,#00e5a0)"
+                        >
+                          <span style="font-size: 12px">⧉</span
+                          ><span data-lbl>コピー</span>
+                        </button>
+                      </div>
+                      <pre
+                        style="margin: 0; padding: 15px 16px; overflow-x: auto"
+                      ><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">cd nextjs-learning
+vercel login</code></pre>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    gap: 13px;
+                    margin: 14px 0;
+                    padding: 15px 17px;
+                    background: rgba(88, 166, 255, 0.06);
+                    border: 1px solid rgba(88, 166, 255, 0.22);
+                    border-radius: 11px;
+                  "
+                >
+                  <span style="font-size: 16px; flex: 0 0 auto">💡</span>
+                  <div
+                    style="font-size: 13.5px; line-height: 1.75; color: #b8cbe0"
+                  >
+                    <strong style="color: #e6edf3">補足:</strong>
+                    Claude Code環境でCLIを実行すると、初回に
+                    <code
+                      style="
+                        font-family: 'IBM Plex Mono', monospace;
+                        background: #0a1119;
+                        padding: 1px 6px;
+                        border-radius: 5px;
+                        color: #e6b877;
+                      "
+                      >Vercel Plugin for Claude Code is not installed. Would you
+                      like to install it now? (Y/n)</code
+                    >
+                    と聞かれることがあります。<br />
+                    これはClaude
+                    Code向けの統合プラグインで、本ハンズオンのデプロイ手順とは無関係です。<br />
+                    <strong style="color: #e6edf3">n</strong
+                    >（スキップ）を選んで進めてください。
+                  </div>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    gap: 14px;
+                    padding: 16px 0;
+                    border-bottom: 1px solid #141e28;
+                  "
+                >
+                  <div
+                    style="
+                      width: 26px;
+                      height: 26px;
+                      border-radius: 7px;
+                      background: rgba(0, 229, 160, 0.14);
+                      color: var(--accent, #00e5a0);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 12px;
+                      font-weight: 600;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    2
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 6px;
+                        margin-bottom: 7px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11.5px;
+                      "
+                    >
+                      <span
+                        style="
+                          padding: 3px 9px;
+                          background: rgba(0, 229, 160, 0.14);
+                          border: 1px solid rgba(0, 229, 160, 0.3);
+                          border-radius: 6px;
+                          color: var(--accent, #00e5a0);
+                        "
+                        >vercel link</span
+                      >
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                      "
+                    >
+                      対話形式のプロンプトに答えて、Vercelプロジェクトを新規作成します。<br />
+                      途中で表示される「Which
+                      project?」は矢印キーで選ぶ選択式になっています。<br />
+                      まだVercel上にプロジェクトが存在しないため、<strong
+                        style="color: #e6edf3"
+                        >「Create a new project」</strong
+                      >を選んでください（「Search all
+                      projects」は既存プロジェクトを探す方の選択肢）。<br />
+                      <code
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          background: #0a1119;
+                          padding: 1px 6px;
+                          border-radius: 5px;
+                          color: #e6b877;
+                        "
+                        >nextjs-learning/</code
+                      >
+                      の中で実行するため、ディレクトリの選択はデフォルト（<code
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          background: #0a1119;
+                          padding: 1px 6px;
+                          border-radius: 5px;
+                          color: #e6b877;
+                        "
+                        >./</code
+                      >）のままでOK。<br />
+                      最後の「Customize settings?」「Customize advanced
+                      settings?」もNext.jsが自動検出されているため、どちらも<strong
+                        style="color: #e6edf3"
+                        >N</strong
+                      >でOK。
+                    </div>
+                    <div
+                      data-code
+                      style="
+                        margin: 16px 0;
+                        border: 1px solid #23303f;
+                        border-radius: 11px;
+                        overflow: hidden;
+                        background: #0a1119;
+                      "
+                    >
+                      <div
+                        style="
+                          display: flex;
+                          align-items: center;
+                          justify-content: space-between;
+                          padding: 9px 14px;
+                          background: #111a24;
+                          border-bottom: 1px solid #1c2836;
+                        "
+                      >
+                        <span
+                          style="
+                            font-family: 'IBM Plex Mono', monospace;
+                            font-size: 11.5px;
+                            color: #7c8b99;
+                            letter-spacing: 0.05em;
+                          "
+                          >bash</span
+                        ><button
+                          onClick="{{ copyCode }}"
+                          style="
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                            background: transparent;
+                            border: 1px solid #2a3746;
+                            color: #8b98a5;
+                            font-size: 11.5px;
+                            padding: 4px 11px;
+                            border-radius: 7px;
+                            cursor: pointer;
+                            font-family: 'IBM Plex Mono', monospace;
+                            transition: all 0.15s;
+                          "
+                          style-hover="border-color:var(--accent,#00e5a0);color:var(--accent,#00e5a0)"
+                        >
+                          <span style="font-size: 12px">⧉</span
+                          ><span data-lbl>コピー</span>
+                        </button>
+                      </div>
+                      <pre
+                        style="margin: 0; padding: 15px 16px; overflow-x: auto"
+                      ><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">vercel link
+
+? Set up "~/.../nextjs-learning"? Y
+? Which scope should contain your project? &lt;自分のアカウント&gt;
+? Which project?
+  Search all projects
+❯ Create a new project
+? Name? recipe-app
+? Customize settings? N
+? Customize advanced settings? N</code></pre>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    gap: 14px;
+                    padding: 16px 0;
+                    border-bottom: 1px solid #141e28;
+                  "
+                >
+                  <div
+                    style="
+                      width: 26px;
+                      height: 26px;
+                      border-radius: 7px;
+                      background: rgba(0, 229, 160, 0.14);
+                      color: var(--accent, #00e5a0);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 12px;
+                      font-weight: 600;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    3
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 6px;
+                        margin-bottom: 7px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11.5px;
+                      "
+                    >
+                      <span
+                        style="
+                          padding: 3px 9px;
+                          background: rgba(0, 229, 160, 0.14);
+                          border: 1px solid rgba(0, 229, 160, 0.3);
+                          border-radius: 6px;
+                          color: var(--accent, #00e5a0);
+                        "
+                        >vercel env add</span
+                      >
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                      "
+                    >
+                      3章でメモしたpooled接続文字列（ホスト名に
+                      <code
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          background: #0a1119;
+                          padding: 1px 6px;
+                          border-radius: 5px;
+                          color: #e6b877;
+                        "
+                        >-pooler</code
+                      >
+                      が付く方）を、
+                      <code
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          background: #0a1119;
+                          padding: 1px 6px;
+                          border-radius: 5px;
+                          color: #e6b877;
+                        "
+                        >DATABASE_URL</code
+                      >
+                      として登録します。<br />
+                      「Store as sensitive?」は<strong style="color: #e6edf3"
+                        >Y（デフォルト）のままでOK</strong
+                      >。パスワードを含む接続文字列なので、登録後はダッシュボード上でも値を読み返せない状態にしておきます。<br />
+                      「Value?」には接続文字列を<strong style="color: #e6edf3"
+                        >ダブルクォートを付けずに素の文字列だけ</strong
+                      >貼り付けます（3章のシェル
+                      <code
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          background: #0a1119;
+                          padding: 1px 6px;
+                          border-radius: 5px;
+                          color: #e6b877;
+                        "
+                        >export</code
+                      >とは違い、対話プロンプトなので&amp;をシェルに解釈させる心配はありません）。<br />
+                      誤ってクォート付きで貼り付けると「Value includes
+                      surrounding quotes」と警告されるので、<strong
+                        style="color: #e6edf3"
+                        >Re-enterを選んでクォート無しで貼り直し</strong
+                      >ます。<br />
+                      「Environments?」はチェックボックス形式。<strong
+                        style="color: #e6edf3"
+                        ><code
+                          style="
+                            font-family: 'IBM Plex Mono', monospace;
+                            background: #0a1119;
+                            padding: 1px 6px;
+                            border-radius: 5px;
+                            color: #e6b877;
+                          "
+                          >a</code
+                        >キーで全選択してからEnterで確定</strong
+                      >します。
+                    </div>
+                    <div
+                      data-code
+                      style="
+                        margin: 16px 0;
+                        border: 1px solid #23303f;
+                        border-radius: 11px;
+                        overflow: hidden;
+                        background: #0a1119;
+                      "
+                    >
+                      <div
+                        style="
+                          display: flex;
+                          align-items: center;
+                          justify-content: space-between;
+                          padding: 9px 14px;
+                          background: #111a24;
+                          border-bottom: 1px solid #1c2836;
+                        "
+                      >
+                        <span
+                          style="
+                            font-family: 'IBM Plex Mono', monospace;
+                            font-size: 11.5px;
+                            color: #7c8b99;
+                            letter-spacing: 0.05em;
+                          "
+                          >bash</span
+                        ><button
+                          onClick="{{ copyCode }}"
+                          style="
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                            background: transparent;
+                            border: 1px solid #2a3746;
+                            color: #8b98a5;
+                            font-size: 11.5px;
+                            padding: 4px 11px;
+                            border-radius: 7px;
+                            cursor: pointer;
+                            font-family: 'IBM Plex Mono', monospace;
+                            transition: all 0.15s;
+                          "
+                          style-hover="border-color:var(--accent,#00e5a0);color:var(--accent,#00e5a0)"
+                        >
+                          <span style="font-size: 12px">⧉</span
+                          ><span data-lbl>コピー</span>
+                        </button>
+                      </div>
+                      <pre
+                        style="margin: 0; padding: 15px 16px; overflow-x: auto"
+                      ><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">vercel env add DATABASE_URL
+
+? Store as sensitive? Sensitive values cannot be read later (Y/n) yes
+? Value? &lt;3章でメモしたpooled接続文字列をクォート無しで貼り付け&gt;
+? Environments?
+# aで全選択してEnter
+❯◉ Production
+ ◉ Preview</code></pre>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    gap: 14px;
+                    padding: 16px 0;
+                    border-bottom: 1px solid #141e28;
+                  "
+                >
+                  <div
+                    style="
+                      width: 26px;
+                      height: 26px;
+                      border-radius: 7px;
+                      background: rgba(0, 229, 160, 0.14);
+                      color: var(--accent, #00e5a0);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 12px;
+                      font-weight: 600;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    4
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 6px;
+                        margin-bottom: 7px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11.5px;
+                      "
+                    >
+                      <span
+                        style="
+                          padding: 3px 9px;
+                          background: rgba(0, 229, 160, 0.14);
+                          border: 1px solid rgba(0, 229, 160, 0.3);
+                          border-radius: 6px;
+                          color: var(--accent, #00e5a0);
+                        "
+                        >vercel --prod</span
+                      >
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                      "
+                    >
+                      本番デプロイを実行します。<br />
+                      ビルドログが
+                      <code
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          background: #0a1119;
+                          padding: 1px 6px;
+                          border-radius: 5px;
+                          color: #e6b877;
+                        "
+                        >bun install</code
+                      >
+                      →
+                      <code
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          background: #0a1119;
+                          padding: 1px 6px;
+                          border-radius: 5px;
+                          color: #e6b877;
+                        "
+                        >postinstall (prisma generate)</code
+                      >
+                      →
+                      <code
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          background: #0a1119;
+                          padding: 1px 6px;
+                          border-radius: 5px;
+                          color: #e6b877;
+                        "
+                        >next build</code
+                      >
+                      の順に流れ、完了すると本番URLがターミナルに出力されます。
+                    </div>
+                    <div
+                      data-code
+                      style="
+                        margin: 16px 0;
+                        border: 1px solid #23303f;
+                        border-radius: 11px;
+                        overflow: hidden;
+                        background: #0a1119;
+                      "
+                    >
+                      <div
+                        style="
+                          display: flex;
+                          align-items: center;
+                          justify-content: space-between;
+                          padding: 9px 14px;
+                          background: #111a24;
+                          border-bottom: 1px solid #1c2836;
+                        "
+                      >
+                        <span
+                          style="
+                            font-family: 'IBM Plex Mono', monospace;
+                            font-size: 11.5px;
+                            color: #7c8b99;
+                            letter-spacing: 0.05em;
+                          "
+                          >bash</span
+                        ><button
+                          onClick="{{ copyCode }}"
+                          style="
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                            background: transparent;
+                            border: 1px solid #2a3746;
+                            color: #8b98a5;
+                            font-size: 11.5px;
+                            padding: 4px 11px;
+                            border-radius: 7px;
+                            cursor: pointer;
+                            font-family: 'IBM Plex Mono', monospace;
+                            transition: all 0.15s;
+                          "
+                          style-hover="border-color:var(--accent,#00e5a0);color:var(--accent,#00e5a0)"
+                        >
+                          <span style="font-size: 12px">⧉</span
+                          ><span data-lbl>コピー</span>
+                        </button>
+                      </div>
+                      <pre
+                        style="margin: 0; padding: 15px 16px; overflow-x: auto"
+                      ><code style="font-family:'IBM Plex Mono',monospace;font-size:var(--code-fs,13px);line-height:1.65;color:#cdd9e5;white-space:pre">vercel --prod
+
+  Inspect         https://vercel.com/&lt;チーム名&gt;/&lt;プロジェクト名&gt;/&lt;デプロイID&gt;
+  Production      https://&lt;プロジェクト名&gt;-&lt;ランダム文字列&gt;-&lt;チーム名&gt;.vercel.app
+▲ Aliased         https://&lt;プロジェクト名&gt;-&lt;ランダム語&gt;.vercel.app
+
+✓ Ready in 36s</code></pre>
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                        margin: 14px 0 0;
+                      "
+                    >
+                      Vercelダッシュボードの「Projects」からも、デプロイの状態やドメインをGUIで確認できます。
+                    </div>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 14px; padding: 16px 0">
+                  <div
+                    style="
+                      width: 26px;
+                      height: 26px;
+                      border-radius: 7px;
+                      background: rgba(0, 229, 160, 0.14);
+                      color: var(--accent, #00e5a0);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 12px;
+                      font-weight: 600;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    5
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 6px;
+                        margin-bottom: 7px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11.5px;
+                      "
+                    >
+                      <span
+                        style="
+                          padding: 3px 9px;
+                          background: rgba(0, 229, 160, 0.14);
+                          border: 1px solid rgba(0, 229, 160, 0.3);
+                          border-radius: 6px;
+                          color: var(--accent, #00e5a0);
+                        "
+                        >動作確認をする</span
+                      >
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                      "
+                    >
+                      出力内の
+                      <strong style="color: #e6edf3">Aliased</strong>
+                      の行のURLをクリックして開きます。<br />
+                      ページが表示されればOKです。
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 18px 0;
+                  padding: 15px 17px;
+                  background: rgba(0, 229, 160, 0.05);
+                  border: 1px solid rgba(0, 229, 160, 0.18);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">💡</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #d3e6dd"
+                >
+                  <strong style="color: var(--accent, #00e5a0)"
+                    >なぜAliasedの行を開くか</strong
+                  >
+                  —
+                  <code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >Production</code
+                  >
+                  行はこの1回のデプロイに紐づく固有URLで、デプロイのたびに変わります。<br />
+                  <code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >Aliased</code
+                  >
+                  行は常に最新のProductionデプロイを指す固定ドメインで、以後もこのURLは変わりません。
+                </div>
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 18px 0;
+                  padding: 15px 17px;
+                  background: rgba(255, 138, 76, 0.07);
+                  border: 1px solid rgba(255, 138, 76, 0.28);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">🛠️</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #e2c9b8"
+                >
+                  <strong style="color: #e6edf3"
+                    >TIPS:
+                    ページが表示されない・エラーになる場合の確認方法</strong
+                  ><br />
+                  まずターミナルの
+                  <code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >vercel --prod</code
+                  >
+                  の出力自体にビルド失敗のエラーが出ていないか確認する。<br />
+                  ビルドは成功したのにアクセス時だけエラーになる場合は、
+                  <code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >vercel logs &lt;AliasedまたはInspectのURL&gt;</code
+                  >
+                  でランタイムログを確認する。<br />
+                  多くの場合の原因は、
+                  <code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >DATABASE_URL</code
+                  >
+                  環境変数の設定漏れ・入力ミス、またはNeon側の接続情報の不一致。
+                </div>
+              </div>
+
+              <sc-if
+                value="{{ showChecklist }}"
+                hint-placeholder-val="{{ true }}"
+              >
+                <div
+                  style="
+                    margin: 30px 0 4px;
+                    padding: 16px 18px 10px;
+                    background: #0e1620;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 9px;
+                      margin-bottom: 6px;
+                      padding: 0 4px;
+                    "
+                  >
+                    <span style="font-size: 13px">✅</span
+                    ><span
+                      style="
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        color: #8b98a5;
+                        letter-spacing: 0.04em;
+                      "
+                      >この章のチェック</span
+                    >
+                  </div>
+                  <sc-for
+                    list="{{ checks_ch4 }}"
+                    as="item"
+                    hint-placeholder-count="5"
+                  >
+                    <div
+                      data-id="{{ item.id }}"
+                      onClick="{{ toggleItem }}"
+                      style="
+                        display: flex;
+                        gap: 12px;
+                        align-items: flex-start;
+                        cursor: pointer;
+                        padding: 9px 8px;
+                        border-radius: 8px;
+                      "
+                      style-hover="background:#131b26"
+                    >
+                      <span style="{{ item.boxStyle }}">✓</span
+                      ><span style="{{ item.txtStyle }}">{{ item.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </section>
+
+            <section
+              id="ch5"
+              data-screen-label="05 動作確認"
+              style="
+                padding: 56px 0;
+                border-bottom: 1px solid #1c2836;
+                animation: fadeUp 0.5s ease both;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 14px;
+                  margin-bottom: 10px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: var(--accent, #00e5a0);
+                    letter-spacing: 0.08em;
+                  "
+                  >CHAPTER 05</span
+                >
+                <span style="flex: 1; height: 1px; background: #1c2836"></span>
+              </div>
+              <h2
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 31px;
+                  font-weight: 700;
+                  margin: 0 0 16px;
+                  letter-spacing: -0.01em;
+                "
+              >
+                動作確認
+              </h2>
+              <p
+                style="
+                  font-size: 16px;
+                  line-height: 1.8;
+                  color: #aab6c2;
+                  margin: 0 0 24px;
+                "
+              >
+                本番URLで実際にCRUDが動くか、Neonまで届いているかを確認します。
+              </p>
+
+              <h3
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 19px;
+                  font-weight: 600;
+                  margin: 30px 0 12px;
+                "
+              >
+                ブラウザで確認
+              </h3>
+              <ol
+                style="
+                  margin: 12px 0 26px;
+                  padding-left: 20px;
+                  font-size: 14px;
+                  line-height: 2;
+                  color: #c3cdd7;
+                "
+              >
+                <li>
+                  本番URL（<code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >https://&lt;プロジェクト名&gt;.vercel.app</code
+                  >）を開き、レシピの検索・登録・編集・削除（および削除の取り消し）を一通り試す
+                </li>
+                <li>
+                  ページをリロードしても内容が残っていれば、Neonへの書き込みと読み込みが両方できている証拠
+                </li>
+              </ol>
+
+              <sc-if
+                value="{{ showChecklist }}"
+                hint-placeholder-val="{{ true }}"
+              >
+                <div
+                  style="
+                    margin: 30px 0 4px;
+                    padding: 16px 18px 10px;
+                    background: #0e1620;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 9px;
+                      margin-bottom: 6px;
+                      padding: 0 4px;
+                    "
+                  >
+                    <span style="font-size: 13px">✅</span
+                    ><span
+                      style="
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        color: #8b98a5;
+                        letter-spacing: 0.04em;
+                      "
+                      >この章のチェック</span
+                    >
+                  </div>
+                  <sc-for
+                    list="{{ checks_ch5 }}"
+                    as="item"
+                    hint-placeholder-count="1"
+                  >
+                    <div
+                      data-id="{{ item.id }}"
+                      onClick="{{ toggleItem }}"
+                      style="
+                        display: flex;
+                        gap: 12px;
+                        align-items: flex-start;
+                        cursor: pointer;
+                        padding: 9px 8px;
+                        border-radius: 8px;
+                      "
+                      style-hover="background:#131b26"
+                    >
+                      <span style="{{ item.boxStyle }}">✓</span
+                      ><span style="{{ item.txtStyle }}">{{ item.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </section>
+
+            <section
+              id="ch6"
+              data-screen-label="06 付録:カスタムドメイン"
+              style="
+                padding: 56px 0;
+                border-bottom: 1px solid #1c2836;
+                animation: fadeUp 0.5s ease both;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 14px;
+                  margin-bottom: 10px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: var(--accent, #00e5a0);
+                    letter-spacing: 0.08em;
+                  "
+                  >CHAPTER EX</span
+                >
+                <span style="flex: 1; height: 1px; background: #1c2836"></span>
+              </div>
+              <h2
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 31px;
+                  font-weight: 700;
+                  margin: 0 0 16px;
+                  letter-spacing: -0.01em;
+                "
+              >
+                付録: カスタムドメイン
+              </h2>
+              <p
+                style="
+                  font-size: 16px;
+                  line-height: 1.8;
+                  color: #aab6c2;
+                  margin: 0 0 24px;
+                "
+              >
+                任意の章です。<code
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    background: #0a1119;
+                    padding: 1px 6px;
+                    border-radius: 5px;
+                    color: #e6b877;
+                  "
+                  >.vercel.app</code
+                >
+                ではなく自分のドメインで公開したい場合の参考に。<br />
+                ドメイン自体の購入費用（実費）はかかりますが、TLS証明書の発行・更新はVercelが自動で行うため、ACMやRoute
+                53のような別サービスの設定は不要です。
+              </p>
+
+              <h3
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 19px;
+                  font-weight: 600;
+                  margin: 30px 0 4px;
+                "
+              >
+                手順 1 — ドメインを取得
+              </h3>
+              <p
+                style="
+                  font-size: 14px;
+                  line-height: 1.9;
+                  color: #c3cdd7;
+                  margin: 0 0 20px;
+                "
+              >
+                お名前.com・Google
+                Domains系のレジストラなど、外部サービスで好きなドメインを購入します（実費がかかります）。
+              </p>
+
+              <h3
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 19px;
+                  font-weight: 600;
+                  margin: 30px 0 4px;
+                "
+              >
+                手順 2 — Vercelにドメインを追加
+              </h3>
+              <div
+                style="
+                  margin: 14px 0;
+                  padding: 0 18px;
+                  background: #0e1620;
+                  border: 1px solid #1c2836;
+                  border-radius: 13px;
+                "
+              >
+                <div style="display: flex; gap: 14px; padding: 16px 0">
+                  <div
+                    style="
+                      width: 26px;
+                      height: 26px;
+                      border-radius: 7px;
+                      background: rgba(0, 229, 160, 0.14);
+                      color: var(--accent, #00e5a0);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 12px;
+                      font-weight: 600;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    1
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 6px;
+                        margin-bottom: 7px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11.5px;
+                      "
+                    >
+                      <span
+                        style="
+                          padding: 3px 9px;
+                          background: #0a1119;
+                          border: 1px solid #24323f;
+                          border-radius: 6px;
+                          color: #cdd9e5;
+                        "
+                        >Project Settings</span
+                      ><span style="color: #5f6f7e">›</span
+                      ><span
+                        style="
+                          padding: 3px 9px;
+                          background: #0a1119;
+                          border: 1px solid #24323f;
+                          border-radius: 6px;
+                          color: #cdd9e5;
+                        "
+                        >Domains</span
+                      ><span style="color: #5f6f7e">›</span
+                      ><span
+                        style="
+                          padding: 3px 9px;
+                          background: rgba(0, 229, 160, 0.14);
+                          border: 1px solid rgba(0, 229, 160, 0.3);
+                          border-radius: 6px;
+                          color: var(--accent, #00e5a0);
+                        "
+                        >Add</span
+                      >
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                      "
+                    >
+                      購入したドメインを入力すると、設定すべきDNSレコード（A /
+                      CNAMEなど）が表示される。
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <h3
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 19px;
+                  font-weight: 600;
+                  margin: 30px 0 4px;
+                "
+              >
+                手順 3 — レジストラ側でDNSレコードを設定
+              </h3>
+              <p
+                style="
+                  font-size: 14px;
+                  line-height: 1.9;
+                  color: #c3cdd7;
+                  margin: 0 0 20px;
+                "
+              >
+                ドメインを購入したレジストラの管理画面で、Vercelが表示したレコードをそのまま追加します。<br />
+                反映まで数分〜数時間かかる場合があります。
+              </p>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 18px 0;
+                  padding: 15px 17px;
+                  background: rgba(88, 166, 255, 0.06);
+                  border: 1px solid rgba(88, 166, 255, 0.22);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">✅</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #b8cbe0"
+                >
+                  <strong style="color: #e6edf3">実行するとこうなる</strong> —
+                  DNSが反映されるとVercelが自動でTLS証明書を発行し、<code
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      background: #0a1119;
+                      padding: 1px 6px;
+                      border-radius: 5px;
+                      color: #e6b877;
+                    "
+                    >https://自分のドメイン</code
+                  >
+                  でページが開くようになります。<br />
+                  ECS版で必要だったACMでの証明書リクエストやRoute
+                  53でのレコード作成に相当する作業を、Vercelが1画面でまとめて代行してくれるイメージです。
+                </div>
+              </div>
+
+              <sc-if
+                value="{{ showChecklist }}"
+                hint-placeholder-val="{{ true }}"
+              >
+                <div
+                  style="
+                    margin: 30px 0 4px;
+                    padding: 16px 18px 10px;
+                    background: #0e1620;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 9px;
+                      margin-bottom: 6px;
+                      padding: 0 4px;
+                    "
+                  >
+                    <span style="font-size: 13px">✅</span
+                    ><span
+                      style="
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        color: #8b98a5;
+                        letter-spacing: 0.04em;
+                      "
+                      >この章のチェック</span
+                    >
+                  </div>
+                  <sc-for
+                    list="{{ checks_ch6 }}"
+                    as="item"
+                    hint-placeholder-count="2"
+                  >
+                    <div
+                      data-id="{{ item.id }}"
+                      onClick="{{ toggleItem }}"
+                      style="
+                        display: flex;
+                        gap: 12px;
+                        align-items: flex-start;
+                        cursor: pointer;
+                        padding: 9px 8px;
+                        border-radius: 8px;
+                      "
+                      style-hover="background:#131b26"
+                    >
+                      <span style="{{ item.boxStyle }}">✓</span
+                      ><span style="{{ item.txtStyle }}">{{ item.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </section>
+
+            <section
+              id="ch7"
+              data-screen-label="07 片付け"
+              style="padding: 56px 0; animation: fadeUp 0.5s ease both"
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 14px;
+                  margin-bottom: 10px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: var(--accent, #00e5a0);
+                    letter-spacing: 0.08em;
+                  "
+                  >CHAPTER 07</span
+                >
+                <span style="flex: 1; height: 1px; background: #1c2836"></span>
+              </div>
+              <h2
+                style="
+                  font-family: 'Space Grotesk', 'IBM Plex Sans JP', sans-serif;
+                  font-size: 31px;
+                  font-weight: 700;
+                  margin: 0 0 16px;
+                  letter-spacing: -0.01em;
+                "
+              >
+                片付け
+              </h2>
+              <p
+                style="
+                  font-size: 16px;
+                  line-height: 1.8;
+                  color: #aab6c2;
+                  margin: 0 0 24px;
+                "
+              >
+                無料枠範囲のため、そのままずっと公開し続けて問題ありません。<br />
+                Vercel・NeonともにNAT
+                GatewayやRDSのような時間課金リソースが存在しません。<br />
+                放置していても料金は発生しません。<br />
+                続けない場合は、参考までに以下の手順で削除できます。
+              </p>
+
+              <div
+                style="
+                  margin: 14px 0;
+                  padding: 0 18px;
+                  background: #0e1620;
+                  border: 1px solid #1c2836;
+                  border-radius: 13px;
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    gap: 14px;
+                    padding: 16px 0;
+                    border-bottom: 1px solid #141e28;
+                  "
+                >
+                  <div
+                    style="
+                      width: 26px;
+                      height: 26px;
+                      border-radius: 7px;
+                      background: rgba(0, 229, 160, 0.14);
+                      color: var(--accent, #00e5a0);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 12px;
+                      font-weight: 600;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    1
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 6px;
+                        margin-bottom: 7px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11.5px;
+                      "
+                    >
+                      <span
+                        style="
+                          padding: 3px 9px;
+                          background: #0a1119;
+                          border: 1px solid #24323f;
+                          border-radius: 6px;
+                          color: #cdd9e5;
+                        "
+                        >Vercel: Project Settings</span
+                      ><span style="color: #5f6f7e">›</span
+                      ><span
+                        style="
+                          padding: 3px 9px;
+                          background: rgba(0, 229, 160, 0.14);
+                          border: 1px solid rgba(0, 229, 160, 0.3);
+                          border-radius: 6px;
+                          color: var(--accent, #00e5a0);
+                        "
+                        >Delete Project</span
+                      >
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                      "
+                    >
+                      設定画面いちばん下の「Delete
+                      Project」からプロジェクト名を入力して削除。<br />
+                      CLIから削除する場合は
+                      <code
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          background: #0a1119;
+                          padding: 1px 6px;
+                          border-radius: 5px;
+                          color: #e6b877;
+                        "
+                        >vercel remove &lt;プロジェクト名&gt;</code
+                      >
+                      でも同様に削除できます。
+                    </div>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 14px; padding: 16px 0">
+                  <div
+                    style="
+                      width: 26px;
+                      height: 26px;
+                      border-radius: 7px;
+                      background: rgba(0, 229, 160, 0.14);
+                      color: var(--accent, #00e5a0);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 12px;
+                      font-weight: 600;
+                      flex: 0 0 auto;
+                    "
+                  >
+                    2
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 6px;
+                        margin-bottom: 7px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11.5px;
+                      "
+                    >
+                      <span
+                        style="
+                          padding: 3px 9px;
+                          background: #0a1119;
+                          border: 1px solid #24323f;
+                          border-radius: 6px;
+                          color: #cdd9e5;
+                        "
+                        >Neon: Project Settings</span
+                      ><span style="color: #5f6f7e">›</span
+                      ><span
+                        style="
+                          padding: 3px 9px;
+                          background: rgba(0, 229, 160, 0.14);
+                          border: 1px solid rgba(0, 229, 160, 0.3);
+                          border-radius: 6px;
+                          color: var(--accent, #00e5a0);
+                        "
+                        >Delete Project</span
+                      >
+                    </div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        line-height: 1.75;
+                        color: #c3cdd7;
+                      "
+                    >
+                      同様に設定画面いちばん下から削除。データも含めて完全に消えるので、必要なデータがあれば先にエクスポートしてください。
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 13px;
+                  margin: 18px 0;
+                  padding: 15px 17px;
+                  background: rgba(88, 166, 255, 0.06);
+                  border: 1px solid rgba(88, 166, 255, 0.22);
+                  border-radius: 11px;
+                "
+              >
+                <span style="font-size: 16px; flex: 0 0 auto">✅</span>
+                <div
+                  style="font-size: 13.5px; line-height: 1.75; color: #b8cbe0"
+                >
+                  上の削除手順はあくまで参考です。<br />
+                  無料枠の範囲なら金銭的な被害は無いので、削除するかどうかは完全に任意です。
+                </div>
+              </div>
+
+              <sc-if
+                value="{{ showChecklist }}"
+                hint-placeholder-val="{{ true }}"
+              >
+                <div
+                  style="
+                    margin: 30px 0 4px;
+                    padding: 16px 18px 10px;
+                    background: #0e1620;
+                    border: 1px solid #1c2836;
+                    border-radius: 13px;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 9px;
+                      margin-bottom: 6px;
+                      padding: 0 4px;
+                    "
+                  >
+                    <span style="font-size: 13px">✅</span
+                    ><span
+                      style="
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        color: #8b98a5;
+                        letter-spacing: 0.04em;
+                      "
+                      >この章のチェック</span
+                    >
+                  </div>
+                  <sc-for
+                    list="{{ checks_ch7 }}"
+                    as="item"
+                    hint-placeholder-count="2"
+                  >
+                    <div
+                      data-id="{{ item.id }}"
+                      onClick="{{ toggleItem }}"
+                      style="
+                        display: flex;
+                        gap: 12px;
+                        align-items: flex-start;
+                        cursor: pointer;
+                        padding: 9px 8px;
+                        border-radius: 8px;
+                      "
+                      style-hover="background:#131b26"
+                    >
+                      <span style="{{ item.boxStyle }}">✓</span
+                      ><span style="{{ item.txtStyle }}">{{ item.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </section>
+
+            <footer
+              style="
+                margin-top: 70px;
+                padding-top: 30px;
+                border-top: 1px solid #1c2836;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 16px;
+              "
+            >
+              <div style="font-size: 12.5px; color: #5f6f7e; line-height: 1.6">
+                Vercel + Neon 実務ハンズオン資料 — 2026年7月版<br />無料枠中心の構成のため、放置による課金リスクはAWS版より大幅に小さいです。
+              </div>
+              <a
+                href="#top"
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 7px;
+                  padding: 9px 16px;
+                  border: 1px solid #2a3746;
+                  border-radius: 9px;
+                  font-size: 13px;
+                  color: #cdd9e5;
+                "
+                style-hover="border-color:var(--accent,#00e5a0);color:var(--accent,#00e5a0)"
+                >↑ 先頭へ戻る</a
+              >
+            </footer>
+          </div>
+        </main>
+      </div>
+    </x-dc>
+    <script
+      type="text/x-dc"
+      data-dc-script
+      data-props='{"$preview":{"width":1240,"height":920},"accent":{"editor":"color","default":"#00e5a0","options":["#00e5a0","#00b8d4","#7c5cff","#ff9900"],"tsType":"string","section":"外観"},"codeFontSize":{"editor":"range","default":13,"min":12,"max":16,"step":1,"unit":"px","tsType":"number","section":"外観"},"showChecklist":{"editor":"boolean","default":true,"tsType":"boolean","section":"挙動"}}'
+    >
+      class Component extends DCLogic {
+        constructor(props) {
+          super(props);
+          this.chapters = [
+            { id: 'ch0', num: '00', title: '全体像 — Webページが開くまで' },
+            { id: 'ch1', num: '01', title: '環境準備' },
+            { id: 'ch2', num: '02', title: 'Neon — PostgreSQL を用意する' },
+            { id: 'ch3', num: '03', title: 'Prismaの準備 — マイグレーション適用' },
+            { id: 'ch4', num: '04', title: 'Vercelへデプロイ' },
+            { id: 'ch5', num: '05', title: '動作確認' },
+            { id: 'ch6', num: 'EX', title: '付録: カスタムドメイン' },
+            { id: 'ch7', num: '07', title: '片付け' },
+          ];
+          this.checkData = {
+            ch0: [
+              { id: 'c0a', label: 'URL入力からページ表示までの流れを説明できる' },
+              { id: 'c0b', label: '登場する全サービスの役割を言える' },
+              { id: 'c0c', label: 'ECS版との違い（常駐サーバーが無い点）を言える' },
+            ],
+            ch1: [
+              { id: 'c1a', label: 'GitHubアカウントを用意した' },
+              { id: 'c1b', label: 'Vercelアカウントを作成した' },
+              { id: 'c1c', label: 'Neonアカウントを作成した' },
+              { id: 'c1d', label: 'prepare-for-vercel.md の①②まで完了した' },
+            ],
+            ch2: [
+              { id: 'c2a', label: 'Neonプロジェクトを作成した' },
+            ],
+            ch3: [
+              { id: 'c3a', label: 'pooled接続文字列をコピーした' },
+              { id: 'c3b', label: 'direct接続文字列も控えた(マイグレーション用)' },
+              { id: 'c3c', label: 'direct接続文字列で prisma migrate deploy を実行した' },
+              { id: 'c3d', label: 'Neon上に Recipe テーブルが作成されたことを確認した' },
+            ],
+            ch4: [
+              { id: 'c4a', label: 'vercel loginでCLIを認証した' },
+              { id: 'c4b', label: 'nextjs-learning内でvercel linkを実行しプロジェクトを作成した' },
+              { id: 'c4c', label: 'vercel env addでDATABASE_URL(pooled)を設定した' },
+              { id: 'c4d', label: 'vercel --prodで初回デプロイが成功した' },
+              { id: 'c4e', label: 'AliasedのURLを開いてページ表示を確認した' },
+            ],
+            ch5: [
+              { id: 'c5a', label: '本番URLでCRUD一通り動作確認した' },
+            ],
+            ch6: [
+              { id: 'c6a', label: 'ドメインをVercelに追加した' },
+              { id: 'c6b', label: '独自ドメインのHTTPSで表示された' },
+            ],
+            ch7: [
+              { id: 'c7a', label: 'Vercelプロジェクトを削除した(続けない場合)' },
+              { id: 'c7b', label: 'Neonプロジェクトを削除した(続けない場合)' },
+            ],
+          };
+          this.allIds = Object.values(this.checkData).flat().map(x => x.id);
+          this.state = { active: 'ch0', checked: this._load() };
+          this._onScroll = this._onScroll.bind(this);
+        }
+        _load() {
+          try { return JSON.parse(localStorage.getItem('vercel_neon_handson_checks_v1') || '{}'); }
+          catch (e) { return {}; }
+        }
+        _save(c) {
+          try { localStorage.setItem('vercel_neon_handson_checks_v1', JSON.stringify(c)); } catch (e) {}
+        }
+        componentDidMount() {
+          window.addEventListener('scroll', this._onScroll, { passive: true });
+          this._onScroll();
+        }
+        componentWillUnmount() {
+          window.removeEventListener('scroll', this._onScroll);
+        }
+        _onScroll() {
+          if (this._raf) return;
+          this._raf = requestAnimationFrame(() => {
+            this._raf = null;
+            let active = this.chapters[0].id;
+            const mark = window.innerHeight * 0.32;
+            for (const c of this.chapters) {
+              const el = document.getElementById(c.id);
+              if (el && el.getBoundingClientRect().top <= mark) active = c.id;
+            }
+            if (active !== this.state.active) this.setState({ active });
+          });
+        }
+        navClick = (e) => {
+          e.preventDefault();
+          const id = e.currentTarget.getAttribute('data-id');
+          const el = document.getElementById(id);
+          if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 12, behavior: 'smooth' });
+        };
+        toggleItem = (e) => {
+          const id = e.currentTarget.getAttribute('data-id');
+          this.setState(s => {
+            const c = { ...s.checked, [id]: !s.checked[id] };
+            this._save(c);
+            return { checked: c };
+          });
+        };
+        copyCode = (e) => {
+          const btn = e.currentTarget;
+          const wrap = btn.closest('[data-code]');
+          const code = wrap && wrap.querySelector('code');
+          if (!code) return;
+          const text = code.innerText;
+          const done = () => {
+            const lbl = btn.querySelector('[data-lbl]');
+            if (!lbl) return;
+            const o = lbl.textContent;
+            lbl.textContent = 'コピー済み';
+            setTimeout(() => { lbl.textContent = o; }, 1400);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done).catch(() => {});
+          } else {
+            const ta = document.createElement('textarea');
+            ta.value = text; document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); done(); } catch (e2) {}
+            document.body.removeChild(ta);
+          }
+        };
+        _decorate(arr) {
+          const checked = this.state.checked;
+          return (arr || []).map(it => {
+            const done = !!checked[it.id];
+            return {
+              ...it,
+              boxStyle: 'width:20px;height:20px;flex:0 0 auto;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid ' + (done ? 'var(--accent,#00e5a0)' : '#3a4a5c') + ';background:' + (done ? 'var(--accent,#00e5a0)' : 'transparent') + ';color:' + (done ? '#0b1016' : 'transparent') + ';transition:all .15s',
+              txtStyle: 'color:' + (done ? '#6b7885' : '#dbe4ec') + ';text-decoration:' + (done ? 'line-through' : 'none') + ';font-size:13.5px;line-height:1.5',
+            };
+          });
+        }
+        renderVals() {
+          const accent = this.props.accent || '#00e5a0';
+          const total = this.allIds.length;
+          const done = this.allIds.filter(id => this.state.checked[id]).length;
+          const pct = total ? Math.round((done / total) * 100) : 0;
+          const navItems = this.chapters.map(c => {
+            const on = c.id === this.state.active;
+            return {
+              id: c.id, num: c.num, title: c.title, href: '#' + c.id,
+              style: 'display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:9px;cursor:pointer;text-decoration:none;transition:background .15s;background:' + (on ? 'rgba(0,229,160,.10)' : 'transparent') + ';color:' + (on ? '#e6edf3' : '#8b98a5'),
+              numStyle: 'font-family:\'IBM Plex Mono\',monospace;font-size:11px;font-weight:600;width:22px;flex:0 0 auto;color:' + (on ? 'var(--accent,#00e5a0)' : '#5f6f7e'),
+              dotStyle: 'width:6px;height:6px;border-radius:99px;flex:0 0 auto;background:' + (on ? 'var(--accent,#00e5a0)' : 'transparent'),
+            };
+          });
+          const out = {
+            accent,
+            codeFs: (this.props.codeFontSize || 13) + 'px',
+            navItems,
+            progressLabel: done + ' / ' + total,
+            progressWidth: pct + '%',
+            navClick: this.navClick,
+            toggleItem: this.toggleItem,
+            copyCode: this.copyCode,
+            showChecklist: this.props.showChecklist !== false,
+          };
+          for (const k of Object.keys(this.checkData)) {
+            out['checks_' + k] = this._decorate(this.checkData[k]);
+          }
+          return out;
+        }
+      }
+    </script>
+  </body>
+</html>

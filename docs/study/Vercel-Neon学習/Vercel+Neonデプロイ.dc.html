@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+html { scroll-behavior: smooth; }
+body { margin: 0; background: #f7fafc; }
+.svc-card-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.svc-icon { width:36px; height:36px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; color:#ffffff; flex-shrink:0; }
+.svc-icon svg { display:block; }
+.svc-label { font-weight:700; font-size:13.5px; color:#334155; }
+.svc-visual { color:#94a3b8; font-size:12px; font-style:italic; margin-bottom:6px; }
+</style>
+</helmet>
+
+<div style="font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#0f172a;padding:48px 24px 80px 24px;line-height:1.7">
+<div style="max-width:1080px;margin:0 auto">
+
+  <!-- ============ HERO ============ -->
+  <header data-screen-label="00 導入" style="margin-bottom:56px">
+    <a href="../../../index.html" style="display:inline-flex;align-items:center;gap:6px;color:#6b7280;text-decoration:none;font-size:13px;font-weight:600;margin-bottom:14px">← ホームに戻る</a>
+    <div style="display:inline-flex;align-items:center;gap:8px;background:#0f172a;color:#00e599;padding:6px 16px;border-radius:999px;font-weight:700;font-size:13px;letter-spacing:0.04em">Vercel + Neon ハンズオン 理解サポート</div>
+    <h1 style="font-size:34px;margin:18px 0 10px 0;line-height:1.3">Vercel + Neonデプロイの理解を振り返る</h1>
+    <p style="color:#6b7280;font-size:16px;margin:0;max-width:720px">同じNext.jsアプリを、今度はVercel + Neonで公開しました。<br>「AWS ECS on Fargate版で必要だったものが、なぜ・どう不要になったのか」を比較しながら振り返るページです。<br>各章にTIPS、クイズ（ボタンを押すと回答例が出ます）、チェックリストを用意しました。<br>特にデータ層（コネクションプーリング）とトラブルシューティングは、ECS版には無かった新しい論点です。</p>
+
+    <!-- TOC -->
+    <nav style="margin-top:24px;display:flex;flex-wrap:wrap;gap:8px">
+      <a href="#ch0" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">00 全体像</a>
+      <a href="#ch1" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">01 ネットワーク</a>
+      <a href="#ch2" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">02 デプロイと配信</a>
+      <a href="#ch3" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">03 データと秘密情報</a>
+      <a href="#ch4" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">04 ビルドとデプロイの仕組み</a>
+      <a href="#ch5" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">05 トラブルシューティング</a>
+      <a href="#ch6" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">06 気付き → 次の一歩</a>
+      <a href="#appendix" style="text-decoration:none;background:#ffffff;border:1px solid #e5e7eb;color:#0f172a;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600">Appendix 用語対応表</a>
+    </nav>
+  </header>
+
+  <!-- ============ CH0 全体像 ============ -->
+  <section id="ch0" data-screen-label="00 全体像" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#64748b">00</span>
+      <h2 style="font-size:26px;margin:0">🗺️ 全体像 — なぜ登場人物がこんなに減るのか</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 20px 0">ECS Fargate版ではVPC・SG・RDS・ECR・ECS・ALBなど10種類以上のAWSリソースを自分で組み合わせて用意しました。<br>Vercel + Neon版では、GitHubリポジトリを繋いでNeonのプロジェクトを1つ作るだけで同じアプリが公開できます。<br>この章では「減ったのは作業であって、仕組みそのものではない」ことを全体像として押さえます。</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px">
+      <div>
+        <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">ECS Fargateデプロイ（前回）</div>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
+          VPC・サブネット・ルートテーブル・IGW・NAT・SGでネットワークを設計した。<br>ALB＋ターゲットグループでリクエストを振り分けた。<br>ECS＋Fargateでコンテナを動かし続けた。<br>RDSとパラメータストアでデータと秘密情報を管理した。<br>すべての繋がりを自分の手で組み立てる必要があった。
+        </div>
+      </div>
+      <div>
+        <div style="display:inline-flex;background:#d1fae5;color:#047857;border:1px solid #a7f3d0;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px">Vercel + Neonデプロイ（今回）</div>
+        <div style="margin-top:12px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;color:#4b5563">
+          GitHubリポジトリをVercelに接続する。<br>Neonでプロジェクトを1つ作る。<br>それだけで同じアプリが公開できる。<br>ネットワーク境界・スケーリング・ヘルスチェックはVercel/Neonの内部に隠れている。<br>利用者が個別に設計する対象にはならない。
+        </div>
+      </div>
+    </div>
+
+    <!-- Vercel / Serverless Function / Neon の3枚導入 -->
+    <div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#0f172a"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 3L22 20H2L12 3Z"/></svg></span>
+          <span class="svc-label">Vercelとは</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: pushするだけで裏側が自動で動き出す配信の管制室</div>
+        <div style="color:#4b5563;font-size:13.5px">Next.jsの開発元が提供するホスティングプラットフォーム。<br>GitHubリポジトリと連携する。<br>pushのたびに自動でビルド・デプロイ・世界中への配信までを行う。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#7c3aed"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span>
+          <span class="svc-label">Serverless Functionとは</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: リクエストが来た瞬間だけ点灯し、終わると消えるランプ</div>
+        <div style="color:#4b5563;font-size:13.5px">リクエストが来た時だけ起動し、処理が終わると消える実行単位。<br>ECSのように「常時起動しているコンテナ」を自分で維持する必要がない。<br>リクエストがゼロならほぼ課金も発生しない。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#059669"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></span>
+          <span class="svc-label">Neonとは</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: コンセントに挿すだけで使えるPostgresの電源タップ</div>
+        <div style="color:#4b5563;font-size:13.5px">サーバーレスのマネージドPostgreSQL。<br>プロジェクトを作ると数秒で接続文字列が発行される。<br>RDSのようなインスタンスタイプ選定は基本的に不要。</div>
+      </div>
+    </div>
+
+    <!-- 登場人物ビフォーアフター -->
+    <div style="margin-top:20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">登場人物の数で比べる</div>
+      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+        <div style="flex:1;min-width:280px">
+          <div style="display:inline-flex;background:#fdf1e0;color:#92580a;border:1px solid #f3ddb8;padding:4px 12px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:10px">ECS Fargate版（13個）</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">VPC</span>
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">サブネット</span>
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">ルートテーブル</span>
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">IGW</span>
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">NATゲートウェイ</span>
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">セキュリティグループ</span>
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">ALB</span>
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">ターゲットグループ</span>
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">ECS</span>
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">Fargate</span>
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">ECR</span>
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">RDS</span>
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">パラメータストア</span>
+          </div>
+        </div>
+        <div style="font-size:28px;color:#94a3b8;flex-shrink:0">→</div>
+        <div style="flex:1;min-width:200px">
+          <div style="display:inline-flex;background:#d1fae5;color:#047857;border:1px solid #a7f3d0;padding:4px 12px;border-radius:999px;font-weight:700;font-size:12px;margin-bottom:10px">Vercel + Neon版（3個）</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">Vercel</span>
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">Serverless Function</span>
+            <span style="background:#f1f5f9;color:#475569;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">Neon</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;color:#6b7280;font-size:13px">数が減った分、それぞれの箱が担っていた責任が消えたわけではありません。<br>Vercel/Neonの中に隠れているだけです。<br>01〜05章で、主要な責任がどこに行ったのかを1つずつ辿ります。</div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#f1f5f9;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#64748b;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#64748b;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#334155;margin-bottom:4px">なくなったのは「責任」ではなく「作業」</div>
+        <div style="color:#4b5563">VPCの分離やヘルスチェック、スケーリングの判断は今回も実際には行われています。<br>ただそれをユーザーが画面上で設計する対象ではなくなりました。<br>Vercel/Neonというプラットフォームの内部に隠蔽されただけです。<br>「無くなった」で終わらせず、「では誰が肩代わりしているか」まで辿るのがこのページの目的です。</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. ECS版では10種類以上のAWSリソースを組み合わせたのに、Vercel + Neon版はなぜアカウント登録＋数クリックで同じアプリが公開できるのですか？</p>
+      <sc-if value="{{ !quizOv1Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizOv1 }}" style="min-height:34px;background:#64748b;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizOv1Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. マネージドサービスがネットワーク境界・スケーリング・ヘルスチェックなどを内部で肩代わりしているからです。<br>ユーザーが「意識しなくていい」だけで、これらの処理自体は今回も裏側で動いています。<br>差はコントロールの粒度と、それに伴う運用負担の大きさです。<br><b>💼 現場では:</b> 学習目的ではAWS版で仕組みを理解する。<br>実プロダクトの立ち上げ速度を優先する場面では、Vercel + Neonのようなマネージド構成を選ぶ。<br>という使い分けができるようになります。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. Vercel + Neon構成でVPCに相当するものはありますか？</p>
+      <sc-if value="{{ !quizOv2Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizOv2 }}" style="min-height:34px;background:#64748b;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizOv2Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. ユーザーが設定する対象としては存在しません。<br>Vercel/Neonの内部でもネットワーク分離は行われているはずです。<br>ただしそれはプラットフォームの実装詳細であり、利用者とのインターフェースには出てきません。<br>ECS版の「VPCを自分で切る」という作業そのものが不要になります。<br><b>💼 現場では:</b> サーバーレスプラットフォームを選ぶ最大の理由の1つが、このネットワーク設計コストの消滅です。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. Neonの無料プランとECS版のRDSを比べたとき、コスト面で決定的に違う点は何ですか？</p>
+      <sc-if value="{{ !quizOv3Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizOv3 }}" style="min-height:34px;background:#64748b;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizOv3Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. RDSは起動している間ずっと課金される時間課金です。<br>一方Neonは一定時間アクセスがないと自動でサスペンド（休止）します。<br>その間の課金はほぼ発生しません。<br>放置してもRDSほど「消し忘れ」の被害が大きくないのが特徴です。<br><b>💼 現場では:</b> とはいえ無制限ではありません。<br>無料枠にはプロジェクト数やCU時間の上限があります。<br>本番利用は有料プランへの移行を前提に設計します。</div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ ovCheckedCount }} / {{ ovCheckTotal }}）</div>
+      <sc-for list="{{ ovChecklist }}" as="item" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #64748b;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CH1 ネットワーク ============ -->
+  <section id="ch1" data-screen-label="01 ネットワーク" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#4f46e5">01</span>
+      <h2 style="font-size:26px;margin:0">🕸️ ネットワーク — VPCを意識しなくていい理由</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">ECS版で最も時間を使ったのがVPC設計でした。<br>Vercel + Neon版ではこの章の作業がまるごと不要になりますが、「では実際は何が代わりに機能しているのか」まで理解しておきます。</p>
+
+    <!-- 用語カード -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#4f46e5"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9Z"/></svg></span>
+          <span class="svc-label">Edge Network</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: 世界中に置かれた中継地点が、地図上でユーザーの一番近くから応答する仕組み</div>
+        <div style="color:#4b5563;font-size:13.5px">Vercelが世界中に持つ配信拠点網。<br>ユーザーの物理的に近い拠点でリクエストを受ける。<br>Serverless Functionを実行する場所まで、そこからルーティングする。<br>IGWやリージョンをまたぐ設計をユーザーが行う必要がない。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#4f46e5"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13l-2 2a3 3 0 004 4l3-3"/><path d="M16 11l2-2a3 3 0 00-4-4l-3 3"/><path d="M9 15l6-6"/></svg></span>
+          <span class="svc-label">接続の実体</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: 建物内の配線ではなく、鍵付きの1本の電話線で直接つながるイメージ</div>
+        <div style="color:#4b5563;font-size:13.5px">NeonへのアクセスはServerless Function内から行う。<br>インターネット経由のTLS接続で行われる。<br>VPC内に閉じた通信ではない。<br>接続文字列に含まれる認証情報が、セキュリティ境界の役割を果たす。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#4f46e5"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z"/><path d="M4 4l16 16"/></svg></span>
+          <span class="svc-label">IPベース制御の限界</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: 毎回顔が変わる訪問者を、入館証（接続文字列）だけで確認する受付</div>
+        <div style="color:#4b5563;font-size:13.5px">Serverless Functionは実行ごとに送信元IPが変わりうる。<br>そのためRDSのようにSGで「特定のIPからだけ許可」という制御は基本的にできない。<br>接続文字列そのものが唯一の壁になる。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#4f46e5"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-11a7 7 0 0114 0c0 4.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+          <span class="svc-label">リージョン選択</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: 配送拠点と倉庫をなるべく近くに置いて、配送時間を縮める工夫</div>
+        <div style="color:#4b5563;font-size:13.5px">VPCのAZ設計の代わりに、今回ユーザーが意識すべき判断は1つだけ。<br>Vercel Functionのリージョンと、Neonプロジェクトのリージョンをできるだけ近づけること。<br>これが唯一残るネットワーク設計判断になる。</div>
+      </div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:20px;background:#eef2ff;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#4f46e5;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#4f46e5;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#3730a3;margin-bottom:4px">SGが無い＝無防備、ではない</div>
+        <div style="color:#4b5563">ネットワークレベルのアクセス制御はありません。<br>その分、Neonでは接続文字列（パスワード相当）そのものが唯一かつ最重要の防御線になります。<br>漏洩させたら即座に再発行してください。<br>ECS版のSG変更より重く意識する必要があります。</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;background:#eef2ff;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#4f46e5;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#4f46e5;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#3730a3;margin-bottom:4px">リージョンを離すとレイテンシが乗る</div>
+        <div style="color:#4b5563">Vercel FunctionとNeonプロジェクトのリージョンが、地理的に離れているとします。<br>DBアクセスのたびに、往復の通信時間が余分にかかります。<br>ECS版ではVPC内・同一AZ内通信でほぼゼロだったコストです。<br>ここでは無視できない要素になります。</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. ECS版ではRDSのSGで「ECSのSGからだけ5432を許可」としていました。Neonでは同じような制御は可能ですか？</p>
+      <sc-if value="{{ !quizNet1Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizNet1 }}" style="min-height:34px;background:#4f46e5;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizNet1Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#eef2ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. Serverless Functionの送信元IPは固定されません。<br>そのためIPベースのアクセス制御は現実的ではありません。<br>Neonでは接続文字列に含まれる認証情報が、アクセス制御の実質的な役割を担います。<br>IP制限をしたい場合、NeonのIP Allowlist機能（プランによる）を使う選択肢もあります。<br>ただし基本方針は「接続文字列を秘密として厳重に扱う」ことです。<br><b>💼 現場では:</b> 接続文字列が漏れたら即ローテーション（再発行）する手順を、SGルール変更と同じくらい当たり前の対応として持っておきます。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. VercelのFunctionリージョンとNeonのプロジェクトリージョンを違う大陸に離して作ると何が起きますか？</p>
+      <sc-if value="{{ !quizNet2Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizNet2 }}" style="min-height:34px;background:#4f46e5;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizNet2Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#eef2ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. DBへの問い合わせのたびに、大陸間の往復通信が発生します。<br>レスポンスが目に見えて遅くなります。<br>ECS版ではVPC内の同一リージョン・同一AZ通信でした。<br>意識しなかったコストが、ここでは顕在化します。<br>対策は両方を同じ（または地理的に近い）リージョンに揃えることです。<br><b>💼 現場では:</b> マネージドサービス同士を組み合わせる構成では、「リージョンを揃える」がVPC設計に代わります。<br>実質的に唯一残るネットワーク上の設計判断になります。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. VPCが無いということは、今回のアプリは「インターネットに直接晒されている」ということですか？</p>
+      <sc-if value="{{ !quizNet3Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizNet3 }}" style="min-height:34px;background:#4f46e5;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizNet3Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#eef2ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. ある意味そうですが、Vercel Edge NetworkとNeonそれぞれが自前の境界防御を持っています。<br>TLS終端やDDoS対策などです。<br>ECS版でALB＋SG＋VPCが担っていた「外部からの防御」の役割を、プラットフォーム側が肩代わりしています。<br>素のサーバーを自分でインターネットに直接置いているわけではありません。<br><b>💼 現場では:</b>「自分で作っていないから安全性が低い」わけではありません。<br>「大規模事業者が多数のユーザー向けに堅牢化したものを共同利用している」と捉えるのが正確です。</div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ netCheckedCount }} / {{ netCheckTotal }}）</div>
+      <sc-for list="{{ netChecklist }}" as="item" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #4f46e5;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CH2 デプロイと配信 ============ -->
+  <section id="ch2" data-screen-label="02 デプロイと配信" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#db2777">02</span>
+      <h2 style="font-size:26px;margin:0">🚦 デプロイと配信 — ALB / ECSの代わりに何が動いているか</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">ECS版ではALBが振り分け、ターゲットグループがタスクの生死を見張り、ECSがタスク数を管理していました。<br>Vercel版ではこれらがEdge NetworkとServerless Functionsという形にまとまっています。</p>
+
+    <!-- 用語カード -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#db2777"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"/><path d="M15 4h5v5"/><path d="M20 15v5h-5"/><path d="M9 20H4v-5"/></svg></span>
+          <span class="svc-label">自動スケーリング</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: 来客数に応じて窓口が自動で増減する受付カウンター</div>
+        <div style="color:#4b5563;font-size:13.5px">Serverless Functionはリクエスト数に応じて、実行環境の数が自動的に増減する。<br>ECSのようにタスク数や希望数を自分で設定する必要がない。<br>スケールの判断自体がVercelの内部に隠れている。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#db2777"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+          <span class="svc-label">コールドスタート</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: しばらく使っていない機械が、動き出すまでに一呼吸かかる感覚</div>
+        <div style="color:#4b5563;font-size:13.5px">しばらく呼ばれていないFunctionは、次のリクエストで新規に起動する。<br>そのため最初の1回だけわずかな遅延が生じることがある。<br>ALB＋ECSの「常時起動」との体感差として、最初に気づきやすい点。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#db2777"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z"/><path d="M9 12l2 2 4-4"/></svg></span>
+          <span class="svc-label">健全性の判断</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: 出荷前の検品だけを厳しく行い、通ったものだけを店頭に並べる仕組み</div>
+        <div style="color:#4b5563;font-size:13.5px">Vercelはデプロイ時に、ビルドが成功するかどうかで健全性を判断する。<br>失敗時は直前の正常なデプロイを配信し続ける。<br>ターゲットグループのように、稼働中のタスクを継続的にポーリングする仕組みとは性質が異なる。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#db2777"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M12 7h7l-2.5 2.5L19 12h-7"/><path d="M12 7H5l2.5 2.5L5 12h7"/></svg></span>
+          <span class="svc-label">ルーティングの一本化</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: 案内板を立てずに、建物そのものが行き先を自動で振り分ける仕組み</div>
+        <div style="color:#4b5563;font-size:13.5px">今回のアプリはNext.jsのRoute Handlers（App Router）を使っている。<br>画面もAPIも同じデプロイの中で、Vercelが自動的に振り分ける。<br>ターゲットグループのような振り分けルールを自分で組む必要がない。</div>
+      </div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:20px;background:#fdf2f8;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#db2777;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#db2777;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#9d174d;margin-bottom:4px">無料枠だとコールドスタートは避けにくい</div>
+        <div style="color:#4b5563">アクセス頻度が低いアプリほど、Functionが「眠っている」状態から起きる頻度が上がります。<br>常時起動のECSタスクとは違います。<br>最初の1リクエストだけ数百ms程度遅くなることがあります。<br>この体感差はあらかじめ知っておくと戸惑いません。</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. ECS版ではターゲットグループが「登録されたタスクがhealthyか」を継続的に確認していました。Vercelには同じ仕組みがありますか？</p>
+      <sc-if value="{{ !quizEdge1Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizEdge1 }}" style="min-height:34px;background:#db2777;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizEdge1Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fdf2f8;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 常時ポーリングするヘルスチェックという形ではありません。<br>デプロイ時にビルド・起動が成功したものだけを本番に切り替える方式です。<br>すでに配信中の正常なデプロイを、壊れたコードに置き換えることはありません。<br>ただし「デプロイ後に実行時エラーが起きる」ケースまでは防げません。<br>その場合はVercelのログで気づく必要があります。<br><b>💼 現場では:</b>「デプロイ前に落とす」設計と「デプロイ後に落ちたものを再起動する」設計の違いを理解しておきます。<br>そうすると障害発生時にどこを疑うべきか分かります。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. リクエストが全く来ない時間帯、Vercelの課金はどうなりますか？ECSのFargateタスクと比較してください。</p>
+      <sc-if value="{{ !quizEdge2Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizEdge2 }}" style="min-height:34px;background:#db2777;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizEdge2Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fdf2f8;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. Fargateは「動いているタスク」自体にCPU/メモリの時間課金が発生し続けます。<br>リクエストがゼロでも、起動している限り課金されます。<br>Serverless Functionはリクエストが来た時だけ実行されます。<br>リクエストがゼロならその時間の実行課金はほぼゼロになります。<br><b>💼 現場では:</b> アクセスが不定期・少ないアプリほどサーバーレスのコストメリットが大きくなります。<br>常時大量トラフィックがあるアプリでは、専有インスタンスの方が単価で有利になる場合もあります。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. 今回のアプリのAPI（/api/entries）と画面（entry-page.tsx）は、Vercel上でそれぞれ別のインフラとして動きますか？</p>
+      <sc-if value="{{ !quizEdge3Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizEdge3 }}" style="min-height:34px;background:#db2777;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizEdge3Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fdf2f8;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. いいえ。<br>どちらも同じNext.jsアプリのデプロイの一部です。<br>Vercelが自動的にルーティングを判断します。<br>ALB＋ターゲットグループのように「/apiはこっちのターゲットグループへ」と自分でルールを組む必要はありません。<br><b>💼 現場では:</b> ルーティング設定そのものがコードの中（ファイル配置）で完結します。<br>そのためインフラ設定のミスでAPIだけ繋がらない、という種類の障害が構造的に起きにくくなります。</div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ edgeCheckedCount }} / {{ edgeCheckTotal }}）</div>
+      <sc-for list="{{ edgeChecklist }}" as="item" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #db2777;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CH3 データと秘密情報 ============ -->
+  <section id="ch3" data-screen-label="03 データと秘密情報" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#2563eb">03</span>
+      <h2 style="font-size:26px;margin:0">🗄️ データと秘密情報 — Neonと環境変数、そして新しい悩みどころ</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">RDSとパラメータストアに相当するのがNeonとVercelの環境変数です。<br>ただしこの章には、ECS版には無かった新しい論点「コネクションプーリング」が登場します。</p>
+
+    <!-- 用語カード -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#2563eb"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.66 3.13 3 7 3s7-1.34 7-3V6"/><path d="M5 12v6c0 1.66 3.13 3 7 3s7-1.34 7-3v-6"/></svg></span>
+          <span class="svc-label">Neonのプロジェクト</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: 契約した瞬間に使える、蛇口をひねるだけの水道</div>
+        <div style="color:#4b5563;font-size:13.5px">作成すると即座に接続文字列が発行される。<br>RDSのようにインスタンスタイプ・ストレージ容量・マルチAZ有無を事前に選ぶ必要が薄い。<br>使った分だけ自動でスケールする。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#2563eb"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="16.5" r="3.5"/><path d="M10 14l8-8"/><path d="M15 9l2.5 2.5"/><path d="M18 6l2.5 2.5"/></svg></span>
+          <span class="svc-label">Vercelの環境変数</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: 金庫にしまった鍵を、必要な時だけそっと取り出す仕組み</div>
+        <div style="color:#4b5563;font-size:13.5px">パラメータストアに相当する仕組み。<br>プロジェクト設定画面でキーと値を登録するだけでよい。<br>ビルド・実行時にprocess.envとして読める。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#2563eb"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16l-6.5 8v7l-3 1.5v-8.5Z"/></svg></span>
+          <span class="svc-label">コネクションプーリング（新論点）</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: 大勢の来客を、窓口の前で一列に並ばせる漏斗</div>
+        <div style="color:#4b5563;font-size:13.5px">Serverless Functionは瞬間的に大量の実行インスタンスが立ち上がりうる。<br>それぞれが素のPostgres接続を張ると、Neonの同時接続数上限にすぐ達する。<br>Neonが提供するpooled接続（PgBouncer）がこれを吸収する。</div>
+      </div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:20px;background:#eff6ff;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#2563eb;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#2563eb;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#1e3a8a;margin-bottom:4px">Neonの無料プランは非アクティブで自動休止する</div>
+        <div style="color:#4b5563">5分間アクセスがないと自動的にサスペンドします。<br>次のアクセス時に再開まで、数百ms〜数秒のコールドスタートが発生します。<br>RDSの「動いてるだけで課金される」問題とは真逆の性質です。<br>逆に「最初のアクセスだけ妙に遅い」という体験の原因になります。</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. RDSは接続前にインスタンスタイプ（vCPU/メモリ）を選ぶ必要がありました。Neonでも同じような事前設計が必要ですか？</p>
+      <sc-if value="{{ !quizData1Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizData1 }}" style="min-height:34px;background:#2563eb;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizData1Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#eff6ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 無料プランでは基本的に不要です。<br>NeonはCU（Compute Unit）という単位で自動的にスケールする仕組みを持っています。<br>プロジェクト作成時に固定サイズのインスタンスを割り当てません（無料プランではオートスケール範囲が制限されます）。<br>RDSのように「見積もりを外して後から容量不足になる」という失敗パターン自体が起きにくい設計です。<br><b>💼 現場では:</b> 有料プランに移行する際は、CUの下限/上限設定というRDSのインスタンスタイプ選定に近い判断が復活します。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. なぜServerless Functionから直接Postgresに繋ぐと、接続数の上限に達しやすいのですか？</p>
+      <sc-if value="{{ !quizData2Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizData2 }}" style="min-height:34px;background:#2563eb;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizData2Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#eff6ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. ECS上の常時起動タスクなら、アプリのインスタンス数は少数に保たれます。<br>それぞれが数本のコネクションプールを持つ程度で済みます。<br>Serverless Functionはリクエストの多さに応じて、一時的に大量の実行インスタンスが並行して立ち上がりえます。<br>それぞれが素の接続を1本ずつ張ると、あっという間にPostgresの同時接続数上限に達してしまいます。<br><b>💼 現場では:</b> これはVercel/Neonに限らず「サーバーレス関数からリレーショナルDBに繋ぐ」構成全般に共通する既知の課題です。<br>pooled接続やRDS Proxyのような「コネクションプーラーを間に挟む」解決策が定石になっています。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. 今回、DATABASE_URLには最初からpooled（PgBouncer経由）の接続文字列を入れました。それなのになぜ、Prismaのマイグレーション適用だけは別のURLが必要になったのですか？</p>
+      <sc-if value="{{ !quizData3Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizData3 }}" style="min-height:34px;background:#2563eb;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizData3Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#eff6ff;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. これは05章（トラブルシューティング）で詳しく扱います。<br>要点だけ言うと、Prisma Migrateはマイグレーション適用中にセッションレベルのアドバイザリロックを取得する仕組みに依存しています。<br>これはコネクション単位で状態を使い回す、トランザクションモードのプーリング（PgBouncer）の上ではうまく機能しません。<br>そのため、マイグレーション適用のこの1コマンドだけは、プーリングを経由しない直接接続を一時的に使います。<br><b>💼 現場では:</b>「アプリの実行時はpooled、スキーマ変更の時だけdirect」という使い分けは、Neon＋Prismaの組み合わせでは定石として広く知られています。</div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ dataCheckedCount }} / {{ dataCheckTotal }}）</div>
+      <sc-for list="{{ dataChecklist }}" as="item" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #2563eb;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CH4 ビルドとデプロイの仕組み ============ -->
+  <section id="ch4" data-screen-label="04 ビルドとデプロイの仕組み" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#c2660a">04</span>
+      <h2 style="font-size:26px;margin:0">📦 ビルドとデプロイの仕組み — なぜDockerfileもECRもいらないのか</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 24px 0">ECS版はDockerfileでイメージを作り、ECRにpushし、タスク定義を更新してからサービスを更新する、という手順が必要でした。<br>Vercel版ではgit pushだけでこの手順がまるごと自動化されます。</p>
+
+    <!-- 用語カード -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#c2660a"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 01-9 9"/></svg></span>
+          <span class="svc-label">Git連携ビルド</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: 荷物を置くだけで、後は倉庫が勝手に仕分けて出荷する自動配送センター</div>
+        <div style="color:#4b5563;font-size:13.5px">GitHubリポジトリを接続すると、pushされるたびにVercelが自動でnext buildを実行する。<br>成功したものを新しいデプロイとして公開する。<br>ECR pushやタスク定義更新のような手動ステップが要らない。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#c2660a"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1Z"/></svg></span>
+          <span class="svc-label">ビルド環境の抽象化</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: 材料を渡すだけで、レシピを読んで自動で調理してくれるキッチン</div>
+        <div style="color:#4b5563;font-size:13.5px">package.json/bun.lockからパッケージマネージャー（今回はBun）を自動検出する。<br>Vercelの標準環境内で依存関係のインストールからビルドまでを行う。<br>Dockerfileでビルド/実行ステージを自分で書く作業がここに相当する。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#c2660a"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span>
+          <span class="svc-label">postinstallフック</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: 荷物受け取り直後に、自動で開封・検品まで済ませる受付</div>
+        <div style="color:#4b5563;font-size:13.5px">prisma generateのような「ビルド前に必ず実行したい処理」がある。<br>DockerfileのRUN命令の代わりに、package.jsonのpostinstallスクリプトとして仕込む。<br>Vercelはinstall直後にこれを自動実行する。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div class="svc-card-head">
+          <span class="svc-icon" style="background:#c2660a"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="10" height="10" rx="2"/><rect x="11" y="11" width="10" height="10" rx="2"/></svg></span>
+          <span class="svc-label">プレビューデプロイ</span>
+        </div>
+        <div class="svc-visual">見た目のイメージ: 枝分かれごとに、試着室が1部屋ずつ増えていくイメージ</div>
+        <div style="color:#4b5563;font-size:13.5px">pushするブランチごとに、独立したURLで確認できる環境が自動生成される。<br>ECS版でステージング環境を作るには、クラスター・サービス・タスク定義をもう1セット用意する必要があった。<br>ここでは追加のインフラ定義なしに、ブランチ単位で得られる。</div>
+      </div>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:20px;background:#fff7ed;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#c2660a;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#c2660a;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#7c2d12;margin-bottom:4px">プレビュー環境が本番DBに繋がったままになりやすい</div>
+        <div style="color:#4b5563">ブランチごとのプレビューは無料で手に入ります。<br>ただし環境変数（DATABASE_URL）を本番と同じNeonプロジェクトに向けたままにすると、プレビューでの操作が本番データを触ってしまいます。<br>ECS版には無かった新しい落とし穴なので、06章の「気付き」でも改めて触れます。</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. ECS版ではコード変更を本番に反映するのに「イメージをbuild→ECRにpush→タスク定義を新リビジョンに更新→サービス更新」という手順が必要でした。Vercel版で同じことをするには何をすればいいですか？</p>
+      <sc-if value="{{ !quizBuild1Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizBuild1 }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizBuild1Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. mainブランチにpushするだけです。<br>Vercelがpushを検知して自動的にビルドとデプロイを行います。<br>ECR相当のイメージレジストリや、タスク定義の更新という概念自体が存在しません。<br><b>💼 現場では:</b>「デプロイ＝git push」まで簡略化されると、リリース頻度を上げるハードルが大きく下がります。<br>一方でmainブランチの保護（レビュー必須化など）がより重要になります。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. DockerfileのRUN bunx prisma generateに相当する処理を、Vercelではどこに書きましたか？</p>
+      <sc-if value="{{ !quizBuild2Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizBuild2 }}" style="min-height:34px;background:#c2660a;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizBuild2Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff7ed;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. next-learning/package.jsonのpostinstallスクリプトとしてprisma generateを追加しました。<br>VercelはBunでのinstall完了直後にこのスクリプトを自動実行します。<br>Dockerfileで明示的なビルドステップを書く代わりになります。<br><b>💼 現場では:</b> この設定を忘れるとVercel上のビルドだけが失敗します。<br>ローカルでは（過去にgenerate済みのクライアントが残っているため）問題なく動いてしまうことがあり、気づきにくい典型例です。</div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ buildCheckedCount }} / {{ buildCheckTotal }}）</div>
+      <sc-for list="{{ buildChecklist }}" as="item" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #c2660a;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CH5 トラブルシューティング ============ -->
+  <section id="ch5" data-screen-label="05 トラブルシューティング" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#dc2626">05</span>
+      <h2 style="font-size:26px;margin:0">🚑 トラブルシューティング — Prisma MigrateとPooled/Direct接続の罠</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 20px 0">ここが今回の構成で唯一、ECS版より難易度が上がる可能性のあるポイントです。<br>「bunx prisma migrate deployが失敗する、またはハングする」という症状を、原因から対処まで順を追って理解します。</p>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;display:flex;gap:14px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#dc2626;flex-shrink:0">1</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">症状を確認する</div>
+          <div style="color:#6b7280;font-size:13px">bunx prisma migrate deployを実行すると、エラーメッセージが出ます。<br>あるいはコマンドがそのままハングして返ってきません。<br>典型的なエラー文字列は「Timed out trying to acquire a postgres advisory lock」。</div>
+        </div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;display:flex;gap:14px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#dc2626;flex-shrink:0">2</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">なぜ起きるか</div>
+          <div style="color:#6b7280;font-size:13px">Prisma Migrateはマイグレーション適用中、他の実行と衝突しないようにPostgresのアドバイザリロックを取得する。<br>同じセッション内でそれを保持し続ける。<br>ところがpooled接続（PgBouncerのトランザクションモード）は、1つのクライアント接続の裏側で実際のPostgresセッションを使い回す方式である。<br>そのため、ロックを取得したはずのセッションが次の瞬間には別のクライアントに割り当てられてしまうことがある。<br>結果としてロックの整合性が壊れ、タイムアウトやハングという形で表面化する。</div>
+        </div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;display:flex;gap:14px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#dc2626;flex-shrink:0">3</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">対処</div>
+          <div style="color:#6b7280;font-size:13px">マイグレーション適用のこの1コマンドだけ、pooling無効の直接接続文字列を環境変数として一時的に上書きする。<br>その状態で実行する。<br>NeonのConnectダイアログで、Connection poolingのトグルをOFFにする。<br>すると-poolerの付かない直接接続文字列が表示されるので、それをコピーしておく。</div>
+        </div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;display:flex;gap:14px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#dc2626;flex-shrink:0">4</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">やってはいけないこと</div>
+          <div style="color:#6b7280;font-size:13px">この直接接続文字列を、Vercelの環境変数としてDATABASE_URLに恒久的に設定してしまうこと。<br>Serverless Functionはリクエストのたびに新しい接続を張りうる。<br>そのため直接接続のままアプリ本体を動かすと、あっという間にNeonの同時接続数上限に達してしまう。<br>直接接続は「ローカルから一時的に叩くマイグレーションコマンドの時だけ」に限定するのが正しい使い分け。</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;background:#0b1016;border-radius:10px;padding:14px 18px;overflow-x:auto">
+      <code style="color:#e6edf3;font-family:ui-monospace,Menlo,monospace;font-size:13px;white-space:pre">DATABASE_URL="&lt;pooling無効の直接接続文字列&gt;" bunx prisma migrate deploy</code>
+    </div>
+
+    <sc-if value="{{ qaOn }}" hint-placeholder-val="{{ true }}">
+    <div style="margin-top:16px;background:#fef2f2;border-radius:12px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:flex-start">
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#dc2626;color:#ffffff;font-size:15px">💡</span>
+      <div>
+        <div style="display:inline-flex;background:#dc2626;color:#ffffff;padding:2px 8px;border-radius:999px;font-weight:700;font-size:10.5px;letter-spacing:0.05em;margin-bottom:6px">TIPS</div>
+        <div style="font-weight:700;color:#991b1b;margin-bottom:4px">体感では、詰まりの大半は接続文字列の選び間違い</div>
+        <div style="color:#4b5563">「コードが悪いのでは」と疑う前に、ホスト名に-poolerが付いているかどうかをまず確認してください。<br>-poolerが付いていればpooled接続、付いていなければdirect接続です。<br>マイグレーション関連のコマンドで詰まったら、まずpooled/directの取り違えを疑うのが最短ルートです。</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- クイズ -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px">クイズ</div>
+
+      <p style="margin:0 0 10px 0;font-size:14px;color:#0f172a">Q1. bunx prisma migrate deployを実行したら「Timed out trying to acquire a postgres advisory lock」というエラーが出ました。何を疑いますか？</p>
+      <sc-if value="{{ !quizTs1Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizTs1 }}" style="min-height:34px;background:#dc2626;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizTs1Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fef2f2;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. DATABASE_URLがpooled（PgBouncer経由、ホスト名に-poolerが付く）接続文字列になっている可能性が高いです。<br>マイグレーション専用に、pooling無効の直接接続文字列を環境変数として一時的に指定し直します。<br>その状態で再実行します。<br><b>💼 現場では:</b>「advisory lock」という単語自体が、Prisma×PgBouncerの組み合わせで最初に検索すべきキーワードとして広く知られています。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q2. マイグレーション用に取得した直接接続文字列を、そのままVercelのDATABASE_URLとして本番設定してしまいました。何が起きますか？</p>
+      <sc-if value="{{ !quizTs2Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizTs2 }}" style="min-height:34px;background:#dc2626;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizTs2Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fef2f2;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. 直接接続にはコネクションプーリングによる接続数の吸収が働きません。<br>そのためServerless Functionが同時に多数起動した瞬間、Neonの同時接続数上限に達します。<br>新しいリクエストがDB接続エラーで失敗し始めます。<br>直接接続は「1回限りのローカルコマンド用」に限定します。<br>Vercel側のDATABASE_URLは常にpooled接続文字列に戻す必要があります。<br><b>💼 現場では:</b>「動くには動くが接続数だけスケールしない」設定は、負荷が低いうちは気づかれません。<br>アクセスが増えて初めて発覚する典型的な地雷です。</div>
+      </sc-if>
+
+      <p style="margin:18px 0 10px 0;font-size:14px;color:#0f172a">Q3. NeonのConnectダイアログで、pooledとdirectの接続文字列を見分ける最も簡単な方法は何ですか？</p>
+      <sc-if value="{{ !quizTs3Revealed }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleQuizTs3 }}" style="min-height:34px;background:#dc2626;color:#ffffff;border:none;padding:7px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">回答例を見る</button>
+      </sc-if>
+      <sc-if value="{{ quizTs3Revealed }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fef2f2;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#334155">A. ホスト名を見ます。<br>pooled接続はホスト名に-poolerというサフィックスが付きます（例: ep-xxxx-pooler.region.aws.neon.tech）。<br>直接接続にはこれが付きません。<br>トグルのON/OFFを切り替えて両方をコピーしておきます。<br>用途ごとに分けて保管しておくと迷いません。<br><b>💼 現場では:</b> 変数名を分けてメモしておく（例: DATABASE_URL / マイグレーション用は都度発行）だけでも、次回以降の事故を防げます。</div>
+      </sc-if>
+    </div>
+
+    <!-- チェックリスト -->
+    <div style="margin-top:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">チェックリスト（{{ tsCheckedCount }} / {{ tsCheckTotal }}）</div>
+      <sc-for list="{{ tsChecklist }}" as="item" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer" onClick="{{ item.toggle }}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #dc2626;background:{{ item.bg }};color:#ffffff;font-size:13px;flex-shrink:0">{{ item.mark }}</span>
+          <span style="font-size:13.5px;color:#334155">{{ item.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CH6 気付き → 次の一歩 ============ -->
+  <section id="ch6" data-screen-label="06 気付き" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#059669">06</span>
+      <h2 style="font-size:26px;margin:0">🌱 作ってみて気付くこと → 次の一歩</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 20px 0">ECS版と作り比べたからこそ見える「気付き」は、そのまま次に学ぶべきテーマに繋がっています。</p>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">「本当に何もかも自動でいいのか？」 → 設定のコード化</div>
+        <div style="color:#6b7280;font-size:13px">Vercel/Neonはダッシュボード操作で完結します。<br>ただし実務では、この設定もコード化・レビュー対象にしたい場面が出てきます。<br>学習が進んだら「画面ポチポチ」からの卒業は、ECS版のIaCと同じテーマとしてここでも登場します。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">「プレビュー環境が本番DBを触ってしまわないか」 → 環境ごとのDB分離</div>
+        <div style="color:#6b7280;font-size:13px">今回は学習用に1つのNeonプロジェクトを使い回しました。<br>実務ではブランチごと/環境ごとにNeonプロジェクト（またはNeonのブランチ機能）を分けます。<br>プレビューが本番データに触れない構成にするのが定石です。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">「監視やアラートはどうする？」 → Observability</div>
+        <div style="color:#6b7280;font-size:13px">Vercelのダッシュボードで基本的なログ・アクセス状況は見えます。<br>エラー通知やパフォーマンス監視を厚くしたい場合は、外部サービスとの連携が一般的です。<br>ECS版のCloudWatchアラームに相当する仕組みを、別途組み込む必要があります。</div>
+      </div>
+      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">「結局どちらを選ぶべきなのか」 → ECS FargateとVercel + Neonの使い分け</div>
+        <div style="color:#6b7280;font-size:13px">学習・個人開発・スピード優先ならVercel + Neon。<br>既存のAWS基盤との統合やインフラの細かなコントロールが必要ならECS Fargate。<br>という判断軸があります。<br>両方を実際に手を動かして経験したことが、その判断材料になります。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Appendix ============ -->
+  <section id="appendix" data-screen-label="Appendix 用語対応表" style="margin-top:72px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;color:#64748b">Appendix</span>
+      <h2 style="font-size:26px;margin:0">用語対応表 — ECS Fargate ⇔ Vercel + Neon</h2>
+    </div>
+    <p style="color:#4b5563;max-width:760px;margin:10px 0 20px 0">ECS版で覚えた用語が、Vercel + Neon版では何に相当するかを一覧で振り返ります。<br>完全に1対1で対応するわけではない点（特にVPC）は本文の各章を参照してください。</p>
+
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;font-size:13.5px">
+        <thead>
+          <tr style="background:#f8fafc;text-align:left">
+            <th style="padding:10px 14px;border-bottom:1px solid #e5e7eb;color:#475569">ECS Fargate版</th>
+            <th style="padding:10px 14px;border-bottom:1px solid #e5e7eb;color:#475569">Vercel + Neon版での相当</th>
+            <th style="padding:10px 14px;border-bottom:1px solid #e5e7eb;color:#475569">備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#0f172a;font-weight:600">VPC</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#4b5563">該当なし（プラットフォーム内部に隠蔽）</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#6b7280">ユーザーが設定する対象ではない</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#0f172a;font-weight:600">ALB + ターゲットグループ</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#4b5563">Vercel Edge Network + 自動ルーティング</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#6b7280">ヘルスチェックはデプロイ時判定に近い</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#0f172a;font-weight:600">ECS + Fargate</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#4b5563">Serverless Functions</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#6b7280">常時起動ではなくリクエスト単位で実行</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#0f172a;font-weight:600">ECR</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#4b5563">Vercelのビルドパイプライン（Git連携）</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#6b7280">イメージレジストリという概念自体がない</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#0f172a;font-weight:600">RDS</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#4b5563">Neon</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#6b7280">サーバーレスPostgres。pooled/direct接続の使い分けに注意</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#0f172a;font-weight:600">パラメータストア</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#4b5563">Vercel Environment Variables</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#6b7280">-</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#0f172a;font-weight:600">セキュリティグループ</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#4b5563">接続文字列（認証情報）</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#6b7280">IPベース制御ではなく認証情報が境界になる</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px;color:#0f172a;font-weight:600">CloudWatch Logs</td>
+            <td style="padding:10px 14px;color:#4b5563">Vercel Logs / Observability</td>
+            <td style="padding:10px 14px;color:#6b7280">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:8px">
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">Vercel</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">Serverless Functions</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">Neon</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">Environment Variables</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">Connection Pooling</span>
+      <span style="background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600">Prisma Migrate</span>
+    </div>
+  </section>
+
+</div>
+</div>
+
+<sc-if value="{{ showBackToTop }}" hint-placeholder-val="{{ false }}">
+  <button onClick="{{ scrollToTop }}" aria-label="トップへ戻る" style="position:fixed;right:24px;bottom:24px;width:44px;height:44px;border-radius:50%;background:#0f172a;color:#00e599;border:none;box-shadow:0 4px 12px rgba(0,0,0,0.2);cursor:pointer;font-size:18px;z-index:50">↑</button>
+</sc-if>
+
+<script type="text/x-dc" data-dc-script data-props="{&quot;showQa&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;表示&quot;,&quot;description&quot;:&quot;各章のTIPSコラムを表示&quot;}}">
+class Component extends DCLogic {
+  state = {
+    quizRevealed: {},
+    ovChecked: {},
+    netChecked: {},
+    edgeChecked: {},
+    dataChecked: {},
+    buildChecked: {},
+    tsChecked: {},
+    showBackToTop: false
+  };
+
+  componentDidMount() {
+    window.addEventListener("scroll", this._onScroll, { passive: true });
+  }
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this._onScroll);
+  }
+  _onScroll = () => {
+    const show = window.scrollY > 400;
+    if (show !== this.state.showBackToTop) this.setState({ showBackToTop: show });
+  };
+  scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+  OV_CHECKLIST_DEFS = [
+    { id: "vercelneon", label: "Vercel・Serverless Function・Neonの役割を一言ずつ説明できる" },
+    { id: "reduced", label: "ECS版で必要だった10種類以上のAWSリソースが、なぜ不要になったかを説明できる" },
+    { id: "hidden", label: "「なくなった」のはユーザーの作業であって、仕組み自体ではないことを説明できる" }
+  ];
+  NET_CHECKLIST_DEFS = [
+    { id: "edge", label: "Vercel Edge Networkがユーザーの近くでリクエストを受ける仕組みを説明できる" },
+    { id: "noip", label: "Serverless Functionの送信元IPが固定されないため、IPベースの接続制限が使えないことを説明できる" },
+    { id: "secretguard", label: "VPC/SGの代わりに接続文字列がアクセス制御の実質的な役割を担うことを説明できる" },
+    { id: "region", label: "Vercel FunctionとNeonのリージョンを揃える理由を説明できる" }
+  ];
+  EDGE_CHECKLIST_DEFS = [
+    { id: "autoscale", label: "Serverless Functionがリクエスト量に応じて自動でスケールする仕組みを説明できる" },
+    { id: "coldstart", label: "コールドスタートが何かを説明できる" },
+    { id: "healthcheck", label: "Vercelのデプロイ健全性の仕組みが、ALBの継続的ヘルスチェックと何が違うかを説明できる" },
+    { id: "routing", label: "画面とAPIのルーティングをVercelが自動で振り分けることを説明できる" }
+  ];
+  DATA_CHECKLIST_DEFS = [
+    { id: "neonproject", label: "Neonプロジェクト作成だけでインスタンスサイズ選定なしに使い始められる理由を説明できる" },
+    { id: "envvar", label: "Vercelの環境変数がパラメータストアに相当する役割を持つことを説明できる" },
+    { id: "pooling", label: "Serverless FunctionからDBに直接繋ぐと接続数上限に達しやすい理由と、pooled接続がそれをどう解決するかを説明できる" }
+  ];
+  BUILD_CHECKLIST_DEFS = [
+    { id: "gitdeploy", label: "git pushだけで本番反映される仕組みを説明できる" },
+    { id: "buildenv", label: "Dockerfileの代わりにVercelがどうやってビルド環境を用意しているかを説明できる" },
+    { id: "postinstall", label: "prisma generateをpostinstallスクリプトに仕込んだ理由を説明できる" },
+    { id: "preview", label: "ブランチごとのプレビューデプロイが何に相当する恩恵かを説明できる" }
+  ];
+  TS_CHECKLIST_DEFS = [
+    { id: "symptom", label: "advisory lockのタイムアウト/ハングという症状からpooled接続が原因だと当たりを付けられる" },
+    { id: "fixflow", label: "マイグレーション適用時だけ直接接続を一時的に使う手順を再現できる" },
+    { id: "donot", label: "直接接続文字列を本番のDATABASE_URLとして恒久設定してはいけない理由を説明できる" }
+  ];
+
+  toggleQuiz = (id) => this.setState(s => ({ quizRevealed: { ...s.quizRevealed, [id]: !s.quizRevealed[id] } }));
+  toggleQuizOv1 = () => this.toggleQuiz("ov1");
+  toggleQuizOv2 = () => this.toggleQuiz("ov2");
+  toggleQuizOv3 = () => this.toggleQuiz("ov3");
+  toggleQuizNet1 = () => this.toggleQuiz("net1");
+  toggleQuizNet2 = () => this.toggleQuiz("net2");
+  toggleQuizNet3 = () => this.toggleQuiz("net3");
+  toggleQuizEdge1 = () => this.toggleQuiz("edge1");
+  toggleQuizEdge2 = () => this.toggleQuiz("edge2");
+  toggleQuizEdge3 = () => this.toggleQuiz("edge3");
+  toggleQuizData1 = () => this.toggleQuiz("data1");
+  toggleQuizData2 = () => this.toggleQuiz("data2");
+  toggleQuizData3 = () => this.toggleQuiz("data3");
+  toggleQuizBuild1 = () => this.toggleQuiz("build1");
+  toggleQuizBuild2 = () => this.toggleQuiz("build2");
+  toggleQuizTs1 = () => this.toggleQuiz("ts1");
+  toggleQuizTs2 = () => this.toggleQuiz("ts2");
+  toggleQuizTs3 = () => this.toggleQuiz("ts3");
+
+  toggleOvCheck = (id) => this.setState(s => ({ ovChecked: { ...s.ovChecked, [id]: !s.ovChecked[id] } }));
+  toggleNetCheck = (id) => this.setState(s => ({ netChecked: { ...s.netChecked, [id]: !s.netChecked[id] } }));
+  toggleEdgeCheck = (id) => this.setState(s => ({ edgeChecked: { ...s.edgeChecked, [id]: !s.edgeChecked[id] } }));
+  toggleDataCheck = (id) => this.setState(s => ({ dataChecked: { ...s.dataChecked, [id]: !s.dataChecked[id] } }));
+  toggleBuildCheck = (id) => this.setState(s => ({ buildChecked: { ...s.buildChecked, [id]: !s.buildChecked[id] } }));
+  toggleTsCheck = (id) => this.setState(s => ({ tsChecked: { ...s.tsChecked, [id]: !s.tsChecked[id] } }));
+
+  renderVals() {
+    const s = this.state;
+    const buildItems = (defs, checkedMap, toggleFn, color) => defs.map(def => {
+      const checked = !!checkedMap[def.id];
+      return {
+        label: def.label,
+        mark: checked ? "✓" : "",
+        bg: checked ? color : "transparent",
+        toggle: () => toggleFn(def.id)
+      };
+    });
+    const ovItems = buildItems(this.OV_CHECKLIST_DEFS, s.ovChecked, this.toggleOvCheck, "#64748b");
+    const netItems = buildItems(this.NET_CHECKLIST_DEFS, s.netChecked, this.toggleNetCheck, "#4f46e5");
+    const edgeItems = buildItems(this.EDGE_CHECKLIST_DEFS, s.edgeChecked, this.toggleEdgeCheck, "#db2777");
+    const dataItems = buildItems(this.DATA_CHECKLIST_DEFS, s.dataChecked, this.toggleDataCheck, "#2563eb");
+    const buildListItems = buildItems(this.BUILD_CHECKLIST_DEFS, s.buildChecked, this.toggleBuildCheck, "#c2660a");
+    const tsItems = buildItems(this.TS_CHECKLIST_DEFS, s.tsChecked, this.toggleTsCheck, "#dc2626");
+
+    return {
+      qaOn: this.props.showQa ?? true,
+
+      quizOv1Revealed: !!s.quizRevealed.ov1,
+      toggleQuizOv1: this.toggleQuizOv1,
+      quizOv2Revealed: !!s.quizRevealed.ov2,
+      toggleQuizOv2: this.toggleQuizOv2,
+      quizOv3Revealed: !!s.quizRevealed.ov3,
+      toggleQuizOv3: this.toggleQuizOv3,
+
+      quizNet1Revealed: !!s.quizRevealed.net1,
+      toggleQuizNet1: this.toggleQuizNet1,
+      quizNet2Revealed: !!s.quizRevealed.net2,
+      toggleQuizNet2: this.toggleQuizNet2,
+      quizNet3Revealed: !!s.quizRevealed.net3,
+      toggleQuizNet3: this.toggleQuizNet3,
+
+      quizEdge1Revealed: !!s.quizRevealed.edge1,
+      toggleQuizEdge1: this.toggleQuizEdge1,
+      quizEdge2Revealed: !!s.quizRevealed.edge2,
+      toggleQuizEdge2: this.toggleQuizEdge2,
+      quizEdge3Revealed: !!s.quizRevealed.edge3,
+      toggleQuizEdge3: this.toggleQuizEdge3,
+
+      quizData1Revealed: !!s.quizRevealed.data1,
+      toggleQuizData1: this.toggleQuizData1,
+      quizData2Revealed: !!s.quizRevealed.data2,
+      toggleQuizData2: this.toggleQuizData2,
+      quizData3Revealed: !!s.quizRevealed.data3,
+      toggleQuizData3: this.toggleQuizData3,
+
+      quizBuild1Revealed: !!s.quizRevealed.build1,
+      toggleQuizBuild1: this.toggleQuizBuild1,
+      quizBuild2Revealed: !!s.quizRevealed.build2,
+      toggleQuizBuild2: this.toggleQuizBuild2,
+
+      quizTs1Revealed: !!s.quizRevealed.ts1,
+      toggleQuizTs1: this.toggleQuizTs1,
+      quizTs2Revealed: !!s.quizRevealed.ts2,
+      toggleQuizTs2: this.toggleQuizTs2,
+      quizTs3Revealed: !!s.quizRevealed.ts3,
+      toggleQuizTs3: this.toggleQuizTs3,
+
+      ovChecklist: ovItems,
+      ovCheckedCount: ovItems.filter(it => it.mark).length,
+      ovCheckTotal: ovItems.length,
+
+      netChecklist: netItems,
+      netCheckedCount: netItems.filter(it => it.mark).length,
+      netCheckTotal: netItems.length,
+
+      edgeChecklist: edgeItems,
+      edgeCheckedCount: edgeItems.filter(it => it.mark).length,
+      edgeCheckTotal: edgeItems.length,
+
+      dataChecklist: dataItems,
+      dataCheckedCount: dataItems.filter(it => it.mark).length,
+      dataCheckTotal: dataItems.length,
+
+      buildChecklist: buildListItems,
+      buildCheckedCount: buildListItems.filter(it => it.mark).length,
+      buildCheckTotal: buildListItems.length,
+
+      tsChecklist: tsItems,
+      tsCheckedCount: tsItems.filter(it => it.mark).length,
+      tsCheckTotal: tsItems.length,
+
+      showBackToTop: s.showBackToTop,
+      scrollToTop: this.scrollToTop
+    };
+  }
+}
+</script>
+</body>
+</html>
